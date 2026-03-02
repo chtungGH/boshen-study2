@@ -2,36 +2,43 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>柏伸聽寫 - 語音指令版</title>
+    <title>柏伸聽寫 - 語音進化版 v1.1.0</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { font-family: "Microsoft JhengHei", sans-serif; text-align: center; padding: 20px; background-color: #f0f3f7; }
-        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); display: inline-block; width: 95%; max-width: 400px; }
-        .mic-status { margin: 10px; padding: 5px 15px; border-radius: 20px; display: inline-block; font-size: 14px; transition: 0.3s; }
+        body { font-family: "Microsoft JhengHei", sans-serif; text-align: center; padding: 20px; background-color: #f0f3f7; color: #2c3e50; }
+        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); display: inline-block; width: 95%; max-width: 400px; min-height: 300px; }
+        
+        /* 麥克風指示燈 */
+        .mic-status { margin: 10px; padding: 8px 20px; border-radius: 25px; display: inline-block; font-size: 14px; transition: 0.3s; font-weight: bold; }
         .mic-on { background: #e74c3c; color: white; animation: pulse 1.5s infinite; }
         .mic-off { background: #95a5a6; color: white; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
-        .command-hint { font-size: 13px; color: #7f8c8d; margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px; }
-        .bopomofo { font-size: 68px; font-weight: bold; margin: 20px 0; color: #2c3e50; }
-        .answer { font-size: 42px; color: #27ae60; margin: 10px 0; display: none; font-weight: bold; }
-        button { font-size: 18px; padding: 12px; margin: 5px; cursor: pointer; border-radius: 10px; border: none; background: #3498db; color: white; width: 45%; }
-        .next-btn { background: #e67e22; width: 95%; margin-top: 15px; font-weight: bold; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        .bopomofo { font-size: 72px; font-weight: bold; margin: 25px 0; color: #34495e; }
+        .answer { font-size: 48px; color: #27ae60; margin: 10px 0; display: none; font-weight: bold; }
+        
+        button { font-size: 18px; padding: 12px; margin: 5px; cursor: pointer; border-radius: 12px; border: none; background: #3498db; color: white; width: 46%; }
+        .next-btn { background: #e67e22; width: 95%; margin-top: 15px; font-weight: bold; font-size: 20px; }
+        
+        .command-hint { font-size: 13px; color: #7f8c8d; margin-top: 20px; border-top: 1px dotted #ccc; padding-top: 15px; line-height: 1.6; }
+        #loader { color: #e67e22; font-weight: bold; margin-top: 50px; }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <div id="loader">🚀 語音模組載入中...</div>
+        <div id="loader">🎙️ 語音系統初始化中...</div>
         
         <div id="setupArea" style="display:none;">
-            <h2>🎙️ 語音控制模式</h2>
-            <select id="lessonSelect" style="font-size:18px; padding:10px; width:80%; margin-bottom:20px;"></select><br>
-            <button onclick="startQuiz()" style="width:80%">開始練習</button>
+            <h2 style="margin-bottom:10px;">🎙️ 語音模式</h2>
+            <p style="font-size:14px; color:gray;">請選擇課次後點擊開始</p>
+            <select id="lessonSelect" style="font-size:18px; padding:10px; width:90%; margin-bottom:20px;"></select><br>
+            <button onclick="startQuiz()" style="width:90%">開始練習 (喚醒麥克風)</button>
         </div>
 
         <div id="quizArea" style="display:none;">
-            <div id="micIndicator" class="mic-status mic-off">🎤 準備聽指令...</div>
-            <div id="status" style="font-size:14px; color:gray;">進度：-</div>
+            <div class="mic-status mic-off" id="micIndicator">🎤 麥克風未啟動</div>
+            <div id="status" style="font-size:14px; color:gray; margin-bottom:10px;">進度：-- / --</div>
             
             <div class="bopomofo" id="bpmfDisplay">---</div>
             <div class="answer" id="wordDisplay">---</div>
@@ -39,14 +46,16 @@
             <button onclick="speak()">🔊 聽讀音</button>
             <button onclick="showAnswer()">👁️ 看答案</button>
             
-            <div style="margin:15px; font-size:18px;">
-                <input type="checkbox" id="masterCheck" style="transform:scale(1.5)"> <label>這題已熟練</label>
+            <div style="margin:20px; font-size:18px; display: flex; justify-content: center; align-items: center; gap: 10px;">
+                <input type="checkbox" id="masterCheck" style="transform:scale(1.8)"> 
+                <label for="masterCheck">這題已熟練</label>
             </div>
 
-            <button class="next-btn" onclick="handleNext()">下一題</button>
+            <button class="next-btn" onclick="handleNext()">下一題 (或說指令)</button>
 
             <div class="command-hint">
-                💡 語音指令：<b>「下一題」</b>、<b>「看答案」</b>、<b>「這題會了」</b>
+                <b>口語指令清單：</b><br>
+                「下一題」 | 「看答案」 | 「這題會了」
             </div>
         </div>
     </div>
@@ -57,102 +66,15 @@
 
         let allData = [], currentPool = [], index = -1;
         
-        // 語音辨識設定
+        // 語音辨識初始化
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         const recognition = SpeechRecognition ? new SpeechRecognition() : null;
         if (recognition) {
             recognition.lang = 'zh-TW';
-            recognition.continuous = true; // 持續監聽
-            recognition.interimResults = false; // 只看最終結果
+            recognition.continuous = true; 
+            recognition.interimResults = false;
         }
 
         async function init() {
             try {
-                const res = await fetch(CSV_URL + "&cb=" + Date.now());
-                const txt = await res.text();
-                const rows = txt.split(/\r?\n/).filter(r => r.trim() !== "");
-                allData = rows.slice(1).map((r, i) => {
-                    const c = r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-                    return { row: i + 2, lesson: (c[0]||"").trim(), word: (c[1]||"").trim(), bpmf: (c[2]||"").trim(), mastered: (c[3]||"").trim()==='是' };
-                }).filter(d => d.word);
-
-                const lessons = [...new Set(allData.map(d => d.lesson))].filter(l => l);
-                const select = document.getElementById('lessonSelect');
-                lessons.forEach(l => {
-                    let opt = document.createElement('option');
-                    opt.value = l; opt.textContent = l;
-                    select.appendChild(opt);
-                });
-                document.getElementById('loader').style.display = 'none';
-                document.getElementById('setupArea').style.display = 'block';
-            } catch (e) { document.getElementById('loader').innerText = "載入失敗"; }
-        }
-
-        function startQuiz() {
-            const lesson = document.getElementById('lessonSelect').value;
-            currentPool = allData.filter(d => d.lesson === lesson && !d.mastered);
-            currentPool.sort(() => Math.random() - 0.5);
-            if (currentPool.length === 0) return alert("都練熟囉！");
-            
-            document.getElementById('setupArea').style.display = 'none';
-            document.getElementById('quizArea').style.display = 'block';
-            
-            // 啟動語音辨識
-            if (recognition) {
-                recognition.start();
-                const mic = document.getElementById('micIndicator');
-                recognition.onstart = () => { mic.innerText = "🔴 語音監聽中..."; mic.className = "mic-status mic-on"; };
-                recognition.onend = () => { recognition.start(); }; // 斷掉自動重啟
-                recognition.onresult = (event) => {
-                    const result = event.results[event.results.length - 1][0].transcript;
-                    processVoiceCommand(result);
-                };
-            } else {
-                alert("此瀏覽器不支援語音辨識，請使用 Chrome");
-            }
-            showNext();
-        }
-
-        function processVoiceCommand(cmd) {
-            console.log("聽到的指令：", cmd);
-            if (cmd.includes("下一題")) { handleNext(); }
-            else if (cmd.includes("答案")) { showAnswer(); }
-            else if (cmd.includes("會了") || cmd.includes("熟了")) {
-                document.getElementById('masterCheck').checked = true;
-                // 為了體感，勾選後自動跳下一題
-                setTimeout(handleNext, 500);
-            }
-        }
-
-        function showNext() {
-            index++;
-            if (index < currentPool.length) {
-                document.getElementById('bpmfDisplay').innerText = currentPool[index].bpmf;
-                document.getElementById('wordDisplay').innerText = currentPool[index].word;
-                document.getElementById('wordDisplay').style.display = 'none';
-                document.getElementById('status').innerText = `進度：${index + 1} / ${currentPool.length}`;
-                document.getElementById('masterCheck').checked = false;
-                speak();
-            } else { alert("練習結束！"); location.reload(); }
-        }
-
-        function handleNext() {
-            if (document.getElementById('masterCheck').checked) {
-                fetch(`${GAS_URL}?action=mastered&row=${currentPool[index].row}`, { mode: 'no-cors' });
-            }
-            showNext();
-        }
-
-        function showAnswer() { document.getElementById('wordDisplay').style.display = 'block'; }
-        
-        function speak() {
-            if (index < 0) return;
-            const msg = new SpeechSynthesisUtterance(currentPool[index].bpmf);
-            msg.lang = 'zh-TW'; msg.rate = 0.7;
-            speechSynthesis.cancel(); speechSynthesis.speak(msg);
-        }
-
-        window.onload = init;
-    </script>
-</body>
-</html>
+                // 修正：使用 & 連接參數
