@@ -2,21 +2,21 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>柏伸聽寫小助手 v1.3.0</title>
+    <title>柏伸聽寫小助手 v1.3.1</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body { font-family: "Microsoft JhengHei", sans-serif; text-align: center; padding: 20px; background-color: #f7f9fc; color: #2c3e50; }
-        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); display: inline-block; width: 95%; max-width: 400px; min-height: 250px; vertical-align: top; }
+        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); display: inline-block; width: 95%; max-width: 400px; min-height: 250px; }
         .top-bar { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 14px; color: #7f8c8d; }
         .stop-link { color: #e74c3c; cursor: pointer; text-decoration: underline; }
-        select { font-size: 18px; padding: 10px; border-radius: 8px; width: 95%; margin: 20px 0; border: 1px solid #ddd; }
+        select { font-size: 18px; padding: 12px; border-radius: 8px; width: 95%; margin: 20px 0; border: 1px solid #ddd; }
         .bopomofo { font-size: 72px; font-weight: bold; margin: 30px 0; min-height: 90px; color: #34495e; }
         .answer { font-size: 48px; color: #27ae60; margin: 15px 0; display: none; font-weight: bold; }
         button { font-size: 20px; padding: 15px; margin: 8px 0; cursor: pointer; border-radius: 12px; border: none; background: #3498db; color: white; width: 100%; box-shadow: 0 4px 0 #2980b9; }
         button:active { transform: translateY(2px); box-shadow: 0 2px 0 #2980b9; }
         .next-btn { background: #e67e22; box-shadow: 0 4px 0 #d35400; margin-top: 20px; font-weight: bold; }
         .ans-btn { background: #95a5a6; box-shadow: 0 4px 0 #7f8c8d; font-size: 16px; width: 60%; margin-top: 10px; }
-        .master-area { margin-top: 25px; font-size: 20px; display: flex; justify-content: center; align-items: center; gap: 12px; padding: 10px; background: #fdfefe; }
+        .master-area { margin-top: 25px; font-size: 20px; display: flex; justify-content: center; align-items: center; gap: 12px; padding: 10px; }
         input[type="checkbox"] { transform: scale(1.8); cursor: pointer; }
         #loader { font-weight: bold; color: #e67e22; margin-top: 50px; }
     </style>
@@ -24,14 +24,12 @@
 <body>
 
     <div class="card">
-        <div id="loader">🚀 正在同步雲端題庫...</div>
-        
+        <div id="loader">🚀 正在讀取題庫...</div>
         <div id="setupArea" style="display:none;">
             <h2 style="margin-top:0;">✍️ 選擇課次</h2>
             <select id="lessonSelect"></select><br>
             <button onclick="startQuiz()">開始練習</button>
         </div>
-
         <div id="quizArea" style="display:none;">
             <div class="top-bar">
                 <div id="status">進度：-- / --</div>
@@ -51,26 +49,36 @@
 
     <script>
         const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR8h56wLvxnA4_Xr7oLo_iO8WycSoz5Mw7m9fJrIw2R6JwhGP5bvAmnPG9yOoYg9WSrnliwmA8wbXhR/pub?output=csv";
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbwLd_hDSaEN4FqumCz5_xCFIzkYc4pQsWxd6UnQFw9aFIMo_PuDMfi2CPfKaXI1rWbpoA/exec";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbwLd_hDSaEN4FqumCz5_xCFIzkYc4pQsWxd6UnQFw9aFIMo_PuDMfi2章CFIzkYc4pQsWxd6UnQFw9aFIMo_PuDMfi2CPfKaXI1rWbpoA/exec";
+        // 修正後的 URL 配置 (防問號錯誤)
+        const GAS_FIXED = "https://script.google.com/macros/s/AKfycbwLd_hDSaEN4FqumCz5_xCFIzkYc4pQsWxd6UnQFw9aFIMo_PuDMfi2CPfKaXI1rWbpoA/exec";
 
         let allData = [];
         let currentPool = [];
         let index = -1;
+        let preferredVoice = null;
+
+        // 初始化語音包選取
+        function loadVoices() {
+            const voices = window.speechSynthesis.getVoices();
+            // 優先權：Google 繁中 > Microsoft Hanhan > 任何 zh-TW
+            preferredVoice = voices.find(v => v.name.includes("Google") && v.lang.includes("zh-TW")) ||
+                             voices.find(v => v.name.includes("Hanhan")) ||
+                             voices.find(v => v.lang.includes("zh-TW"));
+        }
+
+        // 監聽語音包載入
+        window.speechSynthesis.onvoiceschanged = loadVoices;
 
         async function init() {
-            const loader = document.getElementById('loader');
             try {
-                // 修正：CSV_URL 已經有問號，所以 Cachebuster 必須用 & 連接
-                const finalUrl = `${CSV_URL}&cachebust=${Date.now()}`;
+                const finalUrl = CSV_URL + "&cachebust=" + Date.now();
                 const response = await fetch(finalUrl);
-                
-                if (!response.ok) throw new Error("無法連接到 Google 試算表");
+                if (!response.ok) throw new Error("Google 試算表連線失敗");
                 
                 const dataText = await response.text();
                 const rows = dataText.split(/\r?\n/).filter(r => r.trim() !== "");
                 
-                if (rows.length <= 1) throw new Error("試算表內好像沒有資料");
-
                 allData = rows.slice(1).map((line, i) => {
                     const cols = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
                     return {
@@ -90,13 +98,11 @@
                     select.appendChild(opt);
                 });
 
-                loader.style.display = 'none';
+                document.getElementById('loader').style.display = 'none';
                 document.getElementById('setupArea').style.display = 'block';
-                
-                // 預熱語音引擎
-                window.speechSynthesis.getVoices();
+                loadVoices();
             } catch (err) {
-                loader.innerHTML = `❌ 連線出錯：${err.message}<br><small>請檢查 Excel 是否已發布</small>`;
+                document.getElementById('loader').innerHTML = "❌ 連線失敗<br><small>" + err.message + "</small>";
             }
         }
 
@@ -104,16 +110,9 @@
             const selectedLesson = document.getElementById('lessonSelect').value;
             currentPool = allData.filter(d => d.lesson === selectedLesson && !d.mastered);
             currentPool.sort(() => Math.random() - 0.5);
-
-            if (currentPool.length === 0) {
-                alert("太棒了！這一課都練熟了！");
-                return;
-            }
-
-            // 點擊瞬間喚醒語音引擎
-            const wakeup = new SpeechSynthesisUtterance("");
-            window.speechSynthesis.speak(wakeup);
-
+            if (currentPool.length === 0) return alert("這一課都練熟了！");
+            
+            window.speechSynthesis.speak(new SpeechSynthesisUtterance(""));
             document.getElementById('setupArea').style.display = 'none';
             document.getElementById('quizArea').style.display = 'block';
             index = -1;
@@ -125,6 +124,7 @@
             window.speechSynthesis.cancel();
             setTimeout(() => {
                 const utterance = new SpeechSynthesisUtterance(currentPool[index].bpmf);
+                if (preferredVoice) utterance.voice = preferredVoice;
                 utterance.lang = 'zh-TW';
                 utterance.rate = 0.75;
                 window.speechSynthesis.speak(utterance);
@@ -141,15 +141,14 @@
                 document.getElementById('masterCheck').checked = false;
                 speak();
             } else {
-                alert("恭喜！本課練習完成！");
+                alert("恭喜！練習完成！");
                 location.reload();
             }
         }
 
         function handleNext() {
             if (document.getElementById('masterCheck').checked) {
-                const targetRow = currentPool[index].row;
-                fetch(`${GAS_URL}?action=mastered&row=${targetRow}`, { mode: 'no-cors' });
+                fetch(GAS_FIXED + "?action=mastered&row=" + currentPool[index].row, { mode: 'no-cors' });
             }
             showNext();
         }
