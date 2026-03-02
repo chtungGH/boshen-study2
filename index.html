@@ -2,11 +2,11 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>柏伸聽寫小助手 - 終極版</title>
+    <title>柏伸聽寫小助手 - 效能優化版</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body { font-family: "Microsoft JhengHei", sans-serif; text-align: center; padding: 20px; background-color: #f7f9fc; }
-        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); display: inline-block; width: 95%; max-width: 450px; }
+        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); display: inline-block; width: 95%; max-width: 450px; position: relative; }
         .select-area { margin-bottom: 20px; }
         select { font-size: 18px; padding: 8px; border-radius: 8px; border: 1px solid #ddd; width: 80%; }
         .bopomofo { font-size: 64px; font-weight: bold; color: #2c3e50; margin: 25px 0; min-height: 80px; }
@@ -15,6 +15,7 @@
         button:active { transform: translateY(2px); box-shadow: 0 2px 0 #2980b9; }
         .next-btn { background: #e67e22; box-shadow: 0 4px 0 #d35400; }
         .master-btn { background: #27ae60; box-shadow: 0 4px 0 #219150; font-size: 16px; margin-top: 20px; width: 60%; }
+        .stop-btn { background: #e74c3c; box-shadow: 0 4px 0 #c0392b; font-size: 14px; width: 40%; margin-top: 30px; }
         #status { color: #7f8c8d; font-size: 14px; }
     </style>
 </head>
@@ -39,10 +40,12 @@
             <div class="answer" id="word">---</div>
             
             <button onclick="speak()">🔊 聽讀音</button>
-            <button class="next-btn" onclick="nextQuestion()">下一個</button>
+            <button class="next-btn" onclick="nextQuestion()">下一題</button>
             <button style="background:#95a5a6; box-shadow: 0 4px 0 #7f8c8d;" onclick="showAnswer()">看答案</button>
             <br>
             <button class="master-btn" id="masterBtn" onclick="markAsMastered()">✅ 我練熟了 (不再考)</button>
+            <br>
+            <button class="stop-btn" onclick="terminateQuiz()">🛑 終止練習</button>
         </div>
     </div>
 
@@ -60,19 +63,17 @@
                 const txt = await res.text();
                 const rows = txt.split(/\r?\n/).filter(r => r.trim() !== "");
                 
-                // 解析資料 (加上 row 資訊以便寫入)
                 allData = rows.map((r, i) => {
                     const c = r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
                     return {
-                        row: i + 1, // Excel 行號
+                        row: i + 1,
                         lesson: c[0]?.replace(/"/g, '').trim(),
                         word: c[1]?.replace(/"/g, '').trim(),
                         bpmf: c[2]?.replace(/"/g, '').trim(),
                         mastered: c[3]?.replace(/"/g, '').trim() === '是'
                     };
-                }).slice(1); // 跳過標題列
+                }).slice(1);
 
-                // 取得不重複的課次選單
                 const lessons = [...new Set(allData.map(d => d.lesson))];
                 const select = document.getElementById('lessonSelect');
                 lessons.forEach(l => {
@@ -84,15 +85,14 @@
                 document.getElementById('loader').style.display = 'none';
                 document.getElementById('setupArea').style.display = 'block';
             } catch (e) {
-                document.getElementById('loader').innerText = "讀取失敗，請確認網路";
+                document.getElementById('loader').innerText = "讀取失敗";
             }
         }
 
         function startQuiz() {
             const selectedLesson = document.getElementById('lessonSelect').value;
-            // 過濾：課次符合 且 尚未熟練
             currentPool = allData.filter(d => d.lesson === selectedLesson && !d.mastered);
-            currentPool.sort(() => Math.random() - 0.5); // 洗牌
+            currentPool.sort(() => Math.random() - 0.5);
 
             if (currentPool.length === 0) {
                 alert("這一課已經全部練熟囉！");
@@ -119,8 +119,11 @@
                 document.getElementById('word').innerText = currentPool[index].word;
                 document.getElementById('word').style.display = 'none';
                 document.getElementById('status').innerText = `第 ${index + 1} / ${currentPool.length} 題`;
-                document.getElementById('masterBtn').disabled = false;
-                document.getElementById('masterBtn').innerText = "✅ 我練熟了 (不再考)";
+                
+                const btn = document.getElementById('masterBtn');
+                btn.disabled = false;
+                btn.innerText = "✅ 我練熟了 (不再考)";
+                btn.style.opacity = "1";
                 speak();
             } else {
                 alert("本課結束！");
@@ -132,20 +135,25 @@
             document.getElementById('word').style.display = 'block';
         }
 
-        async function markAsMastered() {
+        function markAsMastered() {
             if (index < 0) return;
             const item = currentPool[index];
             const btn = document.getElementById('masterBtn');
-            btn.disabled = true;
-            btn.innerText = "更新中...";
 
-            try {
-                // 呼叫 GAS 寫入 Excel
-                await fetch(`${GAS_URL}?action=mastered&row=${item.row}`, { mode: 'no-cors' });
-                btn.innerText = "已標記！下回不出現";
-            } catch (e) {
-                alert("寫入失敗，請檢查網路");
-                btn.disabled = false;
+            // --- 樂觀更新：立刻改變介面，不讓使用者等待 ---
+            btn.innerText = "已記錄！(同步中)";
+            btn.disabled = true;
+            btn.style.opacity = "0.5";
+
+            // 在後台偷偷發送請求，不使用 await
+            fetch(`${GAS_URL}?action=mastered&row=${item.row}`, { mode: 'no-cors' })
+            .then(() => console.log("背景同步成功"))
+            .catch(e => console.error("背景同步失敗", e));
+        }
+
+        function terminateQuiz() {
+            if (confirm("確定要停止練習，回到選單嗎？")) {
+                location.reload();
             }
         }
 
