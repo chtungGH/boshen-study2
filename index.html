@@ -131,17 +131,25 @@
             showNext();
         }
 
-        // 語音朗讀
-        function speak() {
-            if (index < 0) return;
-            const msg = new SpeechSynthesisUtterance(currentPool[index].bpmf);
-            msg.lang = 'zh-TW'; 
-            msg.rate = 0.7;
-            speechSynthesis.cancel();
-            speechSynthesis.speak(msg);
-        }
+// 修改後的語音朗讀函式
+function speak() {
+    if (index < 0 || index >= currentPool.length) return;
+    
+    // 先取消所有排隊中的語音
+    window.speechSynthesis.cancel();
+
+    // 延遲 50 毫秒再發聲，給瀏覽器一點緩衝時間
+    setTimeout(() => {
+        const msg = new SpeechSynthesisUtterance(currentPool[index].bpmf);
+        msg.lang = 'zh-TW'; 
+        msg.rate = 0.8; // 稍微調快一點點比較像人聲
+        msg.pitch = 1;  // 音調
+        window.speechSynthesis.speak(msg);
+    }, 50);
+}
 
         window.onload = init;
     </script>
 </body>
 </html>
+
