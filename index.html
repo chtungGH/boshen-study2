@@ -6,19 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body { font-family: "Microsoft JhengHei", sans-serif; text-align: center; padding: 20px; background-color: #f7f9fc; color: #2c3e50; }
-        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); display: inline-block; width: 95%; max-width: 400px; min-height: 300px; }
+        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); display: inline-block; width: 95%; max-width: 400px; min-height: 250px; vertical-align: top; }
         .top-bar { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 14px; color: #7f8c8d; }
         .stop-link { color: #e74c3c; cursor: pointer; text-decoration: underline; }
-        select { font-size: 18px; padding: 10px; border-radius: 8px; width: 90%; margin: 20px 0; border: 1px solid #ddd; }
+        select { font-size: 18px; padding: 10px; border-radius: 8px; width: 95%; margin: 20px 0; border: 1px solid #ddd; }
         .bopomofo { font-size: 72px; font-weight: bold; margin: 30px 0; min-height: 90px; color: #34495e; }
         .answer { font-size: 48px; color: #27ae60; margin: 15px 0; display: none; font-weight: bold; }
-        button { font-size: 20px; padding: 15px; margin: 8px 0; cursor: pointer; border-radius: 12px; border: none; background: #3498db; color: white; width: 100%; box-shadow: 0 4px 0 #2980b9; transition: 0.1s; }
+        button { font-size: 20px; padding: 15px; margin: 8px 0; cursor: pointer; border-radius: 12px; border: none; background: #3498db; color: white; width: 100%; box-shadow: 0 4px 0 #2980b9; }
         button:active { transform: translateY(2px); box-shadow: 0 2px 0 #2980b9; }
         .next-btn { background: #e67e22; box-shadow: 0 4px 0 #d35400; margin-top: 20px; font-weight: bold; }
         .ans-btn { background: #95a5a6; box-shadow: 0 4px 0 #7f8c8d; font-size: 16px; width: 60%; margin-top: 10px; }
-        .master-area { margin-top: 25px; font-size: 20px; display: flex; justify-content: center; align-items: center; gap: 12px; padding: 10px; background: #fdfefe; border-radius: 10px; }
+        .master-area { margin-top: 25px; font-size: 20px; display: flex; justify-content: center; align-items: center; gap: 12px; padding: 10px; background: #fdfefe; }
         input[type="checkbox"] { transform: scale(1.8); cursor: pointer; }
-        #loader { font-weight: bold; color: #3498db; margin-top: 50px; }
+        #loader { font-weight: bold; color: #e67e22; margin-top: 50px; }
     </style>
 </head>
 <body>
@@ -37,24 +37,19 @@
                 <div id="status">進度：-- / --</div>
                 <div class="stop-link" onclick="location.reload()">🛑 終止練習</div>
             </div>
-
             <div class="bopomofo" id="bpmfDisplay">---</div>
             <div class="answer" id="wordDisplay">---</div>
-            
             <button onclick="speak()">🔊 聽讀音</button>
             <button class="ans-btn" onclick="document.getElementById('wordDisplay').style.display='block'">看答案</button>
-            
             <div class="master-area">
                 <input type="checkbox" id="masterCheck">
                 <label for="masterCheck">這題我練熟了</label>
             </div>
-
             <button class="next-btn" onclick="handleNext()">下一題 ➔</button>
         </div>
     </div>
 
     <script>
-        // 配置資訊
         const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR8h56wLvxnA4_Xr7oLo_iO8WycSoz5Mw7m9fJrIw2R6JwhGP5bvAmnPG9yOoYg9WSrnliwmA8wbXhR/pub?output=csv";
         const GAS_URL = "https://script.google.com/macros/s/AKfycbwLd_hDSaEN4FqumCz5_xCFIzkYc4pQsWxd6UnQFw9aFIMo_PuDMfi2CPfKaXI1rWbpoA/exec";
 
@@ -62,19 +57,20 @@
         let currentPool = [];
         let index = -1;
 
-// 修正後的初始化函式
         async function init() {
+            const loader = document.getElementById('loader');
             try {
-                // 這裡改用更穩定的 URL 拼接方式
-                const finalUrl = CSV_URL + "&cachebust=" + Date.now();
+                // 修正：CSV_URL 已經有問號，所以 Cachebuster 必須用 & 連接
+                const finalUrl = `${CSV_URL}&cachebust=${Date.now()}`;
                 const response = await fetch(finalUrl);
                 
-                if (!response.ok) throw new Error("Google 伺服器回應異常");
+                if (!response.ok) throw new Error("無法連接到 Google 試算表");
                 
                 const dataText = await response.text();
                 const rows = dataText.split(/\r?\n/).filter(r => r.trim() !== "");
                 
-                // 解析邏輯 (保持不變，確保 67 筆完整)
+                if (rows.length <= 1) throw new Error("試算表內好像沒有資料");
+
                 allData = rows.slice(1).map((line, i) => {
                     const cols = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
                     return {
@@ -84,9 +80,9 @@
                         bpmf: (cols[2] || "").replace(/"/g,'').trim(),
                         mastered: (cols[3] || "").replace(/"/g,'').trim() === '是'
                     };
-                }).filter(item => item.word !== "");
+                }).filter(item => item.word && item.lesson);
 
-                const lessons = [...new Set(allData.map(d => d.lesson))].filter(l => l !== "");
+                const lessons = [...new Set(allData.map(d => d.lesson))];
                 const select = document.getElementById('lessonSelect');
                 lessons.forEach(l => {
                     const opt = document.createElement('option');
@@ -94,18 +90,71 @@
                     select.appendChild(opt);
                 });
 
-                document.getElementById('loader').style.display = 'none';
+                loader.style.display = 'none';
                 document.getElementById('setupArea').style.display = 'block';
                 
+                // 預熱語音引擎
                 window.speechSynthesis.getVoices();
             } catch (err) {
-                // 如果失敗，清楚顯示錯誤，不再讓用戶乾等
-                document.getElementById('loader').innerHTML = `❌ 連線失敗<br><small>${err.message}</small>`;
-                console.error(err);
+                loader.innerHTML = `❌ 連線出錯：${err.message}<br><small>請檢查 Excel 是否已發布</small>`;
             }
         }
 
-        // 開始練習邏輯
         function startQuiz() {
             const selectedLesson = document.getElementById('lessonSelect').value;
+            currentPool = allData.filter(d => d.lesson === selectedLesson && !d.mastered);
+            currentPool.sort(() => Math.random() - 0.5);
 
+            if (currentPool.length === 0) {
+                alert("太棒了！這一課都練熟了！");
+                return;
+            }
+
+            // 點擊瞬間喚醒語音引擎
+            const wakeup = new SpeechSynthesisUtterance("");
+            window.speechSynthesis.speak(wakeup);
+
+            document.getElementById('setupArea').style.display = 'none';
+            document.getElementById('quizArea').style.display = 'block';
+            index = -1;
+            showNext();
+        }
+
+        function speak() {
+            if (index < 0 || index >= currentPool.length) return;
+            window.speechSynthesis.cancel();
+            setTimeout(() => {
+                const utterance = new SpeechSynthesisUtterance(currentPool[index].bpmf);
+                utterance.lang = 'zh-TW';
+                utterance.rate = 0.75;
+                window.speechSynthesis.speak(utterance);
+            }, 50);
+        }
+
+        function showNext() {
+            index++;
+            if (index < currentPool.length) {
+                document.getElementById('bpmfDisplay').innerText = currentPool[index].bpmf;
+                document.getElementById('wordDisplay').innerText = currentPool[index].word;
+                document.getElementById('wordDisplay').style.display = 'none';
+                document.getElementById('status').innerText = `進度：${index + 1} / ${currentPool.length}`;
+                document.getElementById('masterCheck').checked = false;
+                speak();
+            } else {
+                alert("恭喜！本課練習完成！");
+                location.reload();
+            }
+        }
+
+        function handleNext() {
+            if (document.getElementById('masterCheck').checked) {
+                const targetRow = currentPool[index].row;
+                fetch(`${GAS_URL}?action=mastered&row=${targetRow}`, { mode: 'no-cors' });
+            }
+            showNext();
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
