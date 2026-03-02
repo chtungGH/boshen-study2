@@ -2,10 +2,10 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>柏伸聽寫 - 精準校對版</title>
+    <title>柏伸聽寫小助手</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { font-family: "Microsoft JhengHei", sans-serif; text-align: center; padding: 20px; background-color: #f7f9fc; }
+        body { font-family: "Microsoft JhengHei", sans-serif; text-align: center; padding: 20px; background-color: #f7f9fc; color: #2c3e50; }
         .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); display: inline-block; width: 95%; max-width: 400px; }
         .top-bar { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 14px; color: #7f8c8d; }
         .stop-link { color: #e74c3c; cursor: pointer; text-decoration: underline; }
@@ -23,7 +23,7 @@
 <body>
 
     <div class="card">
-        <div id="loader">🚀 正在與 Google 同步...</div>
+        <div id="loader">🚀 同步雲端資料中...</div>
         
         <div id="setupArea" style="display:none;">
             <h2>✍️ 選擇課次</h2>
@@ -49,6 +49,7 @@
     </div>
 
     <script>
+        // 設定區
         const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR8h56wLvxnA4_Xr7oLo_iO8WycSoz5Mw7m9fJrIw2R6JwhGP5bvAmnPG9yOoYg9WSrnliwmA8wbXhR/pub?output=csv";
         const GAS_URL = "https://script.google.com/macros/s/AKfycbwLd_hDSaEN4FqumCz5_xCFIzkYc4pQsWxd6UnQFw9aFIMo_PuDMfi2CPfKaXI1rWbpoA/exec";
 
@@ -56,13 +57,14 @@
         let currentPool = [];
         let index = -1;
 
+        // 初始化：讀取資料
         async function init() {
             try {
-                const res = await fetch(CSV_URL + "&cachebust=" + new Date().getTime()); // 強制不抓快取
+                // 使用 timestamp 避免快取舊的 CSV
+                const res = await fetch(CSV_URL + "&cb=" + Date.now());
                 const txt = await res.text();
                 const rows = txt.split(/\r?\n/).filter(r => r.trim() !== "");
                 
-                // 精準解析
                 allData = rows.slice(1).map((r, i) => {
                     const c = r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
                     return {
@@ -72,15 +74,7 @@
                         bpmf: (c[2] || "").replace(/"/g,'').trim(),
                         mastered: (c[3] || "").replace(/"/g,'').trim() === '是'
                     };
-                }).filter(d => {
-                    if (!d.word) {
-                        console.log("跳過空行，Excel 行號：", d.row);
-                        return false;
-                    }
-                    return true;
-                });
-
-                console.log("資料庫總題數：", allData.length);
+                }).filter(d => d.word); // 僅保留有文字的列
 
                 const lessons = [...new Set(allData.map(d => d.lesson))].filter(l => l);
                 const select = document.getElementById('lessonSelect');
@@ -94,17 +88,17 @@
                 document.getElementById('setupArea').style.display = 'block';
                 document.getElementById('startBtn').onclick = startQuiz;
             } catch (e) {
-                document.getElementById('loader').innerText = "連線失敗";
+                document.getElementById('loader').innerText = "連線失敗，請檢查網路。";
             }
         }
 
+        // 開始練習
         function startQuiz() {
             const lesson = document.getElementById('lessonSelect').value;
-            // 找出該課次且未熟練的題目
             currentPool = allData.filter(d => d.lesson === lesson && !d.mastered);
             currentPool.sort(() => Math.random() - 0.5);
 
-            if (currentPool.length === 0) return alert("都練熟囉！");
+            if (currentPool.length === 0) return alert("本課已全數練習完畢！");
             
             document.getElementById('setupArea').style.display = 'none';
             document.getElementById('quizArea').style.display = 'block';
@@ -112,32 +106,37 @@
             showNext();
         }
 
+        // 顯示下一題
         function showNext() {
             index++;
             if (index < currentPool.length) {
                 document.getElementById('bpmfDisplay').innerText = currentPool[index].bpmf;
                 document.getElementById('wordDisplay').innerText = currentPool[index].word;
                 document.getElementById('wordDisplay').style.display = 'none';
-                // 題數顯示校正：當前是第幾題 / 總題數
                 document.getElementById('status').innerText = `進度：${index + 1} / ${currentPool.length}`;
                 document.getElementById('masterCheck').checked = false;
                 speak();
             } else {
-                alert("本課完成！");
+                alert("練習結束！");
                 location.reload();
             }
         }
 
+        // 處理下一題與背景紀錄
         function handleNext() {
             if (document.getElementById('masterCheck').checked) {
+                // 背景發送寫入指令，不等待回應以提高順暢度
                 fetch(`${GAS_URL}?action=mastered&row=${currentPool[index].row}`, { mode: 'no-cors' });
             }
             showNext();
         }
 
+        // 語音朗讀
         function speak() {
+            if (index < 0) return;
             const msg = new SpeechSynthesisUtterance(currentPool[index].bpmf);
-            msg.lang = 'zh-TW'; msg.rate = 0.7;
+            msg.lang = 'zh-TW'; 
+            msg.rate = 0.7;
             speechSynthesis.cancel();
             speechSynthesis.speak(msg);
         }
