@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>柏伸聽寫 - 精簡模擬版</title>
+    <title>柏伸聽寫 - 精簡模擬版 v1.0.2</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body { font-family: "Microsoft JhengHei", sans-serif; text-align: center; padding: 20px; background-color: #fdfdfd; color: #2c3e50; }
@@ -20,11 +20,11 @@
 <body>
 
     <div class="card">
-        <div id="loader">📝 正在讀取資料...</div>
+        <div id="loader">📝 正在獲取最新題庫...</div>
         
         <div id="setupArea" style="display:none;">
             <h2>📝 聽寫模擬考</h2>
-            <p style="color:gray; font-size:14px;">僅練習尚未熟練的字詞</p>
+            <p style="color:gray; font-size:14px;">已自動排除熟練字詞</p>
             <select id="lessonSelect"></select><br>
             <button onclick="startQuiz()">開始考試</button>
         </div>
@@ -58,7 +58,16 @@
 
         async function init() {
             try {
-                const response = await fetch(`${CSV_URL}&cb=${Date.now()}`);
+                // 【核心修正】強制不使用快取，加入 headers
+                const response = await fetch(`${CSV_URL}&cachebuster=${Date.now()}`, {
+                    method: 'GET',
+                    cache: 'no-store', // 強制不看快取
+                    headers: {
+                        'Cache-Control': 'no-cache',
+                        'Pragma': 'no-cache'
+                    }
+                });
+                
                 const dataText = await response.text();
                 const rows = dataText.split(/\r?\n/).filter(r => r.trim() !== "");
                 
@@ -90,12 +99,12 @@
 
         function startQuiz() {
             const selectedLesson = document.getElementById('lessonSelect').value;
-            // 核心邏輯：過濾掉已經熟練的題目
+            // 過濾邏輯
             currentPool = allData.filter(d => d.lesson === selectedLesson && d.mastered === false);
             currentPool.sort(() => Math.random() - 0.5);
 
             if (currentPool.length === 0) {
-                alert("太棒了！這一課都已經熟練了，沒有題目囉！");
+                alert("太棒了！這一課都已經熟練了！");
                 location.reload();
                 return;
             }
