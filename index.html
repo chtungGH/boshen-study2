@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>柏伸聽寫練習小助手</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: "Microsoft JhengHei", sans-serif; text-align: center; padding: 20px; background-color: #f0f7ff; color: #2c3e50; }
+        .card { background: white; padding: 30px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: inline-block; width: 95%; max-width: 450px; margin-top: 20px; }
+        .info { color: #7f8c8d; font-size: 16px; margin-bottom: 10px; font-weight: bold; }
+        .bopomofo { font-size: 68px; font-weight: bold; color: #2980b9; margin: 25px 0; min-height: 85px; letter-spacing: 4px; }
+        .answer { font-size: 42px; color: #27ae60; margin: 20px 0; display: none; border-top: 2px dashed #ecf0f1; padding-top: 20px; font-weight: bold; }
+        button { font-size: 22px; padding: 16px; margin: 10px 0; cursor: pointer; border-radius: 16px; border: none; background: #3498db; color: white; width: 90%; transition: all 0.2s; box-shadow: 0 4px 0 #2980b9; }
+        button:active { transform: translateY(4px); box-shadow: 0 0 0 #2980b9; }
+        .next-btn { background: #e67e22; box-shadow: 0 4px 0 #d35400; font-weight: bold; }
+        .show-btn { background: #95a5a6; box-shadow: 0 4px 0 #7f8c8d; }
+    </style>
+</head>
+<body>
+    <h1>✍️ 柏伸聽寫練習</h1>
+    <div class="card">
+        <div id="loading">正在連線至 Google 表單...</div>
+        <div id="quizContainer" style="display:none;">
+            <div class="info" id="progressInfo">載入中...</div>
+            <div class="bopomofo" id="bpmfDisplay">---</div>
+            <div class="answer" id="wordDisplay">---</div>
+            <button onclick="speak()">🔊 聽注音</button>
+            <button class="next-btn" onclick="handleNext()">下一個 / 開始</button>
+            <button class="show-btn" onclick="showAns()">看答案 (對獎)</button>
+        </div>
+    </div>
+
+    <script>
+        // 資料來源：你的 Google 試算表 CSV 連結
+        const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR8h56wLvxnA4_Xr7oLo_iO8WycSoz5Mw7m9fJrIw2R6JwhGP5bvAmnPG9yOoYg9WSrnliwmA8wbXhR/pub?output=csv";
+
+        let quizList = [];
+        let currentIdx = -1;
+
+        async function initApp() {
+            try {
+                const response = await fetch(SHEET_URL);
+                const csvData = await response.text();
+                const lines = csvData.split(/\r?\n/).filter(l => l.trim() !== "");
+                
+                quizList = lines.slice(1).map(line => {
+                    const cols = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                    return {
+                        word: cols[0]?.replace(/"/g, '').trim(),
+                        bpmf: cols[1]?.replace(/"/g, '').trim(),
+                        mastered: cols[2]?.replace(/"/g, '').trim() === '是'
+                    };
+                }).filter(item => item.word && !item.mastered);
+
+                quizList.sort(() => Math.random() - 0.5);
+
+                if (quizList.length > 0) {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('quizContainer').style.display = 'block';
+                    document.getElementById('progressInfo').innerText = `還有 ${quizList.length} 題`;
+                } else {
+                    document.getElementById('loading').innerText = "✅ 全部都學會囉！";
+                }
+            } catch (err) {
+                document.getElementById('loading').innerText = "❌ 讀取失敗。";
+            }
+        }
+
+        function speak() {
+            if (currentIdx < 0) return;
+            const msg = new SpeechSynthesisUtterance(quizList[currentIdx].bpmf);
+            msg.lang = 'zh-TW';
+            msg.rate = 0.7;
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.speak(msg);
+        }
+
+        function handleNext() {
+            currentIdx++;
+            if (currentIdx < quizList.length) {
+                document.getElementById('bpmfDisplay').innerText = quizList[currentIdx].bpmf;
+                document.getElementById('wordDisplay').innerText = quizList[currentIdx].word;
+                document.getElementById('wordDisplay').style.display = 'none';
+                document.getElementById('progressInfo').innerText = `第 ${currentIdx + 1} / ${quizList.length} 題`;
+                speak();
+            } else {
+                alert("練習結束！");
+                location.reload(); 
+            }
+        }
+
+        function showAns() {
+            document.getElementById('wordDisplay').style.display = 'block';
+        }
+
+        initApp();
+    </script>
+</body>
+</html>
