@@ -2,35 +2,28 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>柏伸聽寫 - 極簡版</title>
+    <title>柏伸聽寫 - 穩定版</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { font-family: "Microsoft JhengHei", sans-serif; text-align: center; padding: 20px; background-color: #f7f9fc; }
-        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); display: inline-block; width: 95%; max-width: 400px; }
-        
+        body { font-family: "Microsoft JhengHei", sans-serif; text-align: center; padding: 20px; background-color: #f7f9fc; color: #2c3e50; }
+        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); display: inline-block; width: 95%; max-width: 400px; min-height: 200px; }
         .top-bar { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 14px; color: #7f8c8d; }
         .stop-link { color: #e74c3c; cursor: pointer; text-decoration: underline; }
-
-        select { font-size: 18px; padding: 8px; border-radius: 8px; width: 80%; margin-bottom: 20px; }
-        
-        .bopomofo { font-size: 68px; font-weight: bold; color: #2c3e50; margin: 20px 0; min-height: 85px; }
+        select { font-size: 18px; padding: 8px; border-radius: 8px; width: 80%; margin: 20px 0; }
+        .bopomofo { font-size: 68px; font-weight: bold; margin: 20px 0; min-height: 85px; color: #34495e; }
         .answer { font-size: 42px; color: #27ae60; margin: 10px 0; display: none; font-weight: bold; }
-        
         button { font-size: 20px; padding: 15px; margin: 8px 0; cursor: pointer; border-radius: 12px; border: none; background: #3498db; color: white; width: 95%; box-shadow: 0 4px 0 #2980b9; }
         button:active { transform: translateY(2px); box-shadow: 0 2px 0 #2980b9; }
-        
         .next-btn { background: #e67e22; box-shadow: 0 4px 0 #d35400; margin-top: 15px; }
         .ans-btn { background: #95a5a6; box-shadow: 0 4px 0 #7f8c8d; font-size: 16px; width: 60%; }
-
-        /* Checkbox 樣式優化 */
-        .master-area { margin-top: 20px; font-size: 18px; color: #2c3e50; display: flex; justify-content: center; align-items: center; gap: 10px; }
-        input[type="checkbox"] { transform: scale(1.5); cursor: pointer; }
+        .master-area { margin-top: 20px; font-size: 18px; display: flex; justify-content: center; align-items: center; gap: 10px; }
+        input[type="checkbox"] { transform: scale(1.5); }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <div id="loader">載入中...</div>
+        <div id="loader">🚀 正在讀取資料，請稍候...</div>
         
         <div id="setupArea" style="display:none;">
             <h2>✍️ 選擇課次</h2>
@@ -40,21 +33,17 @@
 
         <div id="quizArea" style="display:none;">
             <div class="top-bar">
-                <div id="status">剩餘 - 題</div>
+                <div id="status">載入中...</div>
                 <div class="stop-link" onclick="location.reload()">🛑 終止</div>
             </div>
-
-            <div class="bopomofo" id="bpmf">---</div>
-            <div class="answer" id="word">---</div>
-            
+            <div class="bopomofo" id="bpmfDisplay">---</div>
+            <div class="answer" id="wordDisplay">---</div>
             <button onclick="speak()">🔊 聽讀音</button>
-            <button class="ans-btn" onclick="document.getElementById('word').style.display='block'">看答案</button>
-            
+            <button class="ans-btn" onclick="document.getElementById('wordDisplay').style.display='block'">看答案</button>
             <div class="master-area">
                 <input type="checkbox" id="masterCheck">
                 <label for="masterCheck">這題已熟練</label>
             </div>
-
             <button class="next-btn" onclick="handleNext()">下一題</button>
         </div>
     </div>
@@ -70,45 +59,73 @@
         async function init() {
             try {
                 const res = await fetch(CSV_URL);
+                if (!res.ok) throw new Error("CSV 讀取失敗");
                 const txt = await res.text();
+                
                 const rows = txt.split(/\r?\n/).filter(r => r.trim() !== "");
-                allData = rows.map((r, i) => {
+                allData = rows.slice(1).map((r, i) => {
                     const c = r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-                    return { row: i + 1, lesson: c[0]?.replace(/"/g,''), word: c[1]?.replace(/"/g,''), bpmf: c[2]?.replace(/"/g,''), mastered: c[3]?.replace(/"/g,'') === '是' };
-                }).slice(1);
+                    return {
+                        row: i + 2, // 修正行號：跳過標題(1)，所以從 2 開始
+                        lesson: c[0]?.replace(/"/g,'').trim(),
+                        word: c[1]?.replace(/"/g,'').trim(),
+                        bpmf: c[2]?.replace(/"/g,'').trim(),
+                        mastered: c[3]?.replace(/"/g,'').trim() === '是'
+                    };
+                }).filter(d => d.word); // 確保該行有字才放進去
 
-                const lessons = [...new Set(allData.map(d => d.lesson))];
+                const lessons = [...new Set(allData.map(d => d.lesson))].filter(l => l);
                 const select = document.getElementById('lessonSelect');
                 lessons.forEach(l => {
                     let opt = document.createElement('option');
-                    opt.value = l; opt.innerHTML = l;
+                    opt.value = l; opt.textContent = l;
                     select.appendChild(opt);
                 });
+
                 document.getElementById('loader').style.display = 'none';
                 document.getElementById('setupArea').style.display = 'block';
-            } catch (e) { document.getElementById('loader').innerText = "連線失敗"; }
+            } catch (e) {
+                console.error(e);
+                document.getElementById('loader').innerHTML = "❌ 資料載入失敗<br><small>請確認 Google 試算表是否已發布 CSV</small>";
+            }
         }
 
         function startQuiz() {
             const lesson = document.getElementById('lessonSelect').value;
             currentPool = allData.filter(d => d.lesson === lesson && !d.mastered);
             currentPool.sort(() => Math.random() - 0.5);
-            if (currentPool.length === 0) return alert("都練熟囉！");
+
+            if (currentPool.length === 0) return alert("這一課都練熟囉！");
+            
             document.getElementById('setupArea').style.display = 'none';
             document.getElementById('quizArea').style.display = 'block';
-            showQuestion();
+            index = -1;
+            showNext();
         }
 
         function speak() {
+            if (index < 0 || index >= currentPool.length) return;
             const msg = new SpeechSynthesisUtterance(currentPool[index].bpmf);
             msg.lang = 'zh-TW'; msg.rate = 0.7;
-            speechSynthesis.cancel(); speechSynthesis.speak(msg);
+            speechSynthesis.cancel();
+            speechSynthesis.speak(msg);
         }
 
-        function showQuestion() {
+        function showNext() {
             index++;
             if (index < currentPool.length) {
-                document.getElementById('bpmf').innerText = currentPool[index].bpmf;
-                document.getElementById('word').innerText = currentPool[index].word;
-                document.getElementById('word').style.display = 'none';
-                document.getElementById('status').
+                document.getElementById('bpmfDisplay').innerText = currentPool[index].bpmf;
+                document.getElementById('wordDisplay').innerText = currentPool[index].word;
+                document.getElementById('wordDisplay').style.display = 'none';
+                document.getElementById('status').innerText = `剩餘 ${currentPool.length - index - 1} 題`;
+                document.getElementById('masterCheck').checked = false;
+                speak();
+            } else {
+                alert("本課完成！");
+                location.reload();
+            }
+        }
+
+        function handleNext() {
+            if (document.getElementById('masterCheck').checked) {
+                const targetRow = currentPool[index].row;
