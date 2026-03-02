@@ -20,7 +20,7 @@
 <body>
 
     <div class="card">
-        <div id="loader">📝 正在載入未熟練題庫...</div>
+        <div id="loader">📝 正在讀取資料...</div>
         
         <div id="setupArea" style="display:none;">
             <h2>📝 聽寫模擬考</h2>
@@ -58,7 +58,6 @@
 
         async function init() {
             try {
-                // 加入防快取參數，確保抓到最新的 "是"
                 const response = await fetch(`${CSV_URL}&cb=${Date.now()}`);
                 const dataText = await response.text();
                 const rows = dataText.split(/\r?\n/).filter(r => r.trim() !== "");
@@ -91,12 +90,12 @@
 
         function startQuiz() {
             const selectedLesson = document.getElementById('lessonSelect').value;
-            // 修正處：這裡必須過濾掉 mastered 為 true 的項目
-            currentPool = allData.filter(d => d.lesson === selectedLesson && !d.mastered);
+            // 核心邏輯：過濾掉已經熟練的題目
+            currentPool = allData.filter(d => d.lesson === selectedLesson && d.mastered === false);
             currentPool.sort(() => Math.random() - 0.5);
 
             if (currentPool.length === 0) {
-                alert("太棒了！這一課都已經標記為「是」（熟練）了！");
+                alert("太棒了！這一課都已經熟練了，沒有題目囉！");
                 location.reload();
                 return;
             }
