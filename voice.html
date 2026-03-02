@@ -2,19 +2,27 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>柏伸聽寫 - 語音進化版 v1.1.1</title>
+    <title>柏伸聽寫 - 語音進化版 v1.1.2</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body { font-family: "Microsoft JhengHei", sans-serif; text-align: center; padding: 20px; background-color: #f0f3f7; color: #2c3e50; }
         .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); display: inline-block; width: 95%; max-width: 400px; min-height: 300px; }
-        .mic-status { margin: 10px; padding: 8px 20px; border-radius: 25px; display: inline-block; font-size: 14px; transition: 0.3s; font-weight: bold; }
+        
+        /* 頂部列樣式同步 */
+        .top-bar { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 14px; color: #7f8c8d; align-items: center; }
+        .stop-link { color: #e74c3c; cursor: pointer; text-decoration: underline; font-weight: bold; }
+
+        .mic-status { padding: 5px 12px; border-radius: 20px; font-size: 12px; transition: 0.3s; }
         .mic-on { background: #e74c3c; color: white; animation: pulse 1.5s infinite; }
         .mic-off { background: #95a5a6; color: white; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
         .bopomofo { font-size: 72px; font-weight: bold; margin: 25px 0; color: #34495e; }
         .answer { font-size: 48px; color: #27ae60; margin: 10px 0; display: none; font-weight: bold; }
+        
         button { font-size: 18px; padding: 12px; margin: 5px; cursor: pointer; border-radius: 12px; border: none; background: #3498db; color: white; width: 46%; }
         .next-btn { background: #e67e22; width: 95%; margin-top: 15px; font-weight: bold; font-size: 20px; }
+        
         .command-hint { font-size: 13px; color: #7f8c8d; margin-top: 20px; border-top: 1px dotted #ccc; padding-top: 15px; line-height: 1.6; }
         #loader { color: #e67e22; font-weight: bold; margin-top: 50px; }
     </style>
@@ -23,24 +31,37 @@
 
     <div class="card">
         <div id="loader">🎙️ 語音系統初始化中...</div>
+        
         <div id="setupArea" style="display:none;">
             <h2 style="margin-bottom:10px;">🎙️ 語音模式</h2>
             <select id="lessonSelect" style="font-size:18px; padding:10px; width:90%; margin-bottom:20px;"></select><br>
             <button onclick="startQuiz()" style="width:90%">開始練習</button>
         </div>
+
         <div id="quizArea" style="display:none;">
-            <div class="mic-status mic-off" id="micIndicator">🎤 麥克風未啟動</div>
-            <div id="status" style="font-size:14px; color:gray; margin-bottom:10px;">進度：-- / --</div>
+            <div class="top-bar">
+                <div id="micIndicator" class="mic-status mic-off">🎤 準備中</div>
+                <div class="stop-link" onclick="location.reload()">🛑 終止退出</div>
+            </div>
+            
+            <div id="status" style="font-size:14px; color:gray; margin-bottom:10px; text-align: left;">進度：-- / --</div>
+            
             <div class="bopomofo" id="bpmfDisplay">---</div>
             <div class="answer" id="wordDisplay">---</div>
+            
             <button onclick="speak()">🔊 聽讀音</button>
             <button onclick="showAnswer()">👁️ 看答案</button>
+            
             <div style="margin:20px; font-size:18px; display: flex; justify-content: center; align-items: center; gap: 10px;">
                 <input type="checkbox" id="masterCheck" style="transform:scale(1.8)"> 
                 <label for="masterCheck">這題已熟練</label>
             </div>
+
             <button class="next-btn" onclick="handleNext()">下一題</button>
-            <div class="command-hint">💡 語音指令：<b>「下一題」、「看答案」、「這題會了」</b></div>
+
+            <div class="command-hint">
+                <b>語音指令：</b> 「下一題」、「看答案」、「這題會了」
+            </div>
         </div>
     </div>
 
@@ -93,13 +114,17 @@
             currentPool = allData.filter(d => d.lesson === selectedLesson && !d.mastered);
             currentPool.sort(() => Math.random() - 0.5);
             if (currentPool.length === 0) return alert("都練熟囉！");
+            
             window.speechSynthesis.speak(new SpeechSynthesisUtterance(""));
             if (recognition) {
                 try {
                     recognition.start();
                     const mic = document.getElementById('micIndicator');
-                    recognition.onstart = () => { mic.innerText = "🔴 指令監聽中..."; mic.className = "mic-status mic-on"; };
-                    recognition.onend = () => { recognition.start(); };
+                    recognition.onstart = () => { mic.innerText = "🔴 監聽中"; mic.className = "mic-status mic-on"; };
+                    recognition.onend = () => { 
+                        // 只有在非手動重新整理的情況下才重啟
+                        if (document.getElementById('quizArea').style.display !== 'none') recognition.start(); 
+                    };
                     recognition.onresult = (event) => {
                         const result = event.results[event.results.length - 1][0].transcript;
                         processVoiceCommand(result);
@@ -113,6 +138,7 @@
         }
 
         function processVoiceCommand(cmd) {
+            console.log("語音辨識結果：", cmd);
             if (cmd.includes("下一題")) { handleNext(); }
             else if (cmd.includes("答案")) { showAnswer(); }
             else if (cmd.includes("會了") || cmd.includes("熟了")) {
@@ -128,7 +154,7 @@
                 const utterance = new SpeechSynthesisUtterance(currentPool[index].bpmf);
                 if (preferredVoice) utterance.voice = preferredVoice;
                 utterance.lang = 'zh-TW';
-                utterance.rate = 0.8; // 同步 v1.3.1 的語速
+                utterance.rate = 0.8; 
                 window.speechSynthesis.speak(utterance);
             }, 50);
         }
