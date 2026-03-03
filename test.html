@@ -2,154 +2,159 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>柏伸詞語記憶卡 - 獨立版</title>
+    <title>詞語智慧複習系統 v2.1.0</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { font-family: "Microsoft JhengHei", sans-serif; text-align: center; padding: 20px; background-color: #fdfaf0; color: #2c3e50; }
-        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: inline-block; width: 95%; max-width: 500px; min-height: 350px; text-align: left; }
-        .mode-select { margin-bottom: 25px; display: grid; gap: 10px; }
-        .meaning-box { background: #fff9db; padding: 20px; border-radius: 15px; font-size: 20px; line-height: 1.6; border-left: 10px solid #f1c40f; margin-bottom: 20px; min-height: 80px; }
-        .ans-display { font-size: 36px; font-weight: bold; color: #e67e22; text-align: center; margin: 20px 0; display: none; }
-        
-        /* 選擇題按鈕樣式 */
-        .quiz-option { background: #fff; color: #34495e; border: 2px solid #ecf0f1; padding: 15px; margin: 8px 0; width: 100%; text-align: left; font-size: 18px; border-radius: 12px; cursor: pointer; transition: 0.2s; box-shadow: none; }
-        .quiz-option:hover { background: #f8f9fa; border-color: #bdc3c7; }
-        .quiz-option.correct { background: #2ecc71; color: white; border-color: #27ae60; }
-        .quiz-option.wrong { background: #e74c3c; color: white; border-color: #c0392b; }
-
-        button { font-size: 18px; padding: 15px; border-radius: 12px; border: none; background: #3498db; color: white; width: 100%; cursor: pointer; box-shadow: 0 4px 0 #2980b9; }
-        .next-btn { background: #e67e22; box-shadow: 0 4px 0 #d35400; margin-top: 20px; }
-        #loader { text-align: center; font-weight: bold; margin-top: 50px; color: #f39c12; }
+        body { font-family: sans-serif; text-align: center; padding: 20px; background: #f4f4f4; }
+        .card { background: white; padding: 20px; border-radius: 15px; display: inline-block; width: 100%; max-width: 450px; text-align: left; box-sizing: border-box; }
+        .meaning-box { background: #fff9db; padding: 15px; border-radius: 10px; margin: 15px 0; font-size: 20px; border-left: 5px solid #f1c40f; }
+        .quiz-option { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; background: white; font-size: 18px; cursor: pointer; text-align: left; }
+        .correct { background: #2ecc71 !important; color: white; }
+        .wrong { background: #e74c3c !important; color: white; }
+        button.nav-btn { width: 100%; padding: 15px; margin: 10px 0; font-size: 18px; cursor: pointer; border-radius: 10px; border: none; background: #3498db; color: white; }
+        #syncArea { display: none; text-align: center; }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <div id="loader">🗂️ 正在連結獨立詞語庫...</div>
-        
-        <div id="setupArea" style="display:none;">
-            <h2 style="text-align:center;">💡 詞語記憶挑戰</h2>
-            <div class="mode-select">
-                <button onclick="startApp('flash')">🎴 閃卡模式 (看解釋猜詞語)</button>
-                <button style="background:#8e44ad; box-shadow:0 4px 0 #71338d;" onclick="startApp('quiz')">📝 選擇題模式 (四選一)</button>
-            </div>
-        </div>
+<div class="card">
+    <div id="loader">載入中...</div>
 
-        <div id="gameArea" style="display:none;">
-            <div style="display:flex; justify-content: space-between; font-size:14px; color:#bdc3c7; margin-bottom:10px;">
-                <span id="progress">進度：--</span>
-                <span style="text-decoration:underline; cursor:pointer;" onclick="location.reload()">🛑 返回</span>
-            </div>
-            
-            <div class="meaning-box" id="meaningDisplay">---</div>
-
-            <div id="flashSection" style="display:none;">
-                <div class="ans-display" id="flashWord">---</div>
-                <button onclick="document.getElementById('flashWord').style.display='block'">🔍 顯示詞語答案</button>
-            </div>
-
-            <div id="quizSection" style="display:none;">
-                <div id="optionsGroup"></div>
-            </div>
-
-            <button class="next-btn" id="nextBtn" style="display:none;" onclick="nextQuestion()">下一題 ➔</button>
-        </div>
+    <div id="setupArea" style="display:none;">
+        <h3>選擇練習模式</h3>
+        <button class="nav-btn" onclick="startApp('hard')">🔥 地獄 (9:1:0)</button>
+        <button class="nav-btn" style="background:#27ae60" onclick="startApp('mix')">⚖️ 智慧 (7:2:1)</button>
+        <button class="nav-btn" style="background:#95a5a6" onclick="startApp('review')">🔄 溫故 (4:4:2)</button>
     </div>
 
-    <script>
-        // 請在這裡替換成你新表的 GAS 網址
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbwdIKdIUNvTrWUK30PfzmsKl4Rtd_t1pID7dk8DcYLON_sCxRoH1f5s3h0L3coYHa3A/exec"; 
-        
-        let rawData = [];
-        let pool = [];
-        let currentIndex = -1;
-        let mode = '';
+    <div id="gameArea" style="display:none;">
+        <div id="progress" style="font-size:12px; color:gray;"></div>
+        <div class="meaning-box" id="meaningDisplay"></div>
+        <div id="optionsGroup"></div>
+        <button id="nextBtn" class="nav-btn" style="display:none; background:#2c3e50" onclick="nextQuestion()">下一題</button>
+    </div>
 
-        async function init() {
-            try {
-                const res = await fetch(`${GAS_URL}?action=read&cb=${Date.now()}`);
-                const json = await res.json();
-                // 過濾掉已熟練的
-                rawData = json.data.filter(d => !d.mastered);
-                
-                document.getElementById('loader').style.display = 'none';
-                document.getElementById('setupArea').style.display = 'block';
-            } catch (e) {
-                document.getElementById('loader').innerText = "❌ 讀取失敗，請檢查網址與 Excel 權限";
-            }
-        }
+    <div id="syncArea">
+        <h3>本輪練習結束</h3>
+        <p id="resultSummary"></p>
+        <button id="syncBtn" class="nav-btn" style="background:#e67e22" onclick="syncToCloud()">💾 同步進度到雲端</button>
+        <p id="syncStatus"></p>
+    </div>
+</div>
 
-        function startApp(selectedMode) {
-            mode = selectedMode;
-            pool = [...rawData].sort(() => Math.random() - 0.5);
-            if (pool.length === 0) return alert("目前沒有未熟練的詞語喔！");
-            
-            document.getElementById('setupArea').style.display = 'none';
-            document.getElementById('gameArea').style.display = 'block';
-            nextQuestion();
-        }
+<script>
+    const GAS_URL = "你的GAS網址"; 
+    let rawData = [];
+    let pool = [];
+    let currentIndex = -1;
+    let batchLog = []; // 暫存帳本: [{row, delta}]
 
-        function nextQuestion() {
-            currentIndex++;
-            if (currentIndex >= pool.length) {
-                alert("太棒了！練習結束！");
-                return location.reload();
-            }
+    async function init() {
+        const res = await fetch(`${GAS_URL}?action=read&cb=${Date.now()}`);
+        const json = await res.json();
+        rawData = json.data;
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('setupArea').style.display = 'block';
+    }
 
-            const current = pool[currentIndex];
-            document.getElementById('progress').innerText = `剩餘：${pool.length - currentIndex} 題`;
-            document.getElementById('meaningDisplay').innerText = current.meaning;
-            document.getElementById('nextBtn').style.display = 'none';
+    function startApp(mode) {
+        const red = rawData.filter(d => d.score <= 3);
+        const yellow = rawData.filter(d => d.score >= 4 && d.score <= 7);
+        const green = rawData.filter(d => d.score >= 8);
 
-            if (mode === 'flash') {
-                document.getElementById('flashSection').style.display = 'block';
-                document.getElementById('quizSection').style.display = 'none';
-                document.getElementById('flashWord').innerText = current.word;
-                document.getElementById('flashWord').style.display = 'none';
-                document.getElementById('nextBtn').style.display = 'block';
+        // 抽題比例邏輯
+        for (let i = 0; i < 10; i++) {
+            let rand = Math.random();
+            let target;
+            if (mode === 'hard') {
+                target = rand < 0.9 ? red : yellow;
+            } else if (mode === 'mix') {
+                if (rand < 0.7) target = red;
+                else if (rand < 0.9) target = yellow;
+                else target = green;
             } else {
-                renderQuiz(current);
+                if (rand < 0.4) target = red;
+                else if (rand < 0.8) target = yellow;
+                else target = green;
             }
+            // 如果目標區沒題，就隨便抓一區
+            if (!target || target.length === 0) target = rawData; 
+            pool.push(target[Math.floor(Math.random() * target.length)]);
         }
 
-        function renderQuiz(current) {
-            document.getElementById('flashSection').style.display = 'none';
-            document.getElementById('quizSection').style.display = 'block';
-            const group = document.getElementById('optionsGroup');
-            group.innerHTML = '';
+        document.getElementById('setupArea').style.display = 'none';
+        document.getElementById('gameArea').style.display = 'block';
+        nextQuestion();
+    }
 
-            // 隨機湊 3 個錯題
-            let wrongs = rawData.filter(d => d.word !== current.word)
-                                .sort(() => Math.random() - 0.5)
-                                .slice(0, 3)
-                                .map(d => d.word);
-            
-            let choices = [...wrongs, current.word].sort(() => Math.random() - 0.5);
+    function nextQuestion() {
+        currentIndex++;
+        if (currentIndex >= pool.length) {
+            showSyncScreen();
+            return;
+        }
+        const item = pool[currentIndex];
+        document.getElementById('progress').innerText = `題號：${currentIndex + 1} / ${pool.length} (分值: ${item.score})`;
+        document.getElementById('meaningDisplay').innerText = item.meaning;
+        document.getElementById('nextBtn').style.display = 'none';
+        renderOptions(item);
+    }
 
-            choices.forEach(txt => {
-                const b = document.createElement('button');
-                b.className = 'quiz-option';
-                b.innerText = txt;
-                b.onclick = function() {
-                    const allB = document.querySelectorAll('.quiz-option');
-                    allB.forEach(btn => btn.disabled = true);
-                    if (txt === current.word) {
-                        this.classList.add('correct');
-                        this.innerText = "✅ " + txt;
-                    } else {
-                        this.classList.add('wrong');
-                        this.innerText = "❌ " + txt;
-                        allB.forEach(btn => {
-                            if (btn.innerText === current.word) btn.classList.add('correct');
-                        });
-                    }
-                    document.getElementById('nextBtn').style.display = 'block';
-                };
-                group.appendChild(b);
+    function renderOptions(item) {
+        const group = document.getElementById('optionsGroup');
+        group.innerHTML = '';
+        let choices = [item.word, ...rawData.filter(d => d.word !== item.word).sort(() => Math.random() - 0.5).slice(0, 3).map(d => d.word)];
+        choices.sort(() => Math.random() - 0.5);
+
+        choices.forEach(txt => {
+            const btn = document.createElement('button');
+            btn.className = 'quiz-option';
+            btn.innerText = txt;
+            btn.onclick = function() {
+                const isCorrect = (txt === item.word);
+                batchLog.push({ row: item.row, delta: isCorrect ? 1 : -1 });
+                
+                document.querySelectorAll('.quiz-option').forEach(b => {
+                    b.disabled = true;
+                    if(b.innerText === item.word) b.classList.add('correct');
+                    else if(b.innerText === txt && !isCorrect) b.classList.add('wrong');
+                });
+                document.getElementById('nextBtn').style.display = 'block';
+            };
+            group.appendChild(btn);
+        });
+    }
+
+    function showSyncScreen() {
+        document.getElementById('gameArea').style.display = 'none';
+        document.getElementById('syncArea').style.display = 'block';
+        const correctCount = batchLog.filter(l => l.delta === 1).length;
+        document.getElementById('resultSummary').innerText = `完成！答對 ${correctCount} 題，答錯 ${batchLog.length - correctCount} 題。`;
+    }
+
+    async function syncToCloud() {
+        const btn = document.getElementById('syncBtn');
+        const status = document.getElementById('syncStatus');
+        btn.disabled = true;
+        status.innerText = "⏳ 正在同步，請勿關閉視窗...";
+
+        try {
+            // 使用 POST 發送 batchLog
+            await fetch(GAS_URL, {
+                method: 'POST',
+                mode: 'no-cors', // 避開 CORS 限制
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(batchLog)
             });
+            status.innerText = "✅ 同步完成！";
+            setTimeout(() => location.reload(), 1500);
+        } catch (e) {
+            status.innerText = "❌ 同步失敗，請檢查網路後再試。";
+            btn.disabled = false;
         }
+    }
 
-        window.onload = init;
-    </script>
+    window.onload = init;
+</script>
 </body>
 </html>
