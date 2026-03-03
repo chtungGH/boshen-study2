@@ -2,69 +2,78 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>柏伸智慧複習 v3.2.0</title>
+    <title>柏伸智慧複習 v3.3.0</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { font-family: "Microsoft JhengHei", sans-serif; text-align: center; padding: 20px; background-color: #f0f4f8; color: #2c3e50; }
-        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: inline-block; width: 95%; max-width: 500px; text-align: left; box-sizing: border-box; }
+        body { font-family: "Microsoft JhengHei", sans-serif; text-align: center; padding: 15px; background-color: #f0f4f8; color: #2c3e50; }
+        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: inline-block; width: 100%; max-width: 500px; text-align: left; box-sizing: border-box; }
         
         /* 進度條 */
-        .progress-box { width: 100%; background: #eee; border-radius: 10px; height: 12px; margin: 15px 0; overflow: hidden; display: none; }
-        .progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #3498db, #2ecc71); transition: width 0.3s ease; }
+        .progress-box { width: 100%; background: #eee; border-radius: 10px; height: 10px; margin: 15px 0; overflow: hidden; display: none; }
+        .progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #3498db, #2ecc71); transition: width 0.3s; }
         .percent-text { font-size: 12px; color: #7f8c8d; text-align: center; margin-top: -10px; margin-bottom: 10px; display: none; }
 
         /* 標籤雲 */
         .tag-scroll-area { max-height: 120px; overflow-y: auto; border: 1px solid #eee; padding: 10px; border-radius: 10px; background: #fafafa; margin: 10px 0; display: none; }
         .tag-container { display: flex; flex-wrap: wrap; gap: 8px; }
-        .tag-pill { padding: 6px 14px; border-radius: 20px; background: white; font-size: 13px; cursor: pointer; transition: 0.2s; border: 1px solid #ddd; }
-        .tag-pill.active { background: #3498db; color: white; border-color: #2980b9; box-shadow: 0 2px 5px rgba(52,152,219,0.3); }
+        .tag-pill { padding: 6px 12px; border-radius: 20px; background: white; font-size: 13px; cursor: pointer; border: 1px solid #ddd; transition: 0.2s; }
+        .tag-pill.active { background: #3498db; color: white; border-color: #2980b9; }
+
+        /* 方向切換開關 */
+        .direction-box { display: flex; background: #eee; border-radius: 10px; padding: 4px; margin: 15px 0; }
+        .dir-btn { flex: 1; padding: 10px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; background: none; color: #7f8c8d; transition: 0.3s; }
+        .dir-btn.active { background: white; color: #3498db; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 
         .setting-item { margin: 15px 0; }
         select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; font-size: 16px; margin-top: 5px; background: white; }
-        .primary-btn { width: 100%; padding: 18px; margin-top: 10px; font-size: 18px; cursor: pointer; border-radius: 12px; border: none; background: #3498db; color: white; font-weight: bold; }
+        .primary-btn { width: 100%; padding: 16px; margin-top: 10px; font-size: 18px; cursor: pointer; border-radius: 12px; border: none; background: #3498db; color: white; font-weight: bold; }
         
-        .quiz-option { width: 100%; padding: 16px; margin: 10px 0; border: 2px solid #ecf0f1; border-radius: 12px; background: white; font-size: 19px; cursor: pointer; text-align: left; }
+        .quiz-option { width: 100%; padding: 16px; margin: 10px 0; border: 2px solid #ecf0f1; border-radius: 12px; background: white; font-size: 18px; cursor: pointer; text-align: left; }
         .quiz-option.selected { border-color: #3498db; background-color: #ebf5fb; }
         .correct { background: #2ecc71 !important; color: white; border-color: #27ae60; }
         .wrong { background: #e74c3c !important; color: white; border-color: #c0392b; }
         
-        .meaning-box { background: #fff9db; padding: 20px; border-radius: 15px; font-size: 22px; line-height: 1.6; border-left: 10px solid #f1c40f; margin: 20px 0; }
-        #loader-msg { padding: 20px 0; text-align: center; font-weight: bold; color: #2980b9; }
-        .sync-banner { background: #34495e; color: white; padding: 10px; border-radius: 8px; text-align: center; margin-bottom: 10px; font-size: 14px; }
+        .meaning-box { background: #fff9db; padding: 20px; border-radius: 15px; font-size: 24px; font-weight: bold; line-height: 1.4; border-left: 10px solid #f1c40f; margin: 15px 0; text-align: center; }
+        .supplement { font-size: 14px; color: #7f8c8d; margin-top: 10px; font-weight: normal; }
+        #sync-banner { background: #34495e; color: white; padding: 10px; border-radius: 8px; text-align: center; margin-bottom: 10px; font-size: 14px; }
     </style>
 </head>
 <body>
 
 <div class="card">
     <div id="initArea">
-        <div id="loader-msg">📡 正在同步分頁清單...</div>
+        <div id="loader-msg" style="text-align:center; font-weight:bold; color:#2980b9;">📡 正在同步資料清單...</div>
         <div id="initBarBox" class="progress-box" style="display:block;"><div id="initBarFill" class="progress-fill"></div></div>
         <div id="initPercent" class="percent-text" style="display:block;">0%</div>
     </div>
 
     <div id="setupArea" style="display:none;">
-        <h2 style="margin:0 0 10px 0; text-align:center;">🧠 柏伸智慧複習</h2>
+        <h2 style="margin:0 0 10px 0; text-align:center;">🧠 智慧詞語複習</h2>
         <div class="setting-item">
-            <label>選擇分冊：</label>
-            <select id="sheetSelect" onchange="resetUI()"></select>
+            <label>1. 選擇分冊：</label>
+            <select id="sheetSelect" onchange="resetSelection()"></select>
         </div>
-        <button id="loadSheetBtn" class="primary-btn" onclick="loadSheetData()">載入此題庫內容 ➔</button>
+        <button id="loadSheetBtn" class="primary-btn" onclick="loadSheetData()">載入題庫內容 ➔</button>
 
         <div id="loadBarBox" class="progress-box"><div id="loadBarFill" class="progress-fill"></div></div>
         <div id="loadPercent" class="percent-text">0%</div>
 
-        <div id="subSetup" style="display:none; margin-top:20px; border-top:2px dashed #eee; padding-top:10px;">
-            <p style="margin-bottom:5px; font-weight:bold;">💡 多選標籤篩選 (交集)：</p>
+        <div id="subSetup" style="display:none; margin-top:15px; border-top:2px dashed #eee; padding-top:10px;">
+            <label>2. 測驗方向：</label>
+            <div class="direction-box">
+                <button id="dirAB" class="dir-btn active" onclick="setDirection('AB')">正向 (A ➔ B)</button>
+                <button id="dirBA" class="dir-btn" onclick="setDirection('BA')">反向 (B ➔ A)</button>
+            </div>
+
+            <label>3. 篩選標籤 (多選)：</label>
             <div id="tagScroll" class="tag-scroll-area"><div id="tagCloud" class="tag-container"></div></div>
             <div id="filterCount" style="font-size:12px; color:#3498db; margin-bottom:10px; font-weight:bold;"></div>
             
-            <div class="setting-item">
-                <label>測驗題數：</label>
-                <select id="quizCount"><option value="10">10 題</option><option value="20">20 題</option><option value="30">30 題</option></select>
-            </div>
+            <label>4. 測驗題數：</label>
+            <select id="quizCount"><option value="10">10 題</option><option value="20">20 題</option><option value="30">30 題</option></select>
             
-            <button class="primary-btn" style="background:#e74c3c;" onclick="startQuiz('hard')">🔥 地獄挑戰 (不熟優先)</button>
-            <button class="primary-btn" onclick="startQuiz('mix')">⚖️ 智慧練習 (隨機出題)</button>
+            <button class="primary-btn" style="background:#e74c3c;" onclick="startQuiz('hard')">🔥 地獄挑戰</button>
+            <button class="primary-btn" onclick="startQuiz('mix')">⚖️ 智慧練習</button>
         </div>
     </div>
 
@@ -76,8 +85,8 @@
     </div>
 
     <div id="reportArea" style="display:none;">
-        <div id="syncStatusBanner" class="sync-banner">🔄 進度同步至 Excel 中...</div>
-        <div id="reportList" style="max-height:300px; overflow-y:auto; margin-bottom:15px; border:1px solid #eee; border-radius:10px; padding:10px;"></div>
+        <div id="sync-banner">🔄 進度同步至 Excel 中...</div>
+        <div id="reportList" style="max-height:300px; overflow-y:auto; border:1px solid #eee; border-radius:10px; padding:10px; margin-bottom:15px;"></div>
         <button class="primary-btn" onclick="location.reload()">返回首頁</button>
     </div>
 </div>
@@ -85,7 +94,7 @@
 <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbwdIKdIUNvTrWUK30PfzmsKl4Rtd_t1pID7dk8DcYLON_sCxRoH1f5s3h0L3coYHa3A/exec"; 
     let allData = [], pool = [], currentIndex = -1, batchLog = [], isSyncing = false;
-    let selectedWord = null, currentSheetName = "", activeTags = new Set();
+    let selectedWord = null, currentSheetName = "", activeTags = new Set(), testDir = 'AB';
 
     window.onbeforeunload = () => isSyncing ? "同步中，請稍候" : null;
 
@@ -95,74 +104,58 @@
     }
 
     async function init() {
-        updateProgress('initBarFill', 'initPercent', 15);
+        updateProgress('initBarFill', 'initPercent', 10);
         try {
-            let p = 15;
-            const timer = setInterval(() => { if(p<85) { p+=10; updateProgress('initBarFill', 'initPercent', p); } }, 150);
             const res = await fetch(`${GAS_URL}?action=getSheets&cb=${Date.now()}`);
             const json = await res.json();
-            clearInterval(timer);
             updateProgress('initBarFill', 'initPercent', 100);
-
             const select = document.getElementById('sheetSelect');
             json.sheets.forEach(name => {
                 let opt = document.createElement('option');
                 opt.value = name; opt.innerText = name;
                 select.appendChild(opt);
             });
-
-            setTimeout(() => {
-                document.getElementById('initArea').style.display = 'none';
-                document.getElementById('setupArea').style.display = 'block';
-            }, 500);
-        } catch (e) { document.getElementById('loader-msg').innerText = "❌ 無法連線，請檢查 GAS 網址。"; }
+            setTimeout(() => { document.getElementById('initArea').style.display='none'; document.getElementById('setupArea').style.display='block'; }, 400);
+        } catch (e) { document.getElementById('loader-msg').innerText = "❌ 無法連線，請檢查網路。"; }
     }
 
-    function resetUI() {
+    function resetSelection() {
         document.getElementById('subSetup').style.display = 'none';
         document.getElementById('loadSheetBtn').style.display = 'block';
         document.getElementById('loadSheetBtn').disabled = false;
         activeTags.clear();
     }
 
+    function setDirection(dir) {
+        testDir = dir;
+        document.getElementById('dirAB').classList.toggle('active', dir === 'AB');
+        document.getElementById('dirBA').classList.toggle('active', dir === 'BA');
+    }
+
     async function loadSheetData() {
         const sheetName = document.getElementById('sheetSelect').value;
         const btn = document.getElementById('loadSheetBtn');
         const barBox = document.getElementById('loadBarBox');
-        const pctText = document.getElementById('loadPercent');
-        
-        btn.style.display = 'none';
-        barBox.style.display = 'block';
-        pctText.style.display = 'block';
-        updateProgress('loadBarFill', 'loadPercent', 10);
+        btn.style.display = 'none'; barBox.style.display = 'block';
+        document.getElementById('loadPercent').style.display = 'block';
+        updateProgress('loadBarFill', 'loadPercent', 20);
 
         try {
-            let p = 10;
-            const timer = setInterval(() => { if(p<90) { p+=5; updateProgress('loadBarFill', 'loadPercent', p); } }, 100);
             const res = await fetch(`${GAS_URL}?action=read&sheetName=${encodeURIComponent(sheetName)}&cb=${Date.now()}`);
             const json = await res.json();
-            clearInterval(timer);
             updateProgress('loadBarFill', 'loadPercent', 100);
-            
             allData = json.data;
             currentSheetName = json.currentSheet;
             
             const tagsMap = new Map();
-            allData.forEach(item => {
-                item.tags.forEach(t => tagsMap.set(t, (tagsMap.get(t) || 0) + 1));
-            });
-            
-            const tagScroll = document.getElementById('tagScroll');
+            allData.forEach(item => item.tags.forEach(t => tagsMap.set(t, (tagsMap.get(t) || 0) + 1)));
             const cloud = document.getElementById('tagCloud');
             cloud.innerHTML = '';
-            
             if(tagsMap.size > 0) {
-                tagScroll.style.display = 'block';
-                const sortedTags = [...tagsMap.entries()].sort((a,b) => b[1] - a[1]);
-                sortedTags.forEach(([tag, count]) => {
+                document.getElementById('tagScroll').style.display = 'block';
+                [...tagsMap.entries()].sort((a,b)=>b[1]-a[1]).forEach(([tag, count]) => {
                     const span = document.createElement('span');
-                    span.className = 'tag-pill';
-                    span.innerText = `${tag} (${count})`;
+                    span.className = 'tag-pill'; span.innerText = `${tag} (${count})`;
                     span.onclick = function() {
                         if(activeTags.has(tag)) { activeTags.delete(tag); this.classList.remove('active'); }
                         else { activeTags.add(tag); this.classList.add('active'); }
@@ -170,40 +163,29 @@
                     };
                     cloud.appendChild(span);
                 });
-            } else { tagScroll.style.display = 'none'; }
+            } else { document.getElementById('tagScroll').style.display = 'none'; }
 
-            setTimeout(() => {
-                barBox.style.display = 'none';
-                pctText.style.display = 'none';
-                document.getElementById('subSetup').style.display = 'block';
-                updateCount();
-            }, 600);
+            setTimeout(() => { barBox.style.display = 'none'; document.getElementById('loadPercent').style.display = 'none'; document.getElementById('subSetup').style.display = 'block'; updateCount(); }, 500);
         } catch (e) { alert("讀取失敗"); btn.style.display = 'block'; }
     }
 
     function updateCount() {
-        let filtered = allData;
-        if(activeTags.size > 0) {
-            filtered = allData.filter(d => Array.from(activeTags).every(tag => d.tags.includes(tag)));
-        }
+        let filtered = activeTags.size > 0 ? allData.filter(d => Array.from(activeTags).every(tag => d.tags.includes(tag))) : allData;
         document.getElementById('filterCount').innerText = `已篩選題目：${filtered.length} / ${allData.length}`;
     }
 
     function startQuiz(mode) {
         const totalTarget = parseInt(document.getElementById('quizCount').value);
-        let filtered = allData;
-        if(activeTags.size > 0) {
-            filtered = allData.filter(d => Array.from(activeTags).every(tag => d.tags.includes(tag)));
-        }
-        if(filtered.length === 0) { alert("此組合無題目！"); return; }
+        let filtered = activeTags.size > 0 ? allData.filter(d => Array.from(activeTags).every(tag => d.tags.includes(tag))) : allData;
+        if(filtered.length === 0) return alert("無題目！");
 
         let red = filtered.filter(d => d.score <= 3).sort(() => Math.random() - 0.5);
         let others = filtered.filter(d => d.score > 3).sort(() => Math.random() - 0.5);
-        pool = (mode === 'hard') ? [...red, ...others].slice(0, totalTarget) : filtered.sort(() => Math.random() - 0.5).slice(0, totalTarget);
+        pool = (mode === 'hard' ? [...red, ...others] : filtered.sort(() => Math.random() - 0.5)).slice(0, totalTarget);
 
         document.getElementById('setupArea').style.display = 'none';
         document.getElementById('gameArea').style.display = 'block';
-        nextQuestion();
+        currentIndex = -1; nextQuestion();
     }
 
     function nextQuestion() {
@@ -212,11 +194,18 @@
         selectedWord = null;
         const item = pool[currentIndex];
         document.getElementById('gameHeader').innerText = `${currentSheetName} | ${currentIndex + 1}/${pool.length} (熟練度:${item.score})`;
-        document.getElementById('meaningDisplay').innerText = item.meaning;
+        
+        // 方向邏輯：正向顯示 A，反向顯示 B
+        const qText = (testDir === 'AB') ? item.word : item.meaning;
+        document.getElementById('meaningDisplay').innerHTML = qText + (item.ext ? `<div class="supplement">提示：${item.ext}</div>` : '');
+        
         const group = document.getElementById('optionsGroup');
         group.innerHTML = '';
-        let choices = [item.word, ...allData.filter(d=>d.word!==item.word).map(d=>d.word).sort(()=>Math.random()-0.5).slice(0,3)].sort(()=>Math.random()-0.5);
-        choices.forEach(txt => {
+        // 選項邏輯：正向選 B，反向選 A
+        const correctOpt = (testDir === 'AB') ? item.meaning : item.word;
+        const wrongOpts = allData.filter(d => d.word !== item.word).map(d => (testDir === 'AB' ? d.meaning : d.word)).sort(() => Math.random() - 0.5).slice(0, 3);
+        
+        [correctOpt, ...wrongOpts].sort(() => Math.random() - 0.5).forEach(txt => {
             const btn = document.createElement('button');
             btn.className = 'quiz-option'; btn.innerText = txt;
             btn.onclick = function() {
@@ -228,12 +217,13 @@
     }
 
     function handleNext() {
-        if (!selectedWord) return alert("請先選一個答案！");
+        if (!selectedWord) return alert("選一個答案！");
         const item = pool[currentIndex];
-        const isCorrect = (selectedWord === item.word);
-        batchLog.push({ row: item.row, delta: isCorrect ? 1 : -1, meaning: item.meaning, selected: selectedWord, correct: item.word, isCorrect });
+        const correctOpt = (testDir === 'AB') ? item.meaning : item.word;
+        const isCorrect = (selectedWord === correctOpt);
+        batchLog.push({ row: item.row, delta: isCorrect ? 1 : -1, meaning: (testDir === 'AB' ? item.word : item.meaning), selected: selectedWord, correct: correctOpt, isCorrect });
         document.querySelectorAll('.quiz-option').forEach(b => {
-            if (b.innerText === item.word) b.classList.add('correct');
+            if (b.innerText === correctOpt) b.classList.add('correct');
             else if (b.innerText === selectedWord && !isCorrect) b.classList.add('wrong');
         });
         item.score = Math.max(0, Math.min(10, item.score + (isCorrect ? 1 : -1)));
@@ -244,20 +234,12 @@
         document.getElementById('gameArea').style.display = 'none';
         document.getElementById('reportArea').style.display = 'block';
         const list = document.getElementById('reportList');
-        list.innerHTML = batchLog.sort((a,b)=>a.isCorrect-b.isCorrect).map(i => `
-            <div style="padding:10px; border-bottom:1px solid #eee;">
-                <small style="color:#999">${i.meaning}</small><br>
-                <b>${i.isCorrect ? '✅ '+i.correct : '❌ '+i.selected+' → '+i.correct}</b>
-            </div>`).join('');
-
+        list.innerHTML = batchLog.sort((a,b)=>a.isCorrect-b.isCorrect).map(i => `<div style="padding:10px; border-bottom:1px solid #eee;"><small style="color:#999">${i.meaning}</small><br><b>${i.isCorrect ? '✅ '+i.correct : '❌ '+i.selected+' → '+i.correct}</b></div>`).join('');
         isSyncing = true;
         try {
-            await fetch(`${GAS_URL}?sheetName=${encodeURIComponent(currentSheetName)}`, {
-                method: 'POST', mode: 'no-cors', body: JSON.stringify(batchLog.map(l=>({row:l.row, delta:l.delta})))
-            });
-            document.getElementById('syncStatusBanner').innerText = "✅ 進度同步完成";
-            document.getElementById('syncStatusBanner').style.background = "#27ae60";
-        } catch (e) { document.getElementById('syncStatusBanner').innerText = "❌ 同步異常"; }
+            await fetch(`${GAS_URL}?sheetName=${encodeURIComponent(currentSheetName)}`, { method: 'POST', mode: 'no-cors', body: JSON.stringify(batchLog.map(l=>({row:l.row, delta:l.delta}))) });
+            document.getElementById('sync-banner').innerText = "✅ 已同步成功"; document.getElementById('sync-banner').style.background = "#27ae60";
+        } catch (e) { document.getElementById('sync-banner').innerText = "❌ 同步異常"; }
         isSyncing = false;
     }
     window.onload = init;
