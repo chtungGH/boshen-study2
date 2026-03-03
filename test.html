@@ -77,4 +77,139 @@
     let rawData = [];
     let pool = [];
     let currentIndex = -1;
-    let batchLog = []; // 存 [{word
+    let batchLog = []; // 存 [{word, meaning, selected, correct, isCorrect, row, delta}]
+    let isSyncing = false;
+
+    // 離開提醒邏輯
+    window.onbeforeunload = function() {
+        if (isSyncing) return "資料正在同步中，確定要離開嗎？";
+    };
+
+    async function init() {
+        try {
+            const res = await fetch(`${GAS_URL}?action=read&cb=${Date.now()}`);
+            const json = await res.json();
+            rawData = json.data;
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('setupArea').style.display = 'block';
+        } catch (e) {
+            document.getElementById('loader').innerHTML = "❌ 連線失敗";
+        }
+    }
+
+    function prepareApp(mode) {
+        const totalTarget = parseInt(document.getElementById('quizCount').value);
+        
+        // 1. 分類並洗牌
+        let red = rawData.filter(d => d.score <= 3).sort(() => Math.random() - 0.5);
+        let yellow = rawData.filter(d => d.score >= 4 && d.score <= 7).sort(() => Math.random() - 0.5);
+        let green = rawData.filter(d => d.score >= 8).sort(() => Math.random() - 0.5);
+
+        // 2. 計算配額
+        let counts = { red: 0, yellow: 0, green: 0 };
+        if (mode === 'hard') { counts.red = Math.floor(totalTarget * 0.9); counts.yellow = totalTarget - counts.red; }
+        else if (mode === 'mix') { counts.red = Math.floor(totalTarget * 0.7); counts.yellow = Math.floor(totalTarget * 0.2); counts.green = totalTarget - counts.red - counts.yellow; }
+        else { counts.red = Math.floor(totalTarget * 0.4); counts.yellow = Math.floor(totalTarget * 0.4); counts.green = totalTarget - counts.red - counts.yellow; }
+
+        // 3. 不重複抽取
+        pool = [];
+        for(let i=0; i<counts.red; i++) { if(red.length > 0) pool.push(red.shift()); }
+        for(let i=0; i<counts.yellow; i++) { if(yellow.length > 0) pool.push(yellow.shift()); }
+        for(let i=0; i<counts.green; i++) { if(green.length > 0) pool.push(green.shift()); }
+
+        // 4. 補位
+        if (pool.length < totalTarget) {
+            let remain = [...red, ...yellow, ...green].sort(() => Math.random() - 0.5);
+            while (pool.length < totalTarget && remain.length > 0) pool.push(remain.shift());
+        }
+
+        pool.sort(() => Math.random() - 0.5);
+        startQuiz();
+    }
+
+    function startQuiz() {
+        document.getElementById('setupArea').style.display = 'none';
+        document.getElementById('gameArea').style.display = 'block';
+        nextQuestion();
+    }
+
+    function nextQuestion() {
+        currentIndex++;
+        if (currentIndex >= pool.length) {
+            finishAndSync();
+            return;
+        }
+        const item = pool[currentIndex];
+        document.getElementById('progressText').innerText = `題號：${currentIndex + 1} / ${pool.length}`;
+        document.getElementById('scoreText').innerText = `熟練度: ${item.score}`;
+        document.getElementById('meaningDisplay').innerText = item.meaning;
+        document.getElementById('nextBtn').style.display = 'none';
+        renderOptions(item);
+    }
+
+    function renderOptions(item) {
+        const group = document.getElementById('optionsGroup');
+        group.innerHTML = '';
+        let others = rawData.filter(d => d.word !== item.word).map(d => d.word).sort(() => Math.random() - 0.5);
+        let choices = [item.word, ...others.slice(0, 3)].sort(() => Math.random() - 0.5);
+
+        choices.forEach(txt => {
+            const btn = document.createElement('button');
+            btn.className = 'quiz-option';
+            btn.innerText = txt;
+            btn.onclick = function() {
+                const isCorrect = (txt === item.word);
+                batchLog.push({
+                    meaning: item.meaning,
+                    selected: txt,
+                    correct: item.word,
+                    isCorrect: isCorrect,
+                    row: item.row,
+                    delta: isCorrect ? 1 : -1
+                });
+                
+                document.querySelectorAll('.quiz-option').forEach(b => {
+                    b.disabled = true;
+                    if(b.innerText === item.word) b.classList.add('correct');
+                    else if(b.innerText === txt && !isCorrect) b.classList.add('wrong');
+                });
+                document.getElementById('nextBtn').style.display = 'block';
+            };
+            group.appendChild(btn);
+        });
+    }
+
+    async function finishAndSync() {
+        document.getElementById('gameArea').style.display = 'none';
+        document.getElementById('reportArea').style.display = 'block';
+        
+        // 渲染戰報 (錯題置頂)
+        const list = document.getElementById('reportList');
+        const sortedLog = [...batchLog].sort((a,b) => a.isCorrect - b.isCorrect);
+        list.innerHTML = sortedLog.map(item => `
+            <div class="report-item">
+                <span class="report-q">${item.meaning}</span>
+                <span class="report-res" style="color:${item.isCorrect ? '#2ecc71' : '#e74c3c'}">
+                    ${item.isCorrect ? '✅ ' + item.correct : '❌ ' + item.selected + ' (正確：' + item.correct + ')'}
+                </span>
+            </div>
+        `).join('');
+
+        // 自動同步
+        isSyncing = true;
+        try {
+            const syncData = batchLog.map(l => ({ row: l.row, delta: l.delta }));
+            await fetch(`${GAS_URL}?action=batchUpdate&data=${encodeURIComponent(JSON.stringify(syncData))}`);
+            document.getElementById('syncStatusBanner').innerText = "✅ 同步完成！所有進度已儲存。";
+            document.getElementById('syncStatusBanner').style.background = "#27ae60";
+        } catch (e) {
+            document.getElementById('syncStatusBanner').innerText = "❌ 同步失敗，請檢查網路。";
+            document.getElementById('syncStatusBanner').style.background = "#e74c3c";
+        }
+        isSyncing = false;
+    }
+
+    window.onload = init;
+</script>
+</body>
+</html>
