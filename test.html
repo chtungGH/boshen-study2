@@ -2,23 +2,25 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>柏伸智慧複習 v3.1.3</title>
+    <title>柏伸智慧複習 v3.2.0</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body { font-family: "Microsoft JhengHei", sans-serif; text-align: center; padding: 20px; background-color: #f0f4f8; color: #2c3e50; }
         .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: inline-block; width: 95%; max-width: 500px; text-align: left; box-sizing: border-box; }
         
-        /* 進度條樣式 */
+        /* 進度條 */
         .progress-box { width: 100%; background: #eee; border-radius: 10px; height: 12px; margin: 15px 0; overflow: hidden; display: none; }
-        .progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #3498db, #2ecc71); transition: width 0.4s ease; }
+        .progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #3498db, #2ecc71); transition: width 0.3s ease; }
         .percent-text { font-size: 12px; color: #7f8c8d; text-align: center; margin-top: -10px; margin-bottom: 10px; display: none; }
 
-        .tag-container { margin: 15px 0; display: flex; flex-wrap: wrap; gap: 8px; }
-        .tag-pill { padding: 6px 14px; border-radius: 20px; background: #ecf0f1; font-size: 13px; cursor: pointer; transition: 0.2s; border: 1px solid #ddd; }
-        .tag-pill.active { background: #3498db; color: white; border-color: #2980b9; }
+        /* 標籤雲 */
+        .tag-scroll-area { max-height: 120px; overflow-y: auto; border: 1px solid #eee; padding: 10px; border-radius: 10px; background: #fafafa; margin: 10px 0; display: none; }
+        .tag-container { display: flex; flex-wrap: wrap; gap: 8px; }
+        .tag-pill { padding: 6px 14px; border-radius: 20px; background: white; font-size: 13px; cursor: pointer; transition: 0.2s; border: 1px solid #ddd; }
+        .tag-pill.active { background: #3498db; color: white; border-color: #2980b9; box-shadow: 0 2px 5px rgba(52,152,219,0.3); }
 
         .setting-item { margin: 15px 0; }
-        select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; font-size: 16px; margin-top: 5px; }
+        select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; font-size: 16px; margin-top: 5px; background: white; }
         .primary-btn { width: 100%; padding: 18px; margin-top: 10px; font-size: 18px; cursor: pointer; border-radius: 12px; border: none; background: #3498db; color: white; font-weight: bold; }
         
         .quiz-option { width: 100%; padding: 16px; margin: 10px 0; border: 2px solid #ecf0f1; border-radius: 12px; background: white; font-size: 19px; cursor: pointer; text-align: left; }
@@ -27,41 +29,42 @@
         .wrong { background: #e74c3c !important; color: white; border-color: #c0392b; }
         
         .meaning-box { background: #fff9db; padding: 20px; border-radius: 15px; font-size: 22px; line-height: 1.6; border-left: 10px solid #f1c40f; margin: 20px 0; }
-        .sync-banner { background: #34495e; color: white; padding: 10px; border-radius: 8px; text-align: center; margin-bottom: 10px; font-size: 14px; }
         #loader-msg { padding: 20px 0; text-align: center; font-weight: bold; color: #2980b9; }
+        .sync-banner { background: #34495e; color: white; padding: 10px; border-radius: 8px; text-align: center; margin-bottom: 10px; font-size: 14px; }
     </style>
 </head>
 <body>
 
 <div class="card">
     <div id="initArea">
-        <div id="loader-msg">📡 正在連接資料庫...</div>
+        <div id="loader-msg">📡 正在同步分頁清單...</div>
         <div id="initBarBox" class="progress-box" style="display:block;"><div id="initBarFill" class="progress-fill"></div></div>
         <div id="initPercent" class="percent-text" style="display:block;">0%</div>
     </div>
 
     <div id="setupArea" style="display:none;">
-        <h2 style="margin:0 0 10px 0; text-align:center;">🧠 選擇題庫</h2>
+        <h2 style="margin:0 0 10px 0; text-align:center;">🧠 柏伸智慧複習</h2>
         <div class="setting-item">
-            <label>選擇分冊 (* 標籤)：</label>
-            <select id="sheetSelect"></select>
+            <label>選擇分冊：</label>
+            <select id="sheetSelect" onchange="resetUI()"></select>
         </div>
-        <button id="loadSheetBtn" class="primary-btn" onclick="loadSheetData()">載入題庫內容 ➔</button>
+        <button id="loadSheetBtn" class="primary-btn" onclick="loadSheetData()">載入此題庫內容 ➔</button>
 
         <div id="loadBarBox" class="progress-box"><div id="loadBarFill" class="progress-fill"></div></div>
         <div id="loadPercent" class="percent-text">0%</div>
 
-        <div id="subSetup" style="display:none; margin-top:20px; border-top:2px dashed #eee; padding-top:20px;">
-            <label>💡 依標籤篩選 (自動偵測)：</label>
-            <div id="tagCloud" class="tag-container"></div>
+        <div id="subSetup" style="display:none; margin-top:20px; border-top:2px dashed #eee; padding-top:10px;">
+            <p style="margin-bottom:5px; font-weight:bold;">💡 多選標籤篩選 (交集)：</p>
+            <div id="tagScroll" class="tag-scroll-area"><div id="tagCloud" class="tag-container"></div></div>
+            <div id="filterCount" style="font-size:12px; color:#3498db; margin-bottom:10px; font-weight:bold;"></div>
             
             <div class="setting-item">
                 <label>測驗題數：</label>
                 <select id="quizCount"><option value="10">10 題</option><option value="20">20 題</option><option value="30">30 題</option></select>
             </div>
             
-            <button class="primary-btn" style="background:#e74c3c;" onclick="startQuiz('hard')">🔥 地獄挑戰 (90%)</button>
-            <button class="primary-btn" onclick="startQuiz('mix')">⚖️ 智慧練習 (70%)</button>
+            <button class="primary-btn" style="background:#e74c3c;" onclick="startQuiz('hard')">🔥 地獄挑戰 (不熟優先)</button>
+            <button class="primary-btn" onclick="startQuiz('mix')">⚖️ 智慧練習 (隨機出題)</button>
         </div>
     </div>
 
@@ -73,38 +76,31 @@
     </div>
 
     <div id="reportArea" style="display:none;">
-        <div id="syncStatusBanner" class="sync-banner">🔄 進度同步中...</div>
+        <div id="syncStatusBanner" class="sync-banner">🔄 進度同步至 Excel 中...</div>
         <div id="reportList" style="max-height:300px; overflow-y:auto; margin-bottom:15px; border:1px solid #eee; border-radius:10px; padding:10px;"></div>
-        <button class="primary-btn" onclick="location.reload()">回首頁選其他題庫</button>
+        <button class="primary-btn" onclick="location.reload()">返回首頁</button>
     </div>
 </div>
 
 <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbwdIKdIUNvTrWUK30PfzmsKl4Rtd_t1pID7dk8DcYLON_sCxRoH1f5s3h0L3coYHa3A/exec"; 
     let allData = [], pool = [], currentIndex = -1, batchLog = [], isSyncing = false;
-    let selectedWord = null, currentSheetName = "", activeTag = null;
+    let selectedWord = null, currentSheetName = "", activeTags = new Set();
 
-    window.onbeforeunload = () => isSyncing ? "資料同步中" : null;
+    window.onbeforeunload = () => isSyncing ? "同步中，請稍候" : null;
 
-    // 進度條控制函式
     function updateProgress(barId, textId, value) {
-        const bar = document.getElementById(barId);
-        const text = document.getElementById(textId);
-        bar.style.width = value + "%";
-        text.innerText = value + "%";
+        document.getElementById(barId).style.width = value + "%";
+        document.getElementById(textId).innerText = value + "%";
     }
 
-    // 初始化：抓取分頁清單
     async function init() {
-        updateProgress('initBarFill', 'initPercent', 20);
+        updateProgress('initBarFill', 'initPercent', 15);
         try {
-            // 模擬進度增加
-            let p = 20;
-            const timer = setInterval(() => { if(p<85) { p+=5; updateProgress('initBarFill', 'initPercent', p); } }, 200);
-
+            let p = 15;
+            const timer = setInterval(() => { if(p<85) { p+=10; updateProgress('initBarFill', 'initPercent', p); } }, 150);
             const res = await fetch(`${GAS_URL}?action=getSheets&cb=${Date.now()}`);
             const json = await res.json();
-            
             clearInterval(timer);
             updateProgress('initBarFill', 'initPercent', 100);
 
@@ -119,12 +115,16 @@
                 document.getElementById('initArea').style.display = 'none';
                 document.getElementById('setupArea').style.display = 'block';
             }, 500);
-        } catch (e) {
-            document.getElementById('loader-msg').innerText = "❌ 無法連線，請檢查網路。";
-        }
+        } catch (e) { document.getElementById('loader-msg').innerText = "❌ 無法連線，請檢查 GAS 網址。"; }
     }
 
-    // 載入具體分頁資料
+    function resetUI() {
+        document.getElementById('subSetup').style.display = 'none';
+        document.getElementById('loadSheetBtn').style.display = 'block';
+        document.getElementById('loadSheetBtn').disabled = false;
+        activeTags.clear();
+    }
+
     async function loadSheetData() {
         const sheetName = document.getElementById('sheetSelect').value;
         const btn = document.getElementById('loadSheetBtn');
@@ -138,50 +138,64 @@
 
         try {
             let p = 10;
-            const timer = setInterval(() => { if(p<90) { p+=2; updateProgress('loadBarFill', 'loadPercent', p); } }, 100);
-
+            const timer = setInterval(() => { if(p<90) { p+=5; updateProgress('loadBarFill', 'loadPercent', p); } }, 100);
             const res = await fetch(`${GAS_URL}?action=read&sheetName=${encodeURIComponent(sheetName)}&cb=${Date.now()}`);
             const json = await res.json();
-            
             clearInterval(timer);
             updateProgress('loadBarFill', 'loadPercent', 100);
             
             allData = json.data;
             currentSheetName = json.currentSheet;
             
-            const tags = new Set();
-            allData.forEach(item => item.tags.forEach(t => tags.add(t)));
+            const tagsMap = new Map();
+            allData.forEach(item => {
+                item.tags.forEach(t => tagsMap.set(t, (tagsMap.get(t) || 0) + 1));
+            });
             
+            const tagScroll = document.getElementById('tagScroll');
             const cloud = document.getElementById('tagCloud');
             cloud.innerHTML = '';
-            if(tags.size === 0) cloud.innerHTML = '<span style="color:#ccc; font-size:12px;">此分頁無標籤</span>';
-            tags.forEach(tag => {
-                const span = document.createElement('span');
-                span.className = 'tag-pill';
-                span.innerText = tag;
-                span.onclick = function() {
-                    document.querySelectorAll('.tag-pill').forEach(p => p.classList.remove('active'));
-                    if (activeTag === tag) { activeTag = null; } 
-                    else { activeTag = tag; this.classList.add('active'); }
-                };
-                cloud.appendChild(span);
-            });
+            
+            if(tagsMap.size > 0) {
+                tagScroll.style.display = 'block';
+                const sortedTags = [...tagsMap.entries()].sort((a,b) => b[1] - a[1]);
+                sortedTags.forEach(([tag, count]) => {
+                    const span = document.createElement('span');
+                    span.className = 'tag-pill';
+                    span.innerText = `${tag} (${count})`;
+                    span.onclick = function() {
+                        if(activeTags.has(tag)) { activeTags.delete(tag); this.classList.remove('active'); }
+                        else { activeTags.add(tag); this.classList.add('active'); }
+                        updateCount();
+                    };
+                    cloud.appendChild(span);
+                });
+            } else { tagScroll.style.display = 'none'; }
 
             setTimeout(() => {
                 barBox.style.display = 'none';
                 pctText.style.display = 'none';
                 document.getElementById('subSetup').style.display = 'block';
+                updateCount();
             }, 600);
-        } catch (e) {
-            alert("載入失敗");
-            btn.style.display = 'block';
+        } catch (e) { alert("讀取失敗"); btn.style.display = 'block'; }
+    }
+
+    function updateCount() {
+        let filtered = allData;
+        if(activeTags.size > 0) {
+            filtered = allData.filter(d => Array.from(activeTags).every(tag => d.tags.includes(tag)));
         }
+        document.getElementById('filterCount').innerText = `已篩選題目：${filtered.length} / ${allData.length}`;
     }
 
     function startQuiz(mode) {
         const totalTarget = parseInt(document.getElementById('quizCount').value);
-        let filtered = activeTag ? allData.filter(d => d.tags.includes(activeTag)) : allData;
-        if(filtered.length === 0) { alert("該範圍無題目！"); return; }
+        let filtered = allData;
+        if(activeTags.size > 0) {
+            filtered = allData.filter(d => Array.from(activeTags).every(tag => d.tags.includes(tag)));
+        }
+        if(filtered.length === 0) { alert("此組合無題目！"); return; }
 
         let red = filtered.filter(d => d.score <= 3).sort(() => Math.random() - 0.5);
         let others = filtered.filter(d => d.score > 3).sort(() => Math.random() - 0.5);
@@ -197,26 +211,24 @@
         if (currentIndex >= pool.length) { showReportAndSync(); return; }
         selectedWord = null;
         const item = pool[currentIndex];
-        document.getElementById('gameHeader').innerText = `${currentSheetName} | 題號：${currentIndex + 1}/${pool.length} (熟練度:${item.score})`;
+        document.getElementById('gameHeader').innerText = `${currentSheetName} | ${currentIndex + 1}/${pool.length} (熟練度:${item.score})`;
         document.getElementById('meaningDisplay').innerText = item.meaning;
         const group = document.getElementById('optionsGroup');
         group.innerHTML = '';
         let choices = [item.word, ...allData.filter(d=>d.word!==item.word).map(d=>d.word).sort(()=>Math.random()-0.5).slice(0,3)].sort(()=>Math.random()-0.5);
         choices.forEach(txt => {
             const btn = document.createElement('button');
-            btn.className = 'quiz-option';
-            btn.innerText = txt;
+            btn.className = 'quiz-option'; btn.innerText = txt;
             btn.onclick = function() {
                 document.querySelectorAll('.quiz-option').forEach(b => b.classList.remove('selected'));
-                this.classList.add('selected');
-                selectedWord = txt;
+                this.classList.add('selected'); selectedWord = txt;
             };
             group.appendChild(btn);
         });
     }
 
     function handleNext() {
-        if (!selectedWord) return alert("選個答案吧！");
+        if (!selectedWord) return alert("請先選一個答案！");
         const item = pool[currentIndex];
         const isCorrect = (selectedWord === item.word);
         batchLog.push({ row: item.row, delta: isCorrect ? 1 : -1, meaning: item.meaning, selected: selectedWord, correct: item.word, isCorrect });
@@ -243,9 +255,9 @@
             await fetch(`${GAS_URL}?sheetName=${encodeURIComponent(currentSheetName)}`, {
                 method: 'POST', mode: 'no-cors', body: JSON.stringify(batchLog.map(l=>({row:l.row, delta:l.delta})))
             });
-            document.getElementById('syncStatusBanner').innerText = "✅ 進度已同步成功";
+            document.getElementById('syncStatusBanner').innerText = "✅ 進度同步完成";
             document.getElementById('syncStatusBanner').style.background = "#27ae60";
-        } catch (e) { document.getElementById('syncStatusBanner').innerText = "❌ 同步連線異常"; }
+        } catch (e) { document.getElementById('syncStatusBanner').innerText = "❌ 同步異常"; }
         isSyncing = false;
     }
     window.onload = init;
