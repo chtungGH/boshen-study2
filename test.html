@@ -2,38 +2,35 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>柏伸智慧複習 v3.3.0</title>
+    <title>柏伸智慧複習 v3.3.1</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body { font-family: "Microsoft JhengHei", sans-serif; text-align: center; padding: 15px; background-color: #f0f4f8; color: #2c3e50; }
         .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: inline-block; width: 100%; max-width: 500px; text-align: left; box-sizing: border-box; }
         
-        /* 進度條 */
         .progress-box { width: 100%; background: #eee; border-radius: 10px; height: 10px; margin: 15px 0; overflow: hidden; display: none; }
         .progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #3498db, #2ecc71); transition: width 0.3s; }
         .percent-text { font-size: 12px; color: #7f8c8d; text-align: center; margin-top: -10px; margin-bottom: 10px; display: none; }
 
-        /* 標籤雲 */
         .tag-scroll-area { max-height: 120px; overflow-y: auto; border: 1px solid #eee; padding: 10px; border-radius: 10px; background: #fafafa; margin: 10px 0; display: none; }
         .tag-container { display: flex; flex-wrap: wrap; gap: 8px; }
         .tag-pill { padding: 6px 12px; border-radius: 20px; background: white; font-size: 13px; cursor: pointer; border: 1px solid #ddd; transition: 0.2s; }
         .tag-pill.active { background: #3498db; color: white; border-color: #2980b9; }
 
-        /* 方向切換開關 */
         .direction-box { display: flex; background: #eee; border-radius: 10px; padding: 4px; margin: 15px 0; }
-        .dir-btn { flex: 1; padding: 10px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; background: none; color: #7f8c8d; transition: 0.3s; }
+        .dir-btn { flex: 1; padding: 10px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; background: none; color: #7f8c8d; transition: 0.3s; font-size: 14px; }
         .dir-btn.active { background: white; color: #3498db; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 
         .setting-item { margin: 15px 0; }
         select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; font-size: 16px; margin-top: 5px; background: white; }
-        .primary-btn { width: 100%; padding: 16px; margin-top: 10px; font-size: 18px; cursor: pointer; border-radius: 12px; border: none; background: #3498db; color: white; font-weight: bold; }
+        .primary-btn { width: 100%; padding: 18px; margin-top: 10px; font-size: 18px; cursor: pointer; border-radius: 12px; border: none; background: #3498db; color: white; font-weight: bold; }
         
         .quiz-option { width: 100%; padding: 16px; margin: 10px 0; border: 2px solid #ecf0f1; border-radius: 12px; background: white; font-size: 18px; cursor: pointer; text-align: left; }
         .quiz-option.selected { border-color: #3498db; background-color: #ebf5fb; }
         .correct { background: #2ecc71 !important; color: white; border-color: #27ae60; }
         .wrong { background: #e74c3c !important; color: white; border-color: #c0392b; }
         
-        .meaning-box { background: #fff9db; padding: 20px; border-radius: 15px; font-size: 24px; font-weight: bold; line-height: 1.4; border-left: 10px solid #f1c40f; margin: 15px 0; text-align: center; }
+        .meaning-box { background: #fff9db; padding: 25px; border-radius: 15px; font-size: 26px; font-weight: bold; line-height: 1.4; border-left: 10px solid #f1c40f; margin: 15px 0; text-align: center; }
         .supplement { font-size: 14px; color: #7f8c8d; margin-top: 10px; font-weight: normal; }
         #sync-banner { background: #34495e; color: white; padding: 10px; border-radius: 8px; text-align: center; margin-bottom: 10px; font-size: 14px; }
     </style>
@@ -61,8 +58,8 @@
         <div id="subSetup" style="display:none; margin-top:15px; border-top:2px dashed #eee; padding-top:10px;">
             <label>2. 測驗方向：</label>
             <div class="direction-box">
-                <button id="dirAB" class="dir-btn active" onclick="setDirection('AB')">正向 (A ➔ B)</button>
-                <button id="dirBA" class="dir-btn" onclick="setDirection('BA')">反向 (B ➔ A)</button>
+                <button id="dirAB" class="dir-btn active" onclick="setDirection('AB')">正向 (載入中...)</button>
+                <button id="dirBA" class="dir-btn" onclick="setDirection('BA')">反向 (載入中...)</button>
             </div>
 
             <label>3. 篩選標籤 (多選)：</label>
@@ -95,6 +92,7 @@
     const GAS_URL = "https://script.google.com/macros/s/AKfycbwdIKdIUNvTrWUK30PfzmsKl4Rtd_t1pID7dk8DcYLON_sCxRoH1f5s3h0L3coYHa3A/exec"; 
     let allData = [], pool = [], currentIndex = -1, batchLog = [], isSyncing = false;
     let selectedWord = null, currentSheetName = "", activeTags = new Set(), testDir = 'AB';
+    let colAHeader = "A欄", colBHeader = "B欄";
 
     window.onbeforeunload = () => isSyncing ? "同步中，請稍候" : null;
 
@@ -144,8 +142,15 @@
             const res = await fetch(`${GAS_URL}?action=read&sheetName=${encodeURIComponent(sheetName)}&cb=${Date.now()}`);
             const json = await res.json();
             updateProgress('loadBarFill', 'loadPercent', 100);
+            
             allData = json.data;
             currentSheetName = json.currentSheet;
+            colAHeader = json.headers.colA;
+            colBHeader = json.headers.colB;
+
+            // 更新按鈕文字
+            document.getElementById('dirAB').innerText = `正向 (${colAHeader} ➔ ${colBHeader})`;
+            document.getElementById('dirBA').innerText = `反向 (${colBHeader} ➔ ${colAHeader})`;
             
             const tagsMap = new Map();
             allData.forEach(item => item.tags.forEach(t => tagsMap.set(t, (tagsMap.get(t) || 0) + 1)));
@@ -195,13 +200,11 @@
         const item = pool[currentIndex];
         document.getElementById('gameHeader').innerText = `${currentSheetName} | ${currentIndex + 1}/${pool.length} (熟練度:${item.score})`;
         
-        // 方向邏輯：正向顯示 A，反向顯示 B
         const qText = (testDir === 'AB') ? item.word : item.meaning;
         document.getElementById('meaningDisplay').innerHTML = qText + (item.ext ? `<div class="supplement">提示：${item.ext}</div>` : '');
         
         const group = document.getElementById('optionsGroup');
         group.innerHTML = '';
-        // 選項邏輯：正向選 B，反向選 A
         const correctOpt = (testDir === 'AB') ? item.meaning : item.word;
         const wrongOpts = allData.filter(d => d.word !== item.word).map(d => (testDir === 'AB' ? d.meaning : d.word)).sort(() => Math.random() - 0.5).slice(0, 3);
         
