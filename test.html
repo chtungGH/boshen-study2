@@ -2,43 +2,73 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>詞語智慧複習系統 v2.1.0</title>
+    <title>柏伸詞語智慧複習 v2.2.0</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { font-family: sans-serif; text-align: center; padding: 20px; background: #f4f4f4; }
-        .card { background: white; padding: 20px; border-radius: 15px; display: inline-block; width: 100%; max-width: 450px; text-align: left; box-sizing: border-box; }
-        .meaning-box { background: #fff9db; padding: 15px; border-radius: 10px; margin: 15px 0; font-size: 20px; border-left: 5px solid #f1c40f; }
-        .quiz-option { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; background: white; font-size: 18px; cursor: pointer; text-align: left; }
-        .correct { background: #2ecc71 !important; color: white; }
-        .wrong { background: #e74c3c !important; color: white; }
-        button.nav-btn { width: 100%; padding: 15px; margin: 10px 0; font-size: 18px; cursor: pointer; border-radius: 10px; border: none; background: #3498db; color: white; }
-        #syncArea { display: none; text-align: center; }
+        body { font-family: "Microsoft JhengHei", sans-serif; text-align: center; padding: 20px; background-color: #f0f4f8; color: #2c3e50; }
+        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: inline-block; width: 95%; max-width: 500px; text-align: left; box-sizing: border-box; }
+        
+        /* 設定區樣式 */
+        .setting-item { margin: 15px 0; }
+        select, input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; font-size: 16px; margin-top: 5px; }
+        
+        /* 答題區樣式 */
+        .meaning-box { background: #fff9db; padding: 20px; border-radius: 15px; font-size: 22px; line-height: 1.6; border-left: 10px solid #f1c40f; margin: 20px 0; }
+        .quiz-option { width: 100%; padding: 16px; margin: 10px 0; border: 2px solid #ecf0f1; border-radius: 12px; background: white; font-size: 19px; cursor: pointer; text-align: left; }
+        .correct { background: #2ecc71 !important; color: white; border-color: #27ae60; }
+        .wrong { background: #e74c3c !important; color: white; border-color: #c0392b; }
+        
+        /* 戰報區樣式 */
+        .report-item { padding: 10px; border-bottom: 1px solid #eee; font-size: 15px; }
+        .report-q { color: #7f8c8d; font-style: italic; display: block; margin-bottom: 5px; }
+        .report-res { font-weight: bold; }
+        .sync-banner { background: #34495e; color: white; padding: 10px; border-radius: 8px; text-align: center; margin-bottom: 15px; font-size: 14px; }
+        
+        button.primary-btn { width: 100%; padding: 18px; margin-top: 10px; font-size: 18px; cursor: pointer; border-radius: 12px; border: none; background: #3498db; color: white; font-weight: bold; }
+        #loader { text-align: center; padding: 50px; font-weight: bold; color: #f39c12; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <div id="loader">載入中...</div>
+    <div id="loader">⚡ 正在連結智慧資料庫...</div>
 
     <div id="setupArea" style="display:none;">
-        <h3>選擇練習模式</h3>
-        <button class="nav-btn" onclick="startApp('hard')">🔥 地獄 (9:1:0)</button>
-        <button class="nav-btn" style="background:#27ae60" onclick="startApp('mix')">⚖️ 智慧 (7:2:1)</button>
-        <button class="nav-btn" style="background:#95a5a6" onclick="startApp('review')">🔄 溫故 (4:4:2)</button>
+        <h2 style="text-align:center;">🧠 詞語智慧測驗</h2>
+        
+        <div class="setting-item">
+            <label>選擇練習題數：</label>
+            <select id="quizCount">
+                <option value="10">10 題</option>
+                <option value="20">20 題</option>
+                <option value="30">30 題</option>
+                <option value="50">50 題</option>
+            </select>
+        </div>
+
+        <div class="setting-item">
+            <label>選擇難度模式：</label>
+            <button class="primary-btn" style="background:#e74c3c;" onclick="prepareApp('hard')">🔥 地獄挑戰 (9:1:0)</button>
+            <button class="primary-btn" style="background:#3498db;" onclick="prepareApp('mix')">⚖️ 智慧練習 (7:2:1)</button>
+            <button class="primary-btn" style="background:#27ae60;" onclick="prepareApp('review')">🔄 溫故知新 (4:4:2)</button>
+        </div>
     </div>
 
     <div id="gameArea" style="display:none;">
-        <div id="progress" style="font-size:12px; color:gray;"></div>
+        <div style="display:flex; justify-content: space-between; font-size:13px; color:#bdc3c7;">
+            <span id="progressText"></span>
+            <span id="scoreText"></span>
+        </div>
         <div class="meaning-box" id="meaningDisplay"></div>
         <div id="optionsGroup"></div>
-        <button id="nextBtn" class="nav-btn" style="display:none; background:#2c3e50" onclick="nextQuestion()">下一題</button>
+        <button id="nextBtn" class="primary-btn" style="display:none; background:#2c3e50;" onclick="nextQuestion()">下一題 ➔</button>
     </div>
 
-    <div id="syncArea">
-        <h3>本輪練習結束</h3>
-        <p id="resultSummary"></p>
-        <button id="syncBtn" class="nav-btn" style="background:#e67e22" onclick="syncToCloud()">💾 同步進度到雲端</button>
-        <p id="syncStatus"></p>
+    <div id="reportArea" style="display:none;">
+        <div id="syncStatusBanner" class="sync-banner">🔄 正在同步進度到雲端...</div>
+        <h2 style="text-align:center; margin-bottom:10px;">📊 練習戰報</h2>
+        <div id="reportList" style="max-height: 400px; overflow-y: auto; border: 1px solid #eee; padding: 10px; border-radius: 10px;"></div>
+        <button class="primary-btn" onclick="location.reload()">完成並返回</button>
     </div>
 </div>
 
@@ -47,114 +77,4 @@
     let rawData = [];
     let pool = [];
     let currentIndex = -1;
-    let batchLog = []; // 暫存帳本: [{row, delta}]
-
-    async function init() {
-        const res = await fetch(`${GAS_URL}?action=read&cb=${Date.now()}`);
-        const json = await res.json();
-        rawData = json.data;
-        document.getElementById('loader').style.display = 'none';
-        document.getElementById('setupArea').style.display = 'block';
-    }
-
-    function startApp(mode) {
-        const red = rawData.filter(d => d.score <= 3);
-        const yellow = rawData.filter(d => d.score >= 4 && d.score <= 7);
-        const green = rawData.filter(d => d.score >= 8);
-
-        // 抽題比例邏輯
-        for (let i = 0; i < 10; i++) {
-            let rand = Math.random();
-            let target;
-            if (mode === 'hard') {
-                target = rand < 0.9 ? red : yellow;
-            } else if (mode === 'mix') {
-                if (rand < 0.7) target = red;
-                else if (rand < 0.9) target = yellow;
-                else target = green;
-            } else {
-                if (rand < 0.4) target = red;
-                else if (rand < 0.8) target = yellow;
-                else target = green;
-            }
-            // 如果目標區沒題，就隨便抓一區
-            if (!target || target.length === 0) target = rawData; 
-            pool.push(target[Math.floor(Math.random() * target.length)]);
-        }
-
-        document.getElementById('setupArea').style.display = 'none';
-        document.getElementById('gameArea').style.display = 'block';
-        nextQuestion();
-    }
-
-    function nextQuestion() {
-        currentIndex++;
-        if (currentIndex >= pool.length) {
-            showSyncScreen();
-            return;
-        }
-        const item = pool[currentIndex];
-        document.getElementById('progress').innerText = `題號：${currentIndex + 1} / ${pool.length} (分值: ${item.score})`;
-        document.getElementById('meaningDisplay').innerText = item.meaning;
-        document.getElementById('nextBtn').style.display = 'none';
-        renderOptions(item);
-    }
-
-    function renderOptions(item) {
-        const group = document.getElementById('optionsGroup');
-        group.innerHTML = '';
-        let choices = [item.word, ...rawData.filter(d => d.word !== item.word).sort(() => Math.random() - 0.5).slice(0, 3).map(d => d.word)];
-        choices.sort(() => Math.random() - 0.5);
-
-        choices.forEach(txt => {
-            const btn = document.createElement('button');
-            btn.className = 'quiz-option';
-            btn.innerText = txt;
-            btn.onclick = function() {
-                const isCorrect = (txt === item.word);
-                batchLog.push({ row: item.row, delta: isCorrect ? 1 : -1 });
-                
-                document.querySelectorAll('.quiz-option').forEach(b => {
-                    b.disabled = true;
-                    if(b.innerText === item.word) b.classList.add('correct');
-                    else if(b.innerText === txt && !isCorrect) b.classList.add('wrong');
-                });
-                document.getElementById('nextBtn').style.display = 'block';
-            };
-            group.appendChild(btn);
-        });
-    }
-
-    function showSyncScreen() {
-        document.getElementById('gameArea').style.display = 'none';
-        document.getElementById('syncArea').style.display = 'block';
-        const correctCount = batchLog.filter(l => l.delta === 1).length;
-        document.getElementById('resultSummary').innerText = `完成！答對 ${correctCount} 題，答錯 ${batchLog.length - correctCount} 題。`;
-    }
-
-    async function syncToCloud() {
-        const btn = document.getElementById('syncBtn');
-        const status = document.getElementById('syncStatus');
-        btn.disabled = true;
-        status.innerText = "⏳ 正在同步，請勿關閉視窗...";
-
-        try {
-            // 使用 POST 發送 batchLog
-            await fetch(GAS_URL, {
-                method: 'POST',
-                mode: 'no-cors', // 避開 CORS 限制
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(batchLog)
-            });
-            status.innerText = "✅ 同步完成！";
-            setTimeout(() => location.reload(), 1500);
-        } catch (e) {
-            status.innerText = "❌ 同步失敗，請檢查網路後再試。";
-            btn.disabled = false;
-        }
-    }
-
-    window.onload = init;
-</script>
-</body>
-</html>
+    let batchLog = []; // 存 [{word
