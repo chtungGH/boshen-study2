@@ -162,4 +162,175 @@
     function setQuizType(type) {
         quizType = type;
         document.getElementById('typeChoice').classList.toggle('active', type === 'choice');
-        document.getElementById('typeFlash').classList.toggle('active',
+        document.getElementById('typeFlash').classList.toggle('active', type === 'flash');
+    }
+
+    async function loadSheetData() {
+        const sheetName = document.getElementById('sheetSelect').value;
+        const btn = document.getElementById('loadSheetBtn');
+        const barBox = document.getElementById('loadBarBox');
+        btn.style.display = 'none'; barBox.style.display = 'block';
+        document.getElementById('loadPercent').style.display = 'block';
+        updateProgress('loadBarFill', 'loadPercent', 20);
+
+        try {
+            const res = await fetch(`${GAS_URL}?action=read&sheetName=${encodeURIComponent(sheetName)}&cb=${Date.now()}`);
+            const json = await res.json();
+            updateProgress('loadBarFill', 'loadPercent', 100);
+            
+            allData = json.data;
+            currentSheetName = json.currentSheet;
+            colAHeader = json.headers.colA;
+            colBHeader = json.headers.colB;
+
+            document.getElementById('dirAB').innerText = `正向 (${colAHeader} ➔ ${colBHeader})`;
+            document.getElementById('dirBA').innerText = `反向 (${colBHeader} ➔ ${colAHeader})`;
+            
+            const tagsMap = new Map();
+            allData.forEach(item => item.tags.forEach(t => tagsMap.set(t, (tagsMap.get(t) || 0) + 1)));
+            const cloud = document.getElementById('tagCloud');
+            cloud.innerHTML = '';
+            if(tagsMap.size > 0) {
+                document.getElementById('tagScroll').style.display = 'block';
+                [...tagsMap.entries()].sort((a,b)=>b[1]-a[1]).forEach(([tag, count]) => {
+                    const span = document.createElement('span');
+                    span.className = 'tag-pill'; span.innerText = `${tag} (${count})`;
+                    span.onclick = function() {
+                        if(activeTags.has(tag)) { activeTags.delete(tag); this.classList.remove('active'); }
+                        else { activeTags.add(tag); this.classList.add('active'); }
+                        updateCount();
+                    };
+                    cloud.appendChild(span);
+                });
+            } else { document.getElementById('tagScroll').style.display = 'none'; }
+
+            setTimeout(() => { barBox.style.display = 'none'; document.getElementById('loadPercent').style.display = 'none'; document.getElementById('subSetup').style.display = 'block'; updateCount(); }, 500);
+        } catch (e) { alert("讀取失敗"); btn.style.display = 'block'; }
+    }
+
+    function updateCount() {
+        let filtered = activeTags.size > 0 ? allData.filter(d => Array.from(activeTags).every(tag => d.tags.includes(tag))) : allData;
+        document.getElementById('filterCount').innerText = `符合條件題目：${filtered.length} / ${allData.length}`;
+    }
+
+    function startQuiz(mode) {
+        const totalTarget = parseInt(document.getElementById('quizCount').value);
+        let filtered = activeTags.size > 0 ? allData.filter(d => Array.from(activeTags).every(tag => d.tags.includes(tag))) : allData;
+        
+        if(filtered.length === 0) return alert("無題目！");
+
+        // 如果題目總數少於選定題數，直接以最大數量為主
+        const finalCount = Math.min(totalTarget, filtered.length);
+
+        let red = filtered.filter(d => d.score <= 3).sort(() => Math.random() - 0.5);
+        let others = filtered.filter(d => d.score > 3).sort(() => Math.random() - 0.5);
+        pool = (mode === 'hard' ? [...red, ...others] : filtered.sort(() => Math.random() - 0.5)).slice(0, finalCount);
+
+        document.getElementById('setupArea').style.display = 'none';
+        document.getElementById('gameArea').style.display = 'block';
+        currentIndex = -1; nextQuestion();
+    }
+
+    function nextQuestion() {
+        currentIndex++;
+        if (currentIndex >= pool.length) { showReportAndSync(); return; }
+        
+        const item = pool[currentIndex];
+        document.getElementById('gameHeader').innerText = `${currentSheetName} | ${currentIndex + 1}/${pool.length} (熟練度:${item.score})`;
+        
+        const qText = (testDir === 'AB') ? item.word : item.meaning;
+        document.getElementById('meaningDisplay').innerText = qText;
+
+        if (quizType === 'choice') {
+            setupChoiceMode(item);
+        } else {
+            setupFlashMode(item);
+        }
+    }
+
+    function setupChoiceMode(item) {
+        document.getElementById('optionsGroup').style.display = 'block';
+        document.getElementById('confirmChoiceBtn').style.display = 'block';
+        document.getElementById('showFlashBtn').style.display = 'none';
+        document.getElementById('flashAnswerBox').style.display = 'none';
+        document.getElementById('evalBtnGroup').style.display = 'none';
+        
+        selectedWord = null;
+        const group = document.getElementById('optionsGroup');
+        group.innerHTML = '';
+        const correctOpt = (testDir === 'AB') ? item.meaning : item.word;
+        const wrongOpts = allData.filter(d => d.word !== item.word).map(d => (testDir === 'AB' ? d.meaning : d.word)).sort(() => Math.random() - 0.5).slice(0, 3);
+        
+        [correctOpt, ...wrongOpts].sort(() => Math.random() - 0.5).forEach(txt => {
+            const btn = document.createElement('button');
+            btn.className = 'quiz-option'; btn.innerText = txt;
+            btn.onclick = function() {
+                document.querySelectorAll('.quiz-option').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected'); selectedWord = txt;
+            };
+            group.appendChild(btn);
+        });
+    }
+
+    function handleChoiceNext() {
+        if (!selectedWord) return alert("選一個答案！");
+        const item = pool[currentIndex];
+        const correctOpt = (testDir === 'AB') ? item.meaning : item.word;
+        const isCorrect = (selectedWord === correctOpt);
+        
+        batchLog.push({ row: item.row, delta: isCorrect ? 1 : -1, meaning: (testDir === 'AB' ? item.word : item.meaning), selected: selectedWord, correct: correctOpt, isCorrect });
+        
+        document.querySelectorAll('.quiz-option').forEach(b => {
+            if (b.innerText === correctOpt) b.classList.add('correct');
+            else if (b.innerText === selectedWord && !isCorrect) b.classList.add('wrong');
+        });
+        
+        setTimeout(nextQuestion, 800);
+    }
+
+    function setupFlashMode(item) {
+        document.getElementById('optionsGroup').style.display = 'none';
+        document.getElementById('confirmChoiceBtn').style.display = 'none';
+        document.getElementById('showFlashBtn').style.display = 'block';
+        document.getElementById('flashAnswerBox').style.display = 'none';
+        document.getElementById('evalBtnGroup').style.display = 'none';
+    }
+
+    function revealFlashAnswer() {
+        const item = pool[currentIndex];
+        const correctOpt = (testDir === 'AB') ? item.meaning : item.word;
+        
+        document.getElementById('showFlashBtn').style.display = 'none';
+        document.getElementById('flashAnswerBox').style.display = 'block';
+        document.getElementById('evalBtnGroup').style.display = 'flex';
+        
+        document.getElementById('flashAnswerText').innerText = correctOpt;
+        document.getElementById('flashSupplement').innerText = item.ext ? `補充：${item.ext}` : "";
+    }
+
+    function handleFlashEval(delta) {
+        const item = pool[currentIndex];
+        const correctOpt = (testDir === 'AB') ? item.meaning : item.word;
+        const isCorrect = (delta > 0);
+        
+        batchLog.push({ row: item.row, delta: delta, meaning: (testDir === 'AB' ? item.word : item.meaning), selected: isCorrect?"自評會了":"自評不熟", correct: correctOpt, isCorrect });
+        
+        nextQuestion();
+    }
+
+    async function showReportAndSync() {
+        document.getElementById('gameArea').style.display = 'none';
+        document.getElementById('reportArea').style.display = 'block';
+        const list = document.getElementById('reportList');
+        list.innerHTML = batchLog.sort((a,b)=>a.isCorrect-b.isCorrect).map(i => `<div style="padding:10px; border-bottom:1px solid #eee;"><small style="color:#999">${i.meaning}</small><br><b>${i.isCorrect ? '✅ '+i.correct : '❌ '+i.selected+' → '+i.correct}</b></div>`).join('');
+        isSyncing = true;
+        try {
+            await fetch(`${GAS_URL}?sheetName=${encodeURIComponent(currentSheetName)}`, { method: 'POST', mode: 'no-cors', body: JSON.stringify(batchLog.map(l=>({row:l.row, delta:l.delta}))) });
+            document.getElementById('sync-banner').innerText = "✅ 已同步成功"; document.getElementById('sync-banner').style.background = "#27ae60";
+        } catch (e) { document.getElementById('sync-banner').innerText = "❌ 同備異常"; }
+        isSyncing = false;
+    }
+    window.onload = init;
+</script>
+</body>
+</html>
