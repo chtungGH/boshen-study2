@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>柏伸智慧複習 v3.3.1</title>
+    <title>柏伸智慧複習 v3.4.0</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body { font-family: "Microsoft JhengHei", sans-serif; text-align: center; padding: 15px; background-color: #f0f4f8; color: #2c3e50; }
@@ -17,9 +17,10 @@
         .tag-pill { padding: 6px 12px; border-radius: 20px; background: white; font-size: 13px; cursor: pointer; border: 1px solid #ddd; transition: 0.2s; }
         .tag-pill.active { background: #3498db; color: white; border-color: #2980b9; }
 
-        .direction-box { display: flex; background: #eee; border-radius: 10px; padding: 4px; margin: 15px 0; }
-        .dir-btn { flex: 1; padding: 10px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; background: none; color: #7f8c8d; transition: 0.3s; font-size: 14px; }
-        .dir-btn.active { background: white; color: #3498db; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        /* 切換開關樣式 */
+        .toggle-box { display: flex; background: #eee; border-radius: 10px; padding: 4px; margin: 12px 0; }
+        .toggle-btn { flex: 1; padding: 10px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; background: none; color: #7f8c8d; transition: 0.3s; font-size: 13px; }
+        .toggle-btn.active { background: white; color: #3498db; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 
         .setting-item { margin: 15px 0; }
         select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; font-size: 16px; margin-top: 5px; background: white; }
@@ -30,8 +31,15 @@
         .correct { background: #2ecc71 !important; color: white; border-color: #27ae60; }
         .wrong { background: #e74c3c !important; color: white; border-color: #c0392b; }
         
+        /* 遊戲區域樣式 */
         .meaning-box { background: #fff9db; padding: 25px; border-radius: 15px; font-size: 26px; font-weight: bold; line-height: 1.4; border-left: 10px solid #f1c40f; margin: 15px 0; text-align: center; }
-        .supplement { font-size: 14px; color: #7f8c8d; margin-top: 10px; font-weight: normal; }
+        .supplement { font-size: 14px; color: #7f8c8d; margin-top: 10px; font-weight: normal; font-style: italic; }
+        .flash-answer-box { background: #ebf5fb; padding: 20px; border-radius: 12px; border: 2px dashed #3498db; margin: 15px 0; display: none; text-align: center; }
+        .flash-answer-text { font-size: 28px; color: #2980b9; font-weight: bold; }
+        
+        .eval-btn-group { display: flex; gap: 10px; margin-top: 10px; display: none; }
+        .eval-btn { flex: 1; padding: 20px; border-radius: 12px; border: none; color: white; font-size: 18px; font-weight: bold; cursor: pointer; }
+
         #sync-banner { background: #34495e; color: white; padding: 10px; border-radius: 8px; text-align: center; margin-bottom: 10px; font-size: 14px; }
     </style>
 </head>
@@ -39,13 +47,13 @@
 
 <div class="card">
     <div id="initArea">
-        <div id="loader-msg" style="text-align:center; font-weight:bold; color:#2980b9;">📡 正在同步資料清單...</div>
+        <div id="loader-msg" style="text-align:center; font-weight:bold; color:#2980b9;">📡 正在同步資料庫清單...</div>
         <div id="initBarBox" class="progress-box" style="display:block;"><div id="initBarFill" class="progress-fill"></div></div>
         <div id="initPercent" class="percent-text" style="display:block;">0%</div>
     </div>
 
     <div id="setupArea" style="display:none;">
-        <h2 style="margin:0 0 10px 0; text-align:center;">🧠 智慧詞語複習</h2>
+        <h2 style="margin:0 0 10px 0; text-align:center;">🧠 智慧複習 v3.4.0</h2>
         <div class="setting-item">
             <label>1. 選擇分冊：</label>
             <select id="sheetSelect" onchange="resetSelection()"></select>
@@ -56,18 +64,29 @@
         <div id="loadPercent" class="percent-text">0%</div>
 
         <div id="subSetup" style="display:none; margin-top:15px; border-top:2px dashed #eee; padding-top:10px;">
-            <label>2. 測驗方向：</label>
-            <div class="direction-box">
-                <button id="dirAB" class="dir-btn active" onclick="setDirection('AB')">正向 (載入中...)</button>
-                <button id="dirBA" class="dir-btn" onclick="setDirection('BA')">反向 (載入中...)</button>
+            <label>2. 練習類型：</label>
+            <div class="toggle-box">
+                <button id="typeChoice" class="toggle-btn active" onclick="setQuizType('choice')">選擇題</button>
+                <button id="typeFlash" class="toggle-btn" onclick="setQuizType('flash')">問答題</button>
             </div>
 
-            <label>3. 篩選標籤 (多選)：</label>
+            <label>3. 測驗方向：</label>
+            <div class="toggle-box">
+                <button id="dirAB" class="toggle-btn active" onclick="setDirection('AB')">正向</button>
+                <button id="dirBA" class="toggle-btn" onclick="setDirection('BA')">反向</button>
+            </div>
+
+            <label>4. 篩選標籤 (多選)：</label>
             <div id="tagScroll" class="tag-scroll-area"><div id="tagCloud" class="tag-container"></div></div>
             <div id="filterCount" style="font-size:12px; color:#3498db; margin-bottom:10px; font-weight:bold;"></div>
             
-            <label>4. 測驗題數：</label>
-            <select id="quizCount"><option value="10">10 題</option><option value="20">20 題</option><option value="30">30 題</option></select>
+            <label>5. 測驗題數：</label>
+            <select id="quizCount">
+                <option value="10">10 題</option>
+                <option value="20">20 題</option>
+                <option value="30">30 題</option>
+                <option value="50" selected>50 題</option>
+            </select>
             
             <button class="primary-btn" style="background:#e74c3c;" onclick="startQuiz('hard')">🔥 地獄挑戰</button>
             <button class="primary-btn" onclick="startQuiz('mix')">⚖️ 智慧練習</button>
@@ -77,8 +96,19 @@
     <div id="gameArea" style="display:none;">
         <div id="gameHeader" style="font-size:12px; color:#95a5a6; margin-bottom:5px;"></div>
         <div id="meaningDisplay" class="meaning-box"></div>
+        
         <div id="optionsGroup"></div>
-        <button id="confirmBtn" class="primary-btn" style="background:#2c3e50;" onclick="handleNext()">確認答案 ➔</button>
+        <button id="confirmChoiceBtn" class="primary-btn" style="background:#2c3e50;" onclick="handleChoiceNext()">確認答案 ➔</button>
+
+        <button id="showFlashBtn" class="primary-btn" style="background:#f39c12; display:none;" onclick="revealFlashAnswer()">🔍 顯示答案</button>
+        <div id="flashAnswerBox" class="flash-answer-box">
+            <div class="flash-answer-text" id="flashAnswerText"></div>
+            <div class="supplement" id="flashSupplement"></div>
+        </div>
+        <div id="evalBtnGroup" class="eval-btn-group">
+            <button class="eval-btn" style="background:#e74c3c;" onclick="handleFlashEval(-1)">👎 還不熟</button>
+            <button class="eval-btn" style="background:#2ecc71;" onclick="handleFlashEval(1)">👍 我會了</button>
+        </div>
     </div>
 
     <div id="reportArea" style="display:none;">
@@ -91,8 +121,8 @@
 <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbwdIKdIUNvTrWUK30PfzmsKl4Rtd_t1pID7dk8DcYLON_sCxRoH1f5s3h0L3coYHa3A/exec"; 
     let allData = [], pool = [], currentIndex = -1, batchLog = [], isSyncing = false;
-    let selectedWord = null, currentSheetName = "", activeTags = new Set(), testDir = 'AB';
-    let colAHeader = "A欄", colBHeader = "B欄";
+    let selectedWord = null, currentSheetName = "", activeTags = new Set();
+    let testDir = 'AB', quizType = 'choice', colAHeader = "A欄", colBHeader = "B欄";
 
     window.onbeforeunload = () => isSyncing ? "同步中，請稍候" : null;
 
@@ -114,7 +144,7 @@
                 select.appendChild(opt);
             });
             setTimeout(() => { document.getElementById('initArea').style.display='none'; document.getElementById('setupArea').style.display='block'; }, 400);
-        } catch (e) { document.getElementById('loader-msg').innerText = "❌ 無法連線，請檢查網路。"; }
+        } catch (e) { document.getElementById('loader-msg').innerText = "❌ 連線失敗。"; }
     }
 
     function resetSelection() {
@@ -128,6 +158,12 @@
         testDir = dir;
         document.getElementById('dirAB').classList.toggle('active', dir === 'AB');
         document.getElementById('dirBA').classList.toggle('active', dir === 'BA');
+    }
+
+    function setQuizType(type) {
+        quizType = type;
+        document.getElementById('typeChoice').classList.toggle('active', type === 'choice');
+        document.getElementById('typeFlash').classList.toggle('active', type === 'flash');
     }
 
     async function loadSheetData() {
@@ -148,7 +184,6 @@
             colAHeader = json.headers.colA;
             colBHeader = json.headers.colB;
 
-            // 更新按鈕文字
             document.getElementById('dirAB').innerText = `正向 (${colAHeader} ➔ ${colBHeader})`;
             document.getElementById('dirBA').innerText = `反向 (${colBHeader} ➔ ${colAHeader})`;
             
@@ -176,7 +211,7 @@
 
     function updateCount() {
         let filtered = activeTags.size > 0 ? allData.filter(d => Array.from(activeTags).every(tag => d.tags.includes(tag))) : allData;
-        document.getElementById('filterCount').innerText = `已篩選題目：${filtered.length} / ${allData.length}`;
+        document.getElementById('filterCount').innerText = `符合條件題目：${filtered.length} / ${allData.length}`;
     }
 
     function startQuiz(mode) {
@@ -196,13 +231,30 @@
     function nextQuestion() {
         currentIndex++;
         if (currentIndex >= pool.length) { showReportAndSync(); return; }
-        selectedWord = null;
+        
         const item = pool[currentIndex];
         document.getElementById('gameHeader').innerText = `${currentSheetName} | ${currentIndex + 1}/${pool.length} (熟練度:${item.score})`;
         
+        // 顯示題目
         const qText = (testDir === 'AB') ? item.word : item.meaning;
-        document.getElementById('meaningDisplay').innerHTML = qText + (item.ext ? `<div class="supplement">提示：${item.ext}</div>` : '');
+        document.getElementById('meaningDisplay').innerText = qText;
+
+        if (quizType === 'choice') {
+            setupChoiceMode(item);
+        } else {
+            setupFlashMode(item);
+        }
+    }
+
+    // --- 選擇題邏輯 ---
+    function setupChoiceMode(item) {
+        document.getElementById('optionsGroup').style.display = 'block';
+        document.getElementById('confirmChoiceBtn').style.display = 'block';
+        document.getElementById('showFlashBtn').style.display = 'none';
+        document.getElementById('flashAnswerBox').style.display = 'none';
+        document.getElementById('evalBtnGroup').style.display = 'none';
         
+        selectedWord = null;
         const group = document.getElementById('optionsGroup');
         group.innerHTML = '';
         const correctOpt = (testDir === 'AB') ? item.meaning : item.word;
@@ -219,20 +271,54 @@
         });
     }
 
-    function handleNext() {
+    function handleChoiceNext() {
         if (!selectedWord) return alert("選一個答案！");
         const item = pool[currentIndex];
         const correctOpt = (testDir === 'AB') ? item.meaning : item.word;
         const isCorrect = (selectedWord === correctOpt);
+        
         batchLog.push({ row: item.row, delta: isCorrect ? 1 : -1, meaning: (testDir === 'AB' ? item.word : item.meaning), selected: selectedWord, correct: correctOpt, isCorrect });
+        
         document.querySelectorAll('.quiz-option').forEach(b => {
             if (b.innerText === correctOpt) b.classList.add('correct');
             else if (b.innerText === selectedWord && !isCorrect) b.classList.add('wrong');
         });
-        item.score = Math.max(0, Math.min(10, item.score + (isCorrect ? 1 : -1)));
+        
         setTimeout(nextQuestion, 800);
     }
 
+    // --- 問答題邏輯 ---
+    function setupFlashMode(item) {
+        document.getElementById('optionsGroup').style.display = 'none';
+        document.getElementById('confirmChoiceBtn').style.display = 'none';
+        document.getElementById('showFlashBtn').style.display = 'block';
+        document.getElementById('flashAnswerBox').style.display = 'none';
+        document.getElementById('evalBtnGroup').style.display = 'none';
+    }
+
+    function revealFlashAnswer() {
+        const item = pool[currentIndex];
+        const correctOpt = (testDir === 'AB') ? item.meaning : item.word;
+        
+        document.getElementById('showFlashBtn').style.display = 'none';
+        document.getElementById('flashAnswerBox').style.display = 'block';
+        document.getElementById('evalBtnGroup').style.display = 'flex';
+        
+        document.getElementById('flashAnswerText').innerText = correctOpt;
+        document.getElementById('flashSupplement').innerText = item.ext ? `補充：${item.ext}` : "";
+    }
+
+    function handleFlashEval(delta) {
+        const item = pool[currentIndex];
+        const correctOpt = (testDir === 'AB') ? item.meaning : item.word;
+        const isCorrect = (delta > 0);
+        
+        batchLog.push({ row: item.row, delta: delta, meaning: (testDir === 'AB' ? item.word : item.meaning), selected: isCorrect?"自評會了":"自評不熟", correct: correctOpt, isCorrect });
+        
+        nextQuestion();
+    }
+
+    // --- 戰報與同步 ---
     async function showReportAndSync() {
         document.getElementById('gameArea').style.display = 'none';
         document.getElementById('reportArea').style.display = 'block';
@@ -242,7 +328,7 @@
         try {
             await fetch(`${GAS_URL}?sheetName=${encodeURIComponent(currentSheetName)}`, { method: 'POST', mode: 'no-cors', body: JSON.stringify(batchLog.map(l=>({row:l.row, delta:l.delta}))) });
             document.getElementById('sync-banner').innerText = "✅ 已同步成功"; document.getElementById('sync-banner').style.background = "#27ae60";
-        } catch (e) { document.getElementById('sync-banner').innerText = "❌ 同步異常"; }
+        } catch (e) { document.getElementById('sync-banner').innerText = "❌ 同備異常"; }
         isSyncing = false;
     }
     window.onload = init;
