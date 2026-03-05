@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>柏伸智慧複習 v3.5.1</title>
+    <title>柏伸智慧複習 v3.5.2 (實驗版)</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body { font-family: "Microsoft JhengHei", sans-serif; text-align: center; padding: 15px; background-color: #f0f4f8; color: #2c3e50; }
@@ -34,7 +34,7 @@
         .supplement { font-size: 14px; color: #7f8c8d; margin-top: 10px; font-weight: normal; font-style: italic; }
         
         /* 封印 Checkbox 樣式 */
-        .mastery-checkbox-area { margin: 10px 0; font-size: 14px; color: #e67e22; font-weight: bold; background: #fff5e6; padding: 10px; border-radius: 8px; border: 1px solid #f39c12; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .mastery-checkbox-area { margin: 10px 0; font-size: 14px; color: #e67e22; font-weight: bold; background: #fff5e6; padding: 10px; border-radius: 8px; border: 1px solid #f39c12; display: flex; align-items: center; justify-content: center; gap: 10px; }
         
         .flash-answer-box { background: #ebf5fb; padding: 20px; border-radius: 12px; border: 2px dashed #3498db; margin: 15px 0; display: none; text-align: center; }
         .flash-answer-text { font-size: 28px; color: #2980b9; font-weight: bold; }
@@ -49,44 +49,32 @@
 
 <div class="card">
     <div id="initArea">
-        <div id="loader-msg" style="text-align:center; font-weight:bold; color:#2980b9;">📡 正在同步資料庫清單...</div>
+        <div id="loader-msg" style="text-align:center; font-weight:bold; color:#2980b9;">📡 (測試版) 正在同步資料庫清單...</div>
         <div id="initBarBox" class="progress-box" style="display:block;"><div id="initBarFill" class="progress-fill"></div></div>
         <div id="initPercent" class="percent-text" style="display:block;">0%</div>
     </div>
 
     <div id="setupArea" style="display:none;">
-        <h2 style="margin:0 0 10px 0; text-align:center;">🧠 智慧複習 v3.5.1</h2>
+        <h2 style="margin:0 0 10px 0; text-align:center;">🧠 複習實驗版 v3.5.2</h2>
         <div class="setting-item">
             <label>1. 選擇分冊：</label>
             <select id="sheetSelect" onchange="resetSelection()"></select>
         </div>
-        <button id="loadSheetBtn" class="primary-btn" onclick="loadSheetData()">載入題庫內容 ➔</button>
+        <button id="loadSheetBtn" class="primary-btn" onclick="loadSheetData()">載入測試內容 ➔</button>
 
         <div id="loadBarBox" class="progress-box"><div id="loadBarFill" class="progress-fill"></div></div>
         <div id="loadPercent" class="percent-text">0%</div>
 
         <div id="subSetup" style="display:none; margin-top:15px; border-top:2px dashed #eee; padding-top:10px;">
             <label>2. 練習類型：</label>
-            <div class="toggle-box">
-                <button id="typeChoice" class="toggle-btn active" onclick="setQuizType('choice')">選擇題</button>
-                <button id="typeFlash" class="toggle-btn" onclick="setQuizType('flash')">問答題</button>
-            </div>
+            <div class="toggle-box"><button id="typeChoice" class="toggle-btn active" onclick="setQuizType('choice')">選擇題</button><button id="typeFlash" class="toggle-btn" onclick="setQuizType('flash')">問答題</button></div>
             <label>3. 測驗方向：</label>
-            <div class="toggle-box">
-                <button id="dirAB" class="toggle-btn active" onclick="setDirection('AB')">正向</button>
-                <button id="dirBA" class="toggle-btn" onclick="setDirection('BA')">反向</button>
-            </div>
-            <label>4. 篩選標籤 (多選)：</label>
+            <div class="toggle-box"><button id="dirAB" class="toggle-btn active" onclick="setDirection('AB')">正向</button><button id="dirBA" class="toggle-btn" onclick="setDirection('BA')">反向</button></div>
+            <label>4. 標籤篩選 (多選)：</label>
             <div id="tagScroll" class="tag-scroll-area"><div id="tagCloud" class="tag-container"></div></div>
             <div id="filterCount" style="font-size:12px; color:#3498db; margin-bottom:10px; font-weight:bold;"></div>
             <label>5. 測驗題數：</label>
-            <select id="quizCount">
-                <option value="10" selected>10 題</option>
-                <option value="20">20 題</option>
-                <option value="30">30 題</option>
-                <option value="50">50 題</option>
-                <option value="100">100 題</option>
-            </select>
+            <select id="quizCount"><option value="10" selected>10 題</option><option value="20">20 題</option><option value="30">30 題</option><option value="50">50 題</option><option value="100">100 題</option></select>
             <button class="primary-btn" style="background:#e74c3c;" onclick="startQuiz('hard')">🔥 地獄挑戰</button>
             <button class="primary-btn" onclick="startQuiz('mix')">⚖️ 智慧練習</button>
         </div>
@@ -98,7 +86,7 @@
         <div id="optionsGroup"></div>
         
         <div id="choiceMasteryArea" class="mastery-checkbox-area" style="display:none;">
-            <input type="checkbox" id="masteryCheck" style="transform: scale(1.5);">
+            <input type="checkbox" id="masteryCheck" style="width:20px; height:20px;">
             <label for="masteryCheck">太簡單了，以後不再出 (封印)</label>
         </div>
         <button id="confirmChoiceBtn" class="primary-btn" style="background:#2c3e50; display:none;" onclick="handleChoiceNext()">確認答案 ➔</button>
@@ -114,9 +102,9 @@
     </div>
 
     <div id="reportArea" style="display:none;">
-        <div id="sync-banner">🔄 進度同步至 Excel 中...</div>
+        <div id="sync-banner">🔄 實驗版進度同步中...</div>
         <div id="reportList" style="max-height:300px; overflow-y:auto; border:1px solid #eee; border-radius:10px; padding:10px; margin-bottom:15px;"></div>
-        <button class="primary-btn" onclick="location.reload()">返回首頁</button>
+        <button class="primary-btn" onclick="location.reload()">返回實驗首頁</button>
     </div>
 </div>
 
@@ -125,11 +113,9 @@
     let allRawData = [], allData = [], pool = [], currentIndex = -1, batchLog = [], isSyncing = false;
     let selectedWord = null, currentSheetName = "", activeTags = new Set(), testDir = 'AB', quizType = 'choice', colAHeader = "A欄", colBHeader = "B欄";
 
-    window.onbeforeunload = () => isSyncing ? "同步中，請稍候" : null;
-
     function updateProgress(barId, textId, value) {
         document.getElementById(barId).style.width = value + "%";
-        if(textId) document.getElementById(textId).innerText = value + "%";
+        if(textId && document.getElementById(textId)) document.getElementById(textId).innerText = value + "%";
     }
 
     async function init() {
@@ -151,14 +137,14 @@
     async function loadSheetData() {
         const sheetName = document.getElementById('sheetSelect').value;
         const btn = document.getElementById('loadSheetBtn');
-        btn.style.display = 'none'; document.getElementById('loadBarBox').style.display = 'block'; document.getElementById('loadPercent').style.display = 'block';
-        updateProgress('loadBarFill', 'loadPercent', 20);
+        btn.style.display = 'none'; document.getElementById('loadBarBox').style.display = 'block';
+        updateProgress('loadBarFill', null, 20);
         try {
             const res = await fetch(`${GAS_URL}?action=read&sheetName=${encodeURIComponent(sheetName)}&cb=${Date.now()}`);
             const json = await res.json();
-            updateProgress('loadBarFill', 'loadPercent', 100);
+            updateProgress('loadBarFill', null, 100);
             allRawData = json.data;
-            allData = allRawData.filter(d => d.score !== 99); // 過濾 99 封印題
+            allData = allRawData.filter(d => d.score !== 99); 
             currentSheetName = json.currentSheet;
             colAHeader = json.headers.colA; colBHeader = json.headers.colB;
             document.getElementById('dirAB').innerText = `正向 (${colAHeader} ➔ ${colBHeader})`;
@@ -175,13 +161,13 @@
                     cloud.appendChild(span);
                 });
             } else { document.getElementById('tagScroll').style.display = 'none'; }
-            setTimeout(() => { document.getElementById('loadBarBox').style.display = 'none'; document.getElementById('loadPercent').style.display = 'none'; document.getElementById('subSetup').style.display = 'block'; updateCount(); }, 500);
+            setTimeout(() => { document.getElementById('loadBarBox').style.display = 'none'; document.getElementById('subSetup').style.display = 'block'; updateCount(); }, 500);
         } catch (e) { alert("讀取失敗"); btn.style.display = 'block'; }
     }
 
     function updateCount() {
         let filtered = activeTags.size > 0 ? allData.filter(d => Array.from(activeTags).every(tag => d.tags.includes(tag))) : allData;
-        document.getElementById('filterCount').innerText = `符合條件題目：${filtered.length} / ${allData.length} (已排除封印題)`;
+        document.getElementById('filterCount').innerText = `符合條件：${filtered.length} / ${allData.length} (封印題排除中)`;
     }
 
     function startQuiz(mode) {
@@ -200,7 +186,7 @@
         currentIndex++;
         if (currentIndex >= pool.length) { showReportAndSync(); return; }
         const item = pool[currentIndex];
-        document.getElementById('gameHeader').innerText = `${currentSheetName} | ${currentIndex + 1}/${pool.length} (熟練度:${item.score})`;
+        document.getElementById('gameHeader').innerText = `${currentSheetName} | ${currentIndex + 1}/${pool.length} (熟練:${item.score})`;
         document.getElementById('meaningDisplay').innerText = (testDir === 'AB') ? item.word : item.meaning;
         if (quizType === 'choice') setupChoiceMode(item); else setupFlashMode(item);
     }
@@ -208,7 +194,7 @@
     function setupChoiceMode(item) {
         document.getElementById('optionsGroup').style.display = 'block';
         document.getElementById('confirmChoiceBtn').style.display = 'block';
-        document.getElementById('choiceMasteryArea').style.display = 'flex'; // 顯示封印勾選
+        document.getElementById('choiceMasteryArea').style.display = 'flex';
         document.getElementById('showFlashBtn').style.display = 'none';
         document.getElementById('flashAnswerBox').style.display = 'none';
         document.getElementById('evalBtnGroup').style.display = 'none';
@@ -231,8 +217,7 @@
         const isCorrect = (selectedWord === correctOpt);
         const isMastered = document.getElementById('masteryCheck').checked;
         let delta = isCorrect ? 1 : -1;
-        if (isCorrect && isMastered) delta = 99; // 達成封印
-        
+        if (isCorrect && isMastered) delta = 99; 
         batchLog.push({ row: item.row, delta: delta, meaning: (testDir === 'AB' ? item.word : item.meaning), selected: isMastered && isCorrect ? "封印" : selectedWord, correct: correctOpt, isCorrect });
         document.querySelectorAll('.quiz-option').forEach(b => { if (b.innerText === correctOpt) b.classList.add('correct'); else if (b.innerText === selectedWord && !isCorrect) b.classList.add('wrong'); });
         setTimeout(nextQuestion, 800);
@@ -266,14 +251,13 @@
     async function showReportAndSync() {
         document.getElementById('gameArea').style.display = 'none'; document.getElementById('reportArea').style.display = 'block';
         const list = document.getElementById('reportList');
-        // 錯題排最上面
         const sortedLog = [...batchLog].sort((a,b) => a.isCorrect - b.isCorrect);
         list.innerHTML = sortedLog.map(i => `<div style="padding:10px; border-bottom:1px solid #eee;"><small style="color:#999">${i.meaning}</small><br><b>${i.isCorrect ? '✅ '+i.correct : '❌ '+i.selected+' → '+i.correct}</b></div>`).join('');
         isSyncing = true;
         try {
             await fetch(`${GAS_URL}?sheetName=${encodeURIComponent(currentSheetName)}`, { method: 'POST', mode: 'no-cors', body: JSON.stringify(batchLog.map(l=>({row:l.row, delta:l.delta}))) });
-            document.getElementById('sync-banner').innerText = "✅ 已同步成功"; document.getElementById('sync-banner').style.background = "#27ae60";
-        } catch (e) { document.getElementById('sync-banner').innerText = "❌ 同步異常"; }
+            document.getElementById('sync-banner').innerText = "✅ 實驗版同步完成"; document.getElementById('sync-banner').style.background = "#27ae60";
+        } catch (e) { document.getElementById('sync-banner').innerText = "❌ 同步失敗"; }
         isSyncing = false;
     }
     window.onload = init;
