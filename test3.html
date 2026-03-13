@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>聽寫錯題管理 (test3)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* 繼承聽寫助手的簡潔風格，但修正選擇框寬度 */
+        body { font-family: "Microsoft JhengHei", sans-serif; text-align: center; padding: 20px; background-color: #f7f9fc; color: #2c3e50; }
+        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); display: inline-block; width: 100%; max-width: 400px; box-sizing: border-box; text-align: left; }
+        
+        select { font-size: 18px; padding: 12px; border-radius: 8px; width: 100%; margin: 15px 0; border: 1px solid #ddd; box-sizing: border-box; }
+        button { font-size: 18px; padding: 15px; margin: 8px 0; cursor: pointer; border-radius: 12px; border: none; background: #3498db; color: white; width: 100%; font-weight: bold; }
+        
+        .list-container { margin-top: 20px; max-height: 400px; overflow-y: auto; border-top: 2px solid #eee; }
+        .word-item { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
+        .word-item input { width: 22px; height: 22px; cursor: pointer; }
+        .word-item label { flex: 1; margin-left: 10px; font-size: 18px; cursor: pointer; }
+        
+        .badge { font-size: 12px; padding: 2px 6px; border-radius: 4px; margin-left: 5px; }
+        .badge-f { background: #ffebee; color: #e74c3c; border: 1px solid #ffcdd2; }
+        .badge-h { background: #e8f5e9; color: #27ae60; border: 1px solid #c8e6c9; }
+        #loading { color: #e67e22; font-weight: bold; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2 style="text-align:center; margin-top:0;">📋 錯題勾選 (聽寫版)</h2>
+    
+    <div id="loading">📡 載入雲端資料中...</div>
+    
+    <div id="setupArea" style="display:none;">
+        <label>選擇課次：</label>
+        <select id="lessonSelect" onchange="renderList()"></select>
+        
+        <div id="listContainer" class="list-container"></div>
+        
+        <button onclick="saveChanges()" style="background:#e67e22; margin-top:20px;">儲存並同步 A/E 欄</button>
+        <button onclick="location.reload()" style="background:#95a5a6;">重新整理</button>
+    </div>
+</div>
+
+<script>
+    const GAS_URL = "https://script.google.com/macros/s/你的GAS腳本ID/exec"; // 請填入你部署後的最新 URL
+    let allData = [];
+
+    async function init() {
+        try {
+            const res = await fetch(`${GAS_URL}?action=read&cb=${Date.now()}`);
+            allData = await res.json();
+            
+            // 取得課次清單 (排除 _F 字眼)
+            const lessons = [...new Set(allData.map(d => d.lesson.replace('_F', '')))];
+            const select = document.getElementById('lessonSelect');
+            lessons.forEach(l => {
+                let opt = document.createElement('option');
+                opt.value = l; opt.innerText = l;
+                select.appendChild(opt);
+            });
+
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('setupArea').style.display = 'block';
+            renderList();
+        } catch (e) {
+            document.getElementById('loading').innerText = "❌ 載入失敗，請確認 GAS 部署。";
+        }
+    }
+
+    function renderList() {
+        const selectedLesson = document.getElementById('lessonSelect').value;
+        const container = document.getElementById('listContainer');
+        container.innerHTML = '';
+
+        const filtered = allData.filter(d => d.lesson.replace('_F', '') === selectedLesson);
+
+        filtered.forEach(item => {
+            const isFail = item.lesson.includes('_F');
+            const hasHistory = item.history === "11";
+            
+            const div = document.createElement('div');
+            div.className = 'word-item';
+            div.innerHTML = `
+                <input type="checkbox" id="chk_${item.row}" ${isFail ? 'checked' : ''} data-row="${item.row}">
+                <label for="chk_${item.row}">
+                    ${item.word}
+                    ${isFail ? '<span class="badge badge-f">待補考</span>' : ''}
+                    ${hasHistory ? '<span class="badge badge-h">曾錯</span>' : ''}
+                </label>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    async function saveChanges() {
+        const checkboxes = document.querySelectorAll('#listContainer input[type="checkbox"]');
+        const updates = [];
+
+        checkboxes.forEach(chk => {
+            const row = parseInt(chk.dataset.row);
+            const isFail = chk.checked;
+            const original = allData.find(d => d.row === row);
+            const originalIsFail = original.lesson.includes('_F');
+            
+            if (isFail !== originalIsFail) {
+                updates.push({ row: row, isFail: isFail });
+            }
+        });
+
+        if (updates.length === 0) return alert("內容沒有變動");
+
+        if (!confirm(`確定要更新這 ${updates.length} 題的標記嗎？`)) return;
+
+        try {
+            const res = await fetch(`${GAS_URL}?action=markFail`, {
+                method: 'POST',
+                body: JSON.stringify(updates)
+            });
+            alert("同步完成！");
+            location.reload();
+        } catch (e) {
+            alert("同步時發生錯誤。");
+        }
+    }
+
+    window.onload = init;
+</script>
+</body>
+</html>
