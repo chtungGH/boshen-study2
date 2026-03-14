@@ -2,82 +2,83 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>智慧複習 v4.0.0 (終極整合版)</title>
+    <title>柏伸智慧複習 v4.2.0</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        /* 基礎樣式完全遵循 test.html */
+        /* 樣式完全遵循 v3.4.1 */
         body { font-family: "Microsoft JhengHei", sans-serif; text-align: center; padding: 15px; background-color: #f0f4f8; color: #2c3e50; }
         .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: inline-block; width: 100%; max-width: 500px; text-align: left; box-sizing: border-box; }
-        
         .progress-box { width: 100%; background: #eee; border-radius: 10px; height: 10px; margin: 15px 0; overflow: hidden; display: none; }
         .progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #3498db, #2ecc71); transition: width 0.3s; }
-
+        .percent-text { font-size: 12px; color: #7f8c8d; text-align: center; margin-top: -10px; margin-bottom: 10px; display: none; }
         .tag-scroll-area { max-height: 120px; overflow-y: auto; border: 1px solid #eee; padding: 10px; border-radius: 10px; background: #fafafa; margin: 10px 0; display: none; }
         .tag-container { display: flex; flex-wrap: wrap; gap: 8px; }
         .tag-pill { padding: 6px 12px; border-radius: 20px; background: white; font-size: 13px; cursor: pointer; border: 1px solid #ddd; transition: 0.2s; }
         .tag-pill.active { background: #3498db; color: white; border-color: #2980b9; }
-
         .toggle-box { display: flex; background: #eee; border-radius: 10px; padding: 4px; margin: 12px 0; }
         .toggle-btn { flex: 1; padding: 10px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; background: none; color: #7f8c8d; transition: 0.3s; font-size: 13px; }
         .toggle-btn.active { background: white; color: #3498db; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-
+        .disabled-btn { opacity: 0.3; cursor: not-allowed; }
         select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; font-size: 16px; margin-top: 5px; background: white; box-sizing: border-box; }
         .primary-btn { width: 100%; padding: 18px; margin-top: 10px; font-size: 18px; cursor: pointer; border-radius: 12px; border: none; background: #3498db; color: white; font-weight: bold; }
-        
-        /* 測驗畫面 */
         .meaning-box { background: #fff9db; padding: 25px; border-radius: 15px; font-size: 26px; font-weight: bold; line-height: 1.4; border-left: 10px solid #f1c40f; margin: 15px 0; text-align: center; }
         .quiz-option { width: 100%; padding: 16px; margin: 10px 0; border: 2px solid #ecf0f1; border-radius: 12px; background: white; font-size: 18px; cursor: pointer; text-align: left; }
         .quiz-option.selected { border-color: #3498db; background-color: #ebf5fb; }
         .correct { background: #2ecc71 !important; color: white; }
         .wrong { background: #e74c3c !important; color: white; }
-        
-        /* 錯題管理清單樣式 */
-        .drawer-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: flex-end; }
-        .drawer-content { background: white; width: 100%; max-width: 500px; border-radius: 25px 25px 0 0; padding: 25px; max-height: 85%; overflow-y: auto; text-align: left; }
-        .word-item { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
-        .word-item input { width: 20px; height: 20px; }
-        .badge { font-size: 11px; padding: 2px 6px; border-radius: 4px; margin-left: 5px; }
-        .badge-f { background: #ffebee; color: #e74c3c; border: 1px solid #ffcdd2; }
-        .badge-h { background: #e8f5e9; color: #27ae60; border: 1px solid #c8e6c9; }
+        .flash-answer-box { background: #ebf5fb; padding: 20px; border-radius: 12px; border: 2px dashed #3498db; margin: 15px 0; display: none; text-align: center; }
+        .eval-btn-group { display: flex; gap: 10px; margin-top: 10px; display: none; }
+        .eval-btn { flex: 1; padding: 20px; border-radius: 12px; border: none; color: white; font-size: 18px; font-weight: bold; cursor: pointer; }
+
+        /* 抽屜樣式 */
+        .drawer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; justify-content: center; align-items: flex-end; }
+        .drawer-box { background: white; width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; padding: 20px; box-sizing: border-box; max-height: 80vh; overflow-y: auto; }
+        .list-item { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; text-align: left; }
+        .badge { font-size: 11px; padding: 2px 6px; border-radius: 4px; margin-left: 8px; }
+        .badge-f { background: #ffebee; color: #e74c3c; }
+        .badge-h { background: #e8f5e9; color: #2ecc71; }
     </style>
 </head>
 <body>
 
 <div class="card">
     <div id="initArea">
-        <div id="loader-msg" style="text-align:center; font-weight:bold; color:#2980b9;">📡 正在同步雲端數據...</div>
+        <div id="loader-msg" style="text-align:center; font-weight:bold; color:#2980b9;">📡 正在同步資料庫清單...</div>
         <div id="initBarBox" class="progress-box" style="display:block;"><div id="initBarFill" class="progress-fill"></div></div>
     </div>
 
     <div id="setupArea" style="display:none;">
-        <h2 style="margin:0 0 10px 0; text-align:center;">🧠 終極複習助手 v4.0</h2>
-        
-        <label>1. 選擇題庫：</label>
+        <h2 style="margin:0 0 10px 0; text-align:center;">🧠 智慧複習 v4.2.0</h2>
+        <label>1. 選擇分冊：</label>
         <select id="sheetSelect" onchange="resetSelection()"></select>
-        <button id="loadBtn" class="primary-btn" onclick="loadSheetData()">載入內容 ➔</button>
-        <div id="loadBarBox" class="progress-box"><div id="loadBarFill" class="progress-fill"></div></div>
+        <button id="loadBtn" class="primary-btn" onclick="loadSheetData()">載入題庫內容 ➔</button>
 
         <div id="subSetup" style="display:none; margin-top:15px; border-top:2px dashed #eee; padding-top:10px;">
-            <label>2. 測驗模式：</label>
+            <label>2. 練習類型：</label>
             <div class="toggle-box">
-                <button id="typeChoice" class="toggle-btn active" onclick="setMode('choice')">選擇</button>
-                <button id="typeFlash" class="toggle-btn" onclick="setMode('flash')">問答</button>
+                <button id="typeChoice" class="toggle-btn active" onclick="setMode('choice')">選擇題</button>
+                <button id="typeFlash" class="toggle-btn" onclick="setMode('flash')">問答題</button>
                 <button id="typeDict" class="toggle-btn" onclick="setMode('dict')">聽寫</button>
             </div>
 
-            <label>3. 複習範圍：</label>
+            <label>3. 測驗方向：</label>
             <div class="toggle-box">
-                <button id="scopeAll" class="toggle-btn active" onclick="setScope('all')">全部</button>
-                <button id="scopeFail" class="toggle-btn" onclick="setScope('fail')">補考題(11)</button>
+                <button id="dirAB" class="toggle-btn active" onclick="setDirection('AB')">正向</button>
+                <button id="dirBA" class="toggle-btn" onclick="setDirection('BA')">反向</button>
             </div>
 
-            <label>4. 標籤篩選：</label>
+            <label>4. 標籤篩選 (複選可聯集)：</label>
             <div id="tagScroll" class="tag-scroll-area"><div id="tagCloud" class="tag-container"></div></div>
             <div id="filterCount" style="font-size:12px; color:#3498db; margin-bottom:10px; font-weight:bold;"></div>
             
+            <label>5. 測驗題數：</label>
+            <select id="quizCount">
+                <option value="10" selected>10 題</option><option value="20">20 題</option><option value="30">30 題</option><option value="50">50 題</option><option value="100">100 題</option>
+            </select>
+            
             <button class="primary-btn" style="background:#e74c3c;" onclick="startQuiz('hard')">🔥 地獄挑戰</button>
-            <button class="primary-btn" onclick="startQuiz('mix')">⚖️ 智慧複習</button>
-            <button class="primary-btn" style="background:#95a5a6; font-size: 14px; padding: 10px;" onclick="openDrawer()">🛠️ 標記前次錯題</button>
+            <button class="primary-btn" onclick="startQuiz('mix')">⚖️ 智慧練習</button>
+            <button class="primary-btn" style="background:#95a5a6; font-size:14px;" onclick="openDrawer()">🛠️ 錯題勾選管理</button>
         </div>
     </div>
 
@@ -85,192 +86,156 @@
         <div id="gameHeader" style="font-size:12px; color:#95a5a6; margin-bottom:5px;"></div>
         <div id="meaningDisplay" class="meaning-box"></div>
         <div id="optionsGroup"></div>
-        
-        <div id="masteryArea" style="display:none; text-align:center; margin-bottom:10px; font-weight:bold; color:#e67e22;">
-            <input type="checkbox" id="masteryCheck"> 太簡單了，以後不再出
-        </div>
-        
         <button id="confirmBtn" class="primary-btn" style="background:#2c3e50; display:none;" onclick="handleChoiceNext()">確認答案 ➔</button>
+        <button id="speakBtn" class="primary-btn" style="background:#9b59b6; display:none; margin-bottom:10px;" onclick="speakMeaning()">🔊 聽讀音</button>
         <button id="showAnsBtn" class="primary-btn" style="background:#f39c12; display:none;" onclick="revealAnswer()">🔍 顯示答案</button>
-        <button id="speakBtn" class="primary-btn" style="background:#9b59b6; display:none; margin-bottom:10px;" onclick="speakBpmf()">🔊 聽讀音</button>
-
-        <div id="flashAnswerBox" style="display:none; background:#ebf5fb; padding:15px; border-radius:12px; text-align:center;">
-            <div id="flashText" style="font-size:28px; font-weight:bold; color:#2980b9;"></div>
-            <div id="flashExt" class="supplement"></div>
-        </div>
-
-        <div id="evalBtns" class="toggle-box" style="display:none; gap:10px; background:none;">
-            <button class="primary-btn" style="background:#e67e22; flex:1;" onclick="handleEval(99)">🏆 封印</button>
-            <button class="primary-btn" style="background:#2ecc71; flex:1;" onclick="handleEval(1)">👍 會了</button>
-            <button class="primary-btn" style="background:#e74c3c; flex:1;" onclick="handleEval(-1)">👎 不熟</button>
+        <div id="flashAnswerBox" class="flash-answer-box"><div style="font-size:28px; font-weight:bold; color:#2980b9;" id="flashWord"></div><div class="supplement" id="flashExt"></div></div>
+        <div id="evalBtnGroup" class="eval-btn-group">
+            <button class="eval-btn" style="background:#e67e22; flex:0.6;" onclick="handleEval(99)">🏆 封印</button>
+            <button class="eval-btn" style="background:#e74c3c;" onclick="handleEval(-1)">👎 不熟</button>
+            <button class="eval-btn" style="background:#2ecc71;" onclick="handleEval(1)">👍 會了</button>
         </div>
     </div>
 
     <div id="reportArea" style="display:none;">
-        <div id="sync-status" style="background:#34495e; color:white; padding:10px; border-radius:8px; text-align:center; margin-bottom:10px;">進度同步中...</div>
+        <div id="sync-banner">🔄 進度同步至 Excel 中...</div>
         <div id="reportList" style="max-height:300px; overflow-y:auto; border:1px solid #eee; border-radius:10px; padding:10px; margin-bottom:15px;"></div>
         <button class="primary-btn" onclick="location.reload()">返回首頁</button>
     </div>
 </div>
 
-<div id="drawerOverlay" class="drawer-overlay" onclick="closeDrawer(event)">
-    <div class="drawer-content" onclick="event.stopPropagation()">
-        <h3 style="margin-top:0;">🛠️ 標記前次錯題</h3>
-        <p style="font-size:12px; color:#7f8c8d;">勾選代表「聽寫有錯」，會標記為補考題 (E:11) 並打上曾錯題標籤。</p>
+<div id="drawerOverlay" class="drawer" onclick="closeDrawer()">
+    <div class="drawer-box" onclick="event.stopPropagation()">
+        <h3 style="margin-top:0;">🛠️ 標記本次錯題</h3>
+        <p style="font-size:12px; color:#7f8c8d;">勾選將於 Z 欄標記「本次錯題」，取消則改為「曾錯題」。</p>
         <div id="drawerList"></div>
-        <button class="primary-btn" style="background:#27ae60;" onclick="saveDrawer()">儲存並同步</button>
+        <button class="primary-btn" style="background:#27ae60;" onclick="saveDrawer()">儲存並同步 Z 欄</button>
         <button class="primary-btn" style="background:#95a5a6;" onclick="closeDrawer()">關閉</button>
     </div>
 </div>
 
 <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycby3rHWeSAb7s2WI16cidGH16SkUm0yFvEJ03YyS7BL2-_ba1ErgCVQBkZnFD8NcZ2ek/exec"; 
+    const GAS_URL = "在此填入你的GAS網址"; 
     let allRawData = [], allData = [], pool = [], currentIndex = -1, batchLog = [];
-    let activeTags = new Set(), currentSheet = "", quizMode = 'choice', quizScope = 'all';
-
-    function updateProgress(barId, val) { document.getElementById(barId).style.width = val + "%"; }
+    let activeTags = new Set(), currentSheet = "", quizMode = 'choice', testDir = 'AB';
 
     async function init() {
-        updateProgress('initBarFill', 30);
         try {
             const res = await fetch(`${GAS_URL}?action=getSheets&cb=${Date.now()}`);
             const json = await res.json();
-            updateProgress('initBarFill', 100);
             const select = document.getElementById('sheetSelect');
             json.sheets.forEach(name => { let opt = document.createElement('option'); opt.value = name; opt.innerText = name; select.appendChild(opt); });
-            setTimeout(() => { document.getElementById('initArea').style.display='none'; document.getElementById('setupArea').style.display='block'; }, 400);
+            document.getElementById('initArea').style.display='none'; document.getElementById('setupArea').style.display='block';
         } catch (e) { alert("連線失敗"); }
     }
 
     function resetSelection() { document.getElementById('subSetup').style.display = 'none'; document.getElementById('loadBtn').style.display = 'block'; activeTags.clear(); }
-    function setMode(m) { quizMode = m; document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active')); document.getElementById('type'+m.charAt(0).toUpperCase()+m.slice(1)).classList.add('active'); }
-    function setScope(s) { quizScope = s; document.getElementById('scopeAll').classList.toggle('active', s==='all'); document.getElementById('scopeFail').classList.toggle('active', s==='fail'); updateCount(); }
+    function setDirection(dir) { testDir = dir; document.getElementById('dirAB').classList.toggle('active', dir === 'AB'); document.getElementById('dirBA').classList.toggle('active', dir === 'BA'); }
+    function setMode(m) {
+        if(m==='dict' && !currentSheet.includes('聽寫')) return alert("分冊名需含『聽寫』才可開啟聽寫模式！");
+        quizMode = m;
+        document.querySelectorAll('.toggle-btn').forEach(b => { if(b.id.startsWith('type')) b.classList.remove('active'); });
+        document.getElementById('type'+m.charAt(0).toUpperCase()+m.slice(1)).classList.add('active');
+    }
 
     async function loadSheetData() {
         currentSheet = document.getElementById('sheetSelect').value;
-        document.getElementById('loadBtn').style.display = 'none';
-        document.getElementById('loadBarBox').style.display = 'block';
-        updateProgress('loadBarFill', 20);
+        document.getElementById('loadBtn').innerText = "載入中...";
         try {
             const res = await fetch(`${GAS_URL}?action=read&sheetName=${encodeURIComponent(currentSheet)}&cb=${Date.now()}`);
             const json = await res.json();
-            updateProgress('loadBarFill', 100);
-            allRawData = json.data;
-            allData = allRawData.filter(d => d.score !== 99);
+            allRawData = json.data; allData = allRawData.filter(d => d.score !== 99);
+            const dictBtn = document.getElementById('typeDict');
+            if(!currentSheet.includes('聽寫')) dictBtn.classList.add('disabled-btn'); else dictBtn.classList.remove('disabled-btn');
             
             const tagsMap = new Map();
             allData.forEach(item => item.tags.forEach(t => tagsMap.set(t, (tagsMap.get(t) || 0) + 1)));
             const cloud = document.getElementById('tagCloud'); cloud.innerHTML = '';
             [...tagsMap.entries()].sort((a,b)=>b[1]-a[1]).forEach(([tag, count]) => {
                 const span = document.createElement('span'); span.className = 'tag-pill'; span.innerText = `${tag} (${count})`;
-                span.onclick = function() { if(activeTags.has(tag)) { activeTags.delete(tag); this.classList.remove('active'); } else { activeTags.add(tag); this.classList.add('active'); } updateCount(); };
+                span.onclick = function() { if(activeTags.has(tag)) activeTags.delete(tag); else activeTags.add(tag); this.classList.toggle('active'); updateCount(); };
                 cloud.appendChild(span);
             });
-            document.getElementById('tagScroll').style.display = tagsMap.size > 0 ? 'block' : 'none';
-            document.getElementById('loadBarBox').style.display = 'none';
-            document.getElementById('subSetup').style.display = 'block';
-            updateCount();
-        } catch (e) { alert("載入失敗"); document.getElementById('loadBtn').style.display = 'block'; }
+            document.getElementById('tagScroll').style.display = 'block';
+            document.getElementById('loadBtn').style.display = 'none';
+            document.getElementById('subSetup').style.display = 'block'; updateCount();
+        } catch (e) { alert("讀取失敗"); document.getElementById('loadBtn').innerText = "載入內容 ➔"; }
     }
 
     function updateCount() {
-        let filtered = quizScope === 'fail' ? allData.filter(d => d.failStatus === '11') : allData;
-        if(activeTags.size > 0) filtered = filtered.filter(d => Array.from(activeTags).every(tag => d.tags.includes(tag)));
-        document.getElementById('filterCount').innerText = `符合題目：${filtered.length} 題`;
+        let filtered = (activeTags.size > 0) ? allData.filter(d => Array.from(activeTags).some(tag => d.tags.includes(tag))) : allData;
+        document.getElementById('filterCount').innerText = `符合條件題目：${filtered.length} / ${allData.length}`;
+        return filtered;
     }
 
     function startQuiz(mode) {
-        let filtered = quizScope === 'fail' ? allData.filter(d => d.failStatus === '11') : allData;
-        if(activeTags.size > 0) filtered = filtered.filter(d => Array.from(activeTags).every(tag => d.tags.includes(tag)));
-        if(filtered.length === 0) return alert("目前範圍內沒有題目喔！");
-        
+        let filtered = updateCount();
+        if(filtered.length === 0) return alert("沒題目！");
+        const total = parseInt(document.getElementById('quizCount').value);
         let red = filtered.filter(d => d.score <= 3).sort(() => Math.random() - 0.5);
         let others = filtered.filter(d => d.score > 3).sort(() => Math.random() - 0.5);
-        pool = (mode === 'hard' ? [...red, ...others] : filtered.sort(() => Math.random() - 0.5)).slice(0, 20);
-        
-        document.getElementById('setupArea').style.display = 'none';
-        document.getElementById('gameArea').style.display = 'block';
+        pool = (mode === 'hard' ? [...red, ...others] : filtered.sort(() => Math.random() - 0.5)).slice(0, total);
+        document.getElementById('setupArea').style.display = 'none'; document.getElementById('gameArea').style.display = 'block';
         currentIndex = -1; nextQuestion();
     }
 
     function nextQuestion() {
-        currentIndex++;
-        if (currentIndex >= pool.length) return showReport();
+        currentIndex++; if (currentIndex >= pool.length) return showReport();
         const item = pool[currentIndex];
         document.getElementById('gameHeader').innerText = `${currentSheet} | ${currentIndex+1}/${pool.length} (熟練:${item.score})`;
-        
-        // 內容顯示邏輯
         if (quizMode === 'dict') {
-            document.getElementById('meaningDisplay').innerText = "🔊 請聽音辨字";
-            document.getElementById('speakBtn').style.display = 'block';
-            speakBpmf();
+            document.getElementById('meaningDisplay').innerText = "🔊 聽音辨字";
+            document.getElementById('speakBtn').style.display = 'block'; speakMeaning();
+            setupFlash();
+        } else if (quizMode === 'choice') {
+            document.getElementById('meaningDisplay').innerText = (testDir === 'AB') ? item.word : item.meaning;
+            document.getElementById('speakBtn').style.display = 'none'; setupChoice(item);
         } else {
-            document.getElementById('meaningDisplay').innerText = item.bpmf;
-            document.getElementById('speakBtn').style.display = 'none';
-        }
-
-        if (quizMode === 'choice') {
-            setupChoice(item);
-        } else {
-            setupManual(item);
+            document.getElementById('meaningDisplay').innerText = (testDir === 'AB') ? item.word : item.meaning;
+            document.getElementById('speakBtn').style.display = 'none'; setupFlash();
         }
     }
 
+    function speakMeaning() {
+        window.speechSynthesis.cancel();
+        const ut = new SpeechSynthesisUtterance(pool[currentIndex].meaning);
+        ut.lang = 'zh-TW'; ut.rate = 0.8; window.speechSynthesis.speak(ut);
+    }
+
     function setupChoice(item) {
-        document.getElementById('optionsGroup').style.display = 'block';
-        document.getElementById('confirmBtn').style.display = 'block';
-        document.getElementById('masteryArea').style.display = 'block';
-        document.getElementById('showAnsBtn').style.display = 'none';
-        document.getElementById('evalBtns').style.display = 'none';
+        document.getElementById('optionsGroup').style.display = 'block'; document.getElementById('confirmBtn').style.display = 'block';
+        document.getElementById('showAnsBtn').style.display = 'none'; document.getElementById('evalBtnGroup').style.display = 'none';
         document.getElementById('flashAnswerBox').style.display = 'none';
-        
         const group = document.getElementById('optionsGroup'); group.innerHTML = '';
-        let others = allData.filter(d => d.word !== item.word).map(d => d.word).sort(() => Math.random() - 0.5).slice(0, 3);
-        [item.word, ...others].sort(() => Math.random() - 0.5).forEach(txt => {
+        const corr = (testDir === 'AB') ? item.meaning : item.word;
+        const wrongs = allData.filter(d => d.word !== item.word).map(d => (testDir === 'AB' ? d.meaning : d.word)).sort(() => Math.random() - 0.5).slice(0, 3);
+        [corr, ...wrongs].sort(() => Math.random() - 0.5).forEach(txt => {
             const btn = document.createElement('button'); btn.className = 'quiz-option'; btn.innerText = txt;
             btn.onclick = function() { document.querySelectorAll('.quiz-option').forEach(b => b.classList.remove('selected')); this.classList.add('selected'); selectedWord = txt; };
             group.appendChild(btn);
         });
     }
 
-    function setupManual(item) {
-        document.getElementById('optionsGroup').style.display = 'none';
-        document.getElementById('confirmBtn').style.display = 'none';
-        document.getElementById('masteryArea').style.display = 'none';
-        document.getElementById('showAnsBtn').style.display = 'block';
-        document.getElementById('evalBtns').style.display = 'none';
+    function setupFlash() {
+        document.getElementById('optionsGroup').style.display = 'none'; document.getElementById('confirmBtn').style.display = 'none';
+        document.getElementById('showAnsBtn').style.display = 'block'; document.getElementById('evalBtnGroup').style.display = 'none';
         document.getElementById('flashAnswerBox').style.display = 'none';
     }
 
     function revealAnswer() {
         const item = pool[currentIndex];
         document.getElementById('showAnsBtn').style.display = 'none';
-        document.getElementById('flashAnswerBox').style.display = 'block';
-        document.getElementById('evalBtns').style.display = 'flex';
-        document.getElementById('flashText').innerText = item.word;
+        document.getElementById('flashAnswerBox').style.display = 'block'; document.getElementById('evalBtnGroup').style.display = 'flex';
+        document.getElementById('flashWord').innerText = item.word;
         document.getElementById('flashExt').innerText = item.ext ? `補充：${item.ext}` : "";
     }
 
-    function speakBpmf() {
-        const item = pool[currentIndex];
-        window.speechSynthesis.cancel();
-        const ut = new SpeechSynthesisUtterance(item.bpmf);
-        ut.lang = 'zh-TW'; ut.rate = 0.8;
-        window.speechSynthesis.speak(ut);
-    }
-
     function handleChoiceNext() {
-        const item = pool[currentIndex];
-        if (!selectedWord) return alert("請選擇答案");
-        const isCorrect = selectedWord === item.word;
-        const isMastered = document.getElementById('masteryCheck').checked;
-        let delta = isCorrect ? 1 : -1;
-        if (isCorrect && isMastered) delta = 99;
-        batchLog.push({ row: item.row, delta, word: item.word, isCorrect });
-        document.querySelectorAll('.quiz-option').forEach(b => {
-            if (b.innerText === item.word) b.classList.add('correct');
-            else if (b.innerText === selectedWord && !isCorrect) b.classList.add('wrong');
-        });
+        if (!selectedWord) return alert("選一個！");
+        const item = pool[currentIndex]; const corr = (testDir === 'AB') ? item.meaning : item.word;
+        const isCorr = selectedWord === corr;
+        batchLog.push({ row: item.row, delta: isCorr ? 1 : -1, word: item.word, isCorrect: isCorr });
+        document.querySelectorAll('.quiz-option').forEach(b => { if (b.innerText === corr) b.classList.add('correct'); else if (b.innerText === selectedWord && !isCorr) b.classList.add('wrong'); });
         setTimeout(nextQuestion, 800);
     }
 
@@ -281,57 +246,41 @@
     }
 
     async function showReport() {
-        document.getElementById('gameArea').style.display = 'none';
-        document.getElementById('reportArea').style.display = 'block';
+        document.getElementById('gameArea').style.display = 'none'; document.getElementById('reportArea').style.display = 'block';
         const list = document.getElementById('reportList');
         const sorted = [...batchLog].sort((a,b) => a.isCorrect - b.isCorrect);
         list.innerHTML = sorted.map(i => `<div style="padding:10px; border-bottom:1px solid #eee;"><b>${i.isCorrect?'✅':'❌'} ${i.word}</b></div>`).join('');
-        
         try {
             await fetch(`${GAS_URL}?sheetName=${encodeURIComponent(currentSheet)}`, { method: 'POST', body: JSON.stringify(batchLog) });
-            document.getElementById('sync-status').innerText = "✅ 進度同步成功";
-        } catch(e) { document.getElementById('sync-status').innerText = "❌ 同步異常"; }
+            document.getElementById('sync-banner').innerText = "✅ 同步成功";
+        } catch (e) { document.getElementById('sync-banner').innerText = "❌ 異常"; }
     }
 
-    // 抽屜邏輯
     function openDrawer() {
         document.getElementById('drawerOverlay').style.display = 'flex';
         const container = document.getElementById('drawerList'); container.innerHTML = '';
-        allData.forEach(item => {
-            const isFail = item.failStatus === '11';
-            const hasHistory = item.tags.includes("曾錯題");
-            const div = document.createElement('div'); div.className = 'word-item';
-            div.innerHTML = `
-                <input type="checkbox" id="dr_${item.row}" ${isFail?'checked':''} data-row="${item.row}">
-                <label for="dr_${item.row}" style="margin-left:10px; flex:1;">${item.word} 
-                ${isFail?'<span class="badge badge-f">待補考</span>':''}
-                ${hasHistory?'<span class="badge badge-h">曾錯</span>':''}</label>
-            `;
+        allRawData.forEach(item => {
+            const isFail = item.tags.includes("本次錯題"); const hasHistory = item.tags.includes("曾錯題");
+            const div = document.createElement('div'); div.className = 'list-item';
+            div.innerHTML = `<input type="checkbox" id="dr_${item.row}" ${isFail?'checked':''} data-row="${item.row}">
+                <label for="dr_${item.row}" style="margin-left:10px; flex:1;">${item.word} ${isFail?'<span class="badge badge-f">本次錯題</span>':''} ${hasHistory?'<span class="badge badge-h">曾錯題</span>':''}</label>`;
             container.appendChild(div);
         });
     }
-
-    function closeDrawer(e) { document.getElementById('drawerOverlay').style.display = 'none'; }
-
+    function closeDrawer() { document.getElementById('drawerOverlay').style.display = 'none'; }
     async function saveDrawer() {
         const updates = [];
         document.querySelectorAll('#drawerList input').forEach(chk => {
-            const row = parseInt(chk.dataset.row);
-            const isFail = chk.checked;
-            const original = allData.find(d => d.row === row);
-            if (isFail !== (original.failStatus==='11')) updates.push({ row, isFail });
+            const row = parseInt(chk.dataset.row); const isFail = chk.checked;
+            const original = allRawData.find(d => d.row === row);
+            if (isFail !== original.tags.includes("本次錯題")) updates.push({ row, isFail });
         });
         if (updates.length === 0) return closeDrawer();
-        
-        document.getElementById('drawerList').innerHTML = '<p style="text-align:center;">同步中...</p>';
         try {
             await fetch(`${GAS_URL}?action=syncFails&sheetName=${encodeURIComponent(currentSheet)}`, { method: 'POST', body: JSON.stringify(updates) });
-            alert("同步完成！");
-            loadSheetData(); // 重新載入數據
-            closeDrawer();
-        } catch(e) { alert("同步失敗"); }
+            alert("同步完成！"); loadSheetData(); closeDrawer();
+        } catch(e) { alert("失敗"); }
     }
-
     window.onload = init;
 </script>
 </body>
