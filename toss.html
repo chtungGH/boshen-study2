@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>真實台幣 50 元丟銅板</title>
+    <title>Bryson家台幣 50 元擲硬幣</title>
     <style>
         :root {
-            /* 定義一個通用的硬幣尺寸，方便修改 */
             --coin-size: 200px; 
         }
 
@@ -17,18 +16,13 @@
             justify-content: center;
             height: 100vh;
             margin: 0;
-            background-color: #f4f7f6; /* 淺灰色背景，更貼近真實生活 */
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
             color: #333;
         }
 
-        h1 {
-            margin-bottom: 40px;
-            color: #2c3e50;
-        }
-
         .coin-container {
-            perspective: 1500px; /* 增加透視感，讓 3D 效果更強烈 */
+            perspective: 1500px;
             margin-bottom: 40px;
         }
 
@@ -37,61 +31,55 @@
             height: var(--coin-size);
             position: relative;
             transform-style: preserve-3d;
-            transition: transform 1.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* 更平滑的動畫 */
+            /* 使用 ease-out 讓結尾更有停下來的感覺 */
+            transition: transform 2s cubic-bezier(0.1, 0, 0.1, 1); 
             cursor: pointer;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1); /* 給硬幣一個陰影，更有質感 */
         }
 
         .side {
             position: absolute;
             width: 100%;
             height: 100%;
-            border-radius: 50%; /* 確保硬幣是圓的 */
-            backface-visibility: hidden; /* 關鍵！轉到背面時隱藏正面 */
-            background-size: cover; /* 確保圖片填滿，不留白 */
+            border-radius: 50%;
+            backface-visibility: hidden;
+            background-size: cover;
             background-position: center;
-            border: 2px solid rgba(0,0,0,0.05); /* 極細微的邊框，區隔邊緣 */
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.2), 0 10px 20px rgba(0,0,0,0.2);
         }
 
-        /* 正面 (image_1.png) - 國父像 */
+        /* 正面 -  */
         .heads {
-            background-image: url('image_1.png'); /* 注意檔名要正確 */
+            background-image: url('image_0.png'); 
         }
 
-        /* 反面 (image_0.png) - 50 圓 */
+        /* 反面 -  */
         .tails {
-            background-image: url('image_0.png'); /* 注意檔名要正確 */
-            transform: rotateY(180deg); /* 預設先轉 180 度，作為背面 */
+            background-image: url('image_1.png');
+            transform: rotateY(180deg);
         }
 
         button {
-            padding: 12px 30px;
+            padding: 12px 35px;
             font-size: 1.3rem;
             cursor: pointer;
-            background-color: #f1c40f; /* 金色按鈕，搭配硬幣 */
+            background-color: #f1c40f;
             color: #2c3e50;
             border: none;
-            border-radius: 5px;
+            border-radius: 50px;
             font-weight: bold;
-            transition: background-color 0.3s, transform 0.1s;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: 0.2s;
         }
 
-        button:hover { 
-            background-color: #f39c12; 
-        }
-
-        button:active {
-            transform: translateY(1px);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
+        button:hover { background-color: #f39c12; transform: scale(1.05); }
+        button:active { transform: scale(0.95); }
 
         #resultText {
             margin-top: 25px;
-            font-size: 1.6rem;
+            font-size: 1.8rem;
             font-weight: bold;
-            height: 2.2rem;
-            color: #e67e22; /* 醒目的橙色，用於顯示結果 */
+            height: 2.5rem;
+            color: #e67e22;
         }
     </style>
 </head>
@@ -99,7 +87,7 @@
 
     <h1>決定命運的 moment！</h1>
 
-    <div class="coin-container">
+    <div class="coin-container" onclick="flipCoin()">
         <div class="coin" id="coin">
             <div class="side heads"></div>
             <div class="side tails"></div>
@@ -107,52 +95,49 @@
     </div>
 
     <button onclick="flipCoin()">開始擲幣</button>
-    <div id="resultText">點擊按鈕或硬幣開始</div>
+    <div id="resultText">點擊硬幣或按鈕開始</div>
 
     <script>
-        // 記錄當前的總旋轉角度，確保每次擲都從上一次的狀態繼續轉
         let currentRotation = 0;
-        // 防抖旗標，防止連續點擊
         let isFlipping = false;
 
         function flipCoin() {
-            if (isFlipping) return; // 動畫中，拒絕新的點擊
+            if (isFlipping) return;
             
             isFlipping = true;
             const coin = document.getElementById('coin');
             const resultDisplay = document.getElementById('resultText');
             
-            // 1. 隨機決定結果 (0 是正面, 1 是反面)
-            // 你也可以使用更加純粹的隨機: (Math.random() < 0.5)
-            // 這裡我們用一個整數隨機性更強
-            const isHeads = (Math.floor(Math.random() * 2) === 0);
+            // 1. 隨機決定結果
+            const isHeads = Math.random() < 0.5;
             
-            // 2. 計算旋轉角度
-            // - 基礎旋轉：為了展示拋擲過程，至少轉 5 圈 (360 * 5 = 1800)
-            // - 結果補正：如果是反面，需要額外多轉 180 度
-            const baseSpins = 1800; // 5 圈
-            const extraDegrees = isHeads ? 0 : 180;
+            // 2. 角度計算強化
+            // 每次至少轉 10 圈 (3600度)，確保視覺上很快
+            // 使用取餘數的概念，確保最後停下的位置精確對準 0度(正) 或 180度(反)
+            const spins = 3600; 
+            const degrees = isHeads ? 0 : 180;
             
-            // 累積角度，確保硬幣會一直順向轉下去，而不是突然跳回原位
-            currentRotation += baseSpins + extraDegrees; 
+            // 關鍵：將目前的旋轉加到下一個整圈的角度上
+            currentRotation += spins + degrees + (360 - (currentRotation % 360));
             
-            // 3. 執行 3D 旋轉動畫
+            // 3. 執行動畫
             coin.style.transform = `rotateY(${currentRotation}deg)`;
             
-            // 4. 更新狀態顯示
-            resultDisplay.innerText = "旋轉中... 命運掌握在天！";
-            resultDisplay.style.color = "#888"; // 旋轉時文字變淡
+            resultDisplay.innerText = "命運旋轉中...";
+            resultDisplay.style.color = "#888";
 
-            // 5. 動畫結束後（1.8秒後），顯示結果文字
+            // 4. 動畫結束後的處理 (動畫時間設為 2秒)
             setTimeout(() => {
-                isFlipping = false; // 動畫結束，允許下次擲
-                resultDisplay.style.color = isHeads ? "#e67e22" : "#c0392b"; // 正面橙色，反面紅色
-                resultDisplay.innerText = isHeads ? "✨ 結果是：正面 (國父像)！" : "✨ 結果是：反面 (50圓)！";
-            }, 1800); // 這個時間要跟 CSS 的 transition 時間一致 (1.8s)
+                isFlipping = false;
+                if (isHeads) {
+                    resultDisplay.innerText = "✨ 結果是：正面 (國父像)！";
+                    resultDisplay.style.color = "#e67e22";
+                } else {
+                    resultDisplay.innerText = "✨ 結果是：反面 (50圓)！";
+                    resultDisplay.style.color = "#c0392b";
+                }
+            }, 2000); 
         }
-
-        // 點擊硬幣本身也可以觸發拋擲
-        document.getElementById('coin').addEventListener('click', flipCoin);
     </script>
 </body>
 </html>
