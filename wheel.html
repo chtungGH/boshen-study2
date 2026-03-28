@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自訂隨機轉盤</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f2f5;
+            font-family: "Microsoft JhengHei", sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 40px;
+            max-width: 1000px;
+        }
+        .wheel-box {
+            position: relative;
+            width: 400px;
+            height: 400px;
+        }
+        /* 指針 */
+        .arrow {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0; height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 30px solid #e74c3c;
+            z-index: 10;
+        }
+        canvas {
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            background: white;
+        }
+        .controls {
+            width: 300px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            margin-bottom: 15px;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 20px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover { background-color: #2980b9; }
+        button:disabled { background-color: #bdc3c7; }
+        h2 { color: #2c3e50; }
+    </style>
+</head>
+<body>
+
+    <h2>🎡 隨機大轉盤</h2>
+
+    <div class="container">
+        <div class="wheel-box">
+            <div class="arrow"></div>
+            <canvas id="wheelCanvas" width="400" height="400"></canvas>
+        </div>
+
+        <div class="controls">
+            <p>輸入選項 (每行一個)：</p>
+            <textarea id="optionsInput">午餐吃麵
+午餐吃飯
+水餃
+麥當勞
+便利商店
+火鍋</textarea>
+            <button id="spinBtn">開始旋轉！</button>
+        </div>
+    </div>
+
+    <script>
+const canvas = document.getElementById('wheelCanvas');
+        const ctx = canvas.getContext('2d');
+        const input = document.getElementById('optionsInput');
+        const btn = document.getElementById('spinBtn');
+
+        let options = [];
+        let startAngle = 0;
+        let arc = 0;
+        let spinTimeout = null;
+        let spinAngleStart = 0;
+        let spinTime = 0;
+        let spinTimeTotal = 0;
+
+        const colors = ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40", "#8BC34A", "#F44336"];
+
+        function drawWheel() {
+            options = input.value.split('\n').filter(t => t.trim() !== "");
+            if (options.length === 0) return;
+
+            arc = Math.PI * 2 / options.length;
+            ctx.clearRect(0, 0, 400, 400);
+
+            options.forEach((text, i) => {
+                const angle = startAngle + i * arc;
+                ctx.fillStyle = colors[i % colors.length];
+                
+                ctx.beginPath();
+                ctx.moveTo(200, 200);
+                ctx.arc(200, 200, 190, angle, angle + arc, false);
+                ctx.fill();
+                ctx.strokeStyle = "rgba(255,255,255,0.5)";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.save();
+                ctx.fillStyle = "black";
+                ctx.shadowBlur = 2;
+                ctx.shadowColor = "black";
+                ctx.translate(200 + Math.cos(angle + arc / 2) * 140, 200 + Math.sin(angle + arc / 2) * 140);
+                ctx.rotate(angle + arc / 2 + Math.PI / 2);
+                ctx.font = 'bold 20px Arial';
+                ctx.fillText(text, -ctx.measureText(text).width / 2, 0);
+                ctx.restore();
+            });
+        }
+
+        function rotateWheel() {
+            spinTime += 20; // 縮短更新間隔，增加流暢度
+            if (spinTime >= spinTimeTotal) {
+                stopRotateWheel();
+                return;
+            }
+
+            // 使用三次方的 Ease Out 公式，讓減速感更明顯
+            // 這裡的邏輯是：初始速度極快，隨著時間增加，增量急遽減少
+            const progress = spinTime / spinTimeTotal;
+            const easeOutValue = 1 - Math.pow(1 - progress, 3); // 三次方曲線
+            
+            // 讓旋轉角度與曲線掛鉤
+            const currentSpinAngle = spinAngleStart * (1 - easeOutValue);
+            startAngle += (currentSpinAngle * Math.PI / 180);
+            
+            drawWheel();
+            spinTimeout = requestAnimationFrame(rotateWheel); // 改用系統級動畫幀，更順暢
+        }
+
+        function stopRotateWheel() {
+            cancelAnimationFrame(spinTimeout);
+            // 計算結果（修正指針指向頂部的角度偏差）
+            const degrees = (startAngle * 180 / Math.PI) + 90;
+            const arcd = arc * 180 / Math.PI;
+            const index = Math.floor((360 - degrees % 360) / arcd);
+            const result = options[(index + options.length) % options.length];
+            
+            // 延遲一點點跳出結果，體驗更好
+            setTimeout(() => {
+                alert("🎊 恭喜抽中： " + result);
+                btn.disabled = false;
+            }, 300);
+        }
+
+        btn.addEventListener('click', () => {
+            if (options.length < 2) return alert("請至少輸入兩個選項");
+            btn.disabled = true;
+            
+            // 修改參數：
+            // spinAngleStart 從原來的 10 增加到 40~50，速度提升 4 倍以上！
+            spinAngleStart = Math.random() * 20 + 40; 
+            spinTime = 0;
+            // 總旋轉時間設定為 5 秒
+            spinTimeTotal = 5000; 
+            
+            rotateWheel();
+        });
+
+        input.addEventListener('input', drawWheel);
+        drawWheel();
+    </script>
+</body>
+</html>
