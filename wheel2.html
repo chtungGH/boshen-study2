@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>自訂隨機轉盤</title>
+    <title>Bryson家的自訂隨機轉盤</title>
     <style>
         body {
             display: flex;
@@ -78,7 +78,7 @@
 </head>
 <body>
 
-    <h2>🎡 隨機大轉盤</h2>
+    <h2>🎡 Bryson家的隨機大轉盤</h2>
 
     <div class="container">
         <div class="wheel-box">
@@ -88,54 +88,15 @@
 
         <div class="controls">
             <p>輸入選項 (每行一個)：</p>
-            <textarea id="optionsInput">午餐吃麵
-午餐吃飯
-水餃
-麥當勞
-便利商店
-火鍋</textarea>
+            <textarea id="optionsInput">搔癢Bryson
+咬Bryson屁股
+親Bryson額頭
+抱Bryson
+給Bryson讚
+捏Bryson臉</textarea>
             <button id="spinBtn">開始旋轉！</button>
         </div>
     </div>
-
-// --- 音效外掛模組 (不改動原邏輯) ---
-const spinAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
-const winAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3');
-
-// 讓旋轉聲可以快速重複播放
-spinAudio.volume = 0.5;
-
-let lastOptionIndex = -1;
-
-// 監控轉盤旋轉的「側面掛鉤」
-function playTickSound() {
-    const degrees = (startAngle * 180 / Math.PI) + 90;
-    const arcd = arc * 180 / Math.PI;
-    const currentIndex = Math.floor((360 - degrees % 360) / arcd);
-    
-    // 當選項跳轉時播放滴答聲
-    if (currentIndex !== lastOptionIndex) {
-        spinAudio.currentTime = 0;
-        spinAudio.play().catch(() => {}); // 避免瀏覽器政策阻擋報錯
-        lastOptionIndex = currentIndex;
-    }
-}
-
-// 覆寫 requestAnimationFrame 來「偷聽」旋轉動作
-const originalRotateWheel = rotateWheel;
-rotateWheel = function() {
-    playTickSound();
-    originalRotateWheel();
-};
-
-// 覆寫 alert 來加入獲獎音效
-const originalAlert = window.alert;
-window.alert = function(msg) {
-    winAudio.play().catch(() => {});
-    setTimeout(() => {
-        originalAlert(msg);
-    }, 100);
-};
 
     <script>
 const canvas = document.getElementById('wheelCanvas');
@@ -201,6 +162,43 @@ const canvas = document.getElementById('wheelCanvas');
             startAngle += (currentSpinAngle * Math.PI / 180);
             
             drawWheel();
+// --- Bryson 轉盤專屬音效外掛 (不改動原邏輯) ---
+const tickSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
+const winSound = new Audio('https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3');
+
+tickSound.volume = 0.4; // 調整滴答聲輸出音量
+let lastIdx = -1;
+
+// 監聽轉盤旋轉的角度變化
+function checkTick() {
+    const degrees = (startAngle * 180 / Math.PI) + 90;
+    const arcd = arc * 180 / Math.PI;
+    const currentIndex = Math.floor((360 - degrees % 360) / arcd);
+    
+    // 當指針跨越到下一個選項區塊時，播放音效
+    if (currentIndex !== lastIdx) {
+        tickSound.currentTime = 0;
+        tickSound.play().catch(() => {}); 
+        lastIdx = currentIndex;
+    }
+}
+
+// 【外掛技術點 1】劫持 rotateWheel 函數：在每次畫面更新時檢查是否該發出滴答聲
+const _originalRotate = rotateWheel;
+rotateWheel = function() {
+    checkTick();
+    _originalRotate();
+};
+
+// 【外掛技術點 2】劫持 window.alert：在跳出結果視窗前先播放慶祝音效
+const _originalAlert = window.alert;
+window.alert = function(message) {
+    winSound.play().catch(() => {});
+    // 稍微延遲讓音樂響起後再彈出視窗
+    setTimeout(() => {
+        _originalAlert(message);
+    }, 100);
+};
             spinTimeout = requestAnimationFrame(rotateWheel); // 改用系統級動畫幀，更順暢
         }
 
@@ -238,3 +236,4 @@ const canvas = document.getElementById('wheelCanvas');
     </script>
 </body>
 </html>
+
