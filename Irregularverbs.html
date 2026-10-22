@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>英語 100 不規則動詞三態互動特訓站</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', '"Noto Sans TC"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* 隱藏滾動條但保持滾動 */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="h-full bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
+
+  <!-- 頂部導航列 -->
+  <header class="border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('quiz')">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-400 flex items-center justify-center text-white shadow-md shadow-brand-500/20">
+          <i data-lucide="sparkles" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white">VerbMaster 100</h1>
+          <p class="text-xs text-slate-500 dark:text-slate-400">英語不規則動詞三態高頻特訓</p>
+        </div>
+      </div>
+
+      <!-- 導航分頁 -->
+      <nav class="flex items-center space-x-1 sm:space-x-2">
+        <button id="nav-btn-quiz" onclick="switchTab('quiz')" class="px-3.5 py-2 rounded-lg text-sm font-semibold flex items-center space-x-1.5 transition-all bg-brand-50 text-brand-700 dark:bg-brand-900/40 dark:text-brand-300">
+          <i data-lucide="dumbbell" class="w-4 h-4"></i>
+          <span>測驗特訓</span>
+        </button>
+        <button id="nav-btn-dictionary" onclick="switchTab('dictionary')" class="px-3.5 py-2 rounded-lg text-sm font-semibold flex items-center space-x-1.5 transition-all text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
+          <i data-lucide="book-open" class="w-4 h-4"></i>
+          <span>100動詞速查</span>
+        </button>
+        <button onclick="toggleDarkMode()" class="p-2 ml-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" title="切換深色/淺色主題">
+          <i id="theme-icon" data-lucide="moon" class="w-4 h-4"></i>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- 主內容容器 -->
+  <main class="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col justify-start">
+
+    <!-- ================= 區塊 1: 測驗設定介面 ================= -->
+    <div id="section-setup" class="w-full max-w-2xl mx-auto space-y-6">
+      <div class="text-center space-y-2 mb-6">
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">
+          <i data-lucide="check-circle-2" class="w-3.5 h-3.5 mr-1"></i> 完整收錄 100 個高頻動詞
+        </span>
+        <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">自適應動詞三態練習</h2>
+        <p class="text-sm text-slate-500 dark:text-slate-400">告別死記硬背！結合語境選擇、錯題改錯與克漏字填空強化記憶。</p>
+      </div>
+
+      <!-- 設定卡片 -->
+      <div class="bg-white dark:bg-slate-800/90 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-6 sm:p-8 shadow-sm space-y-6">
+        <!-- 動詞群組選擇 -->
+        <div class="space-y-2">
+          <label class="text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between">
+            <span>1. 練習動詞類型分類</span>
+            <span id="selected-type-count" class="text-xs text-brand-600 dark:text-brand-400 font-medium">100 個動詞</span>
+          </label>
+          <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
+            <button type="button" onclick="setTypeFilter('ALL')" class="type-btn active px-3 py-2.5 rounded-xl border text-xs sm:text-sm font-semibold transition text-center" data-type="ALL">全部 (100)</button>
+            <button type="button" onclick="setTypeFilter('AAA')" class="type-btn px-3 py-2.5 rounded-xl border text-xs sm:text-sm font-semibold transition text-center" data-type="AAA">AAA (8)</button>
+            <button type="button" onclick="setTypeFilter('ABA')" class="type-btn px-3 py-2.5 rounded-xl border text-xs sm:text-sm font-semibold transition text-center" data-type="ABA">ABA/AAB (4)</button>
+            <button type="button" onclick="setTypeFilter('ABB')" class="type-btn px-3 py-2.5 rounded-xl border text-xs sm:text-sm font-semibold transition text-center" data-type="ABB">ABB (51)</button>
+            <button type="button" onclick="setTypeFilter('ABC')" class="type-btn px-3 py-2.5 rounded-xl border text-xs sm:text-sm font-semibold transition text-center" data-type="ABC">ABC (37)</button>
+          </div>
+        </div>
+
+        <!-- 題型選擇 -->
+        <div class="space-y-2">
+          <label class="text-sm font-bold text-slate-700 dark:text-slate-300">2. 測驗題型</label>
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
+            <label class="flex items-center p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer transition">
+              <input type="radio" name="question-mode" value="MIXED" checked class="text-brand-600 focus:ring-brand-500">
+              <span class="ml-2 text-sm font-medium">混合題型</span>
+            </label>
+            <label class="flex items-center p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer transition">
+              <input type="radio" name="question-mode" value="CHOICE" class="text-brand-600 focus:ring-brand-500">
+              <span class="ml-2 text-sm font-medium">單選題</span>
+            </label>
+            <label class="flex items-center p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer transition">
+              <input type="radio" name="question-mode" value="ERROR" class="text-brand-600 focus:ring-brand-500">
+              <span class="ml-2 text-sm font-medium">挑錯改錯題</span>
+            </label>
+            <label class="flex items-center p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer transition">
+              <input type="radio" name="question-mode" value="CLOZE" class="text-brand-600 focus:ring-brand-500">
+              <span class="ml-2 text-sm font-medium">克漏字填空</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- 題數選擇 -->
+        <div class="space-y-2">
+          <label class="text-sm font-bold text-slate-700 dark:text-slate-300">3. 題目數量</label>
+          <div class="flex items-center space-x-3">
+            <button type="button" onclick="setCount(10)" class="count-btn active flex-1 py-2.5 rounded-xl border text-sm font-semibold transition text-center" data-count="10">10 題</button>
+            <button type="button" onclick="setCount(20)" class="count-btn flex-1 py-2.5 rounded-xl border text-sm font-semibold transition text-center" data-count="20">20 題</button>
+            <button type="button" onclick="setCount(30)" class="count-btn flex-1 py-2.5 rounded-xl border text-sm font-semibold transition text-center" data-count="30">30 題</button>
+            <button type="button" onclick="setCount(50)" class="count-btn flex-1 py-2.5 rounded-xl border text-sm font-semibold transition text-center" data-count="50">50 題</button>
+          </div>
+        </div>
+
+        <!-- 開始按鈕 -->
+        <div class="pt-2">
+          <button onclick="startQuiz()" class="w-full py-4 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-base shadow-lg shadow-brand-600/30 active:scale-[0.99] transition flex items-center justify-center space-x-2">
+            <i data-lucide="play" class="w-5 h-5 fill-current"></i>
+            <span>開始測驗</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= 區塊 2: 進行中測驗介面 ================= -->
+    <div id="section-quiz" class="w-full max-w-3xl mx-auto hidden flex-col space-y-6">
+      <!-- 頂部進度條與資訊 -->
+      <div class="flex flex-col space-y-2 bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+        <div class="flex items-center justify-between text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400">
+          <div class="flex items-center space-x-2">
+            <span id="quiz-badge-type" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300">題型</span>
+            <span id="quiz-progress-text">第 1 / 10 題</span>
+          </div>
+          <div class="flex items-center space-x-4">
+            <span class="flex items-center text-emerald-600 dark:text-emerald-400 font-bold"><i data-lucide="check" class="w-4 h-4 mr-1"></i><span id="current-correct">0</span></span>
+            <span class="flex items-center text-rose-500 font-bold"><i data-lucide="x" class="w-4 h-4 mr-1"></i><span id="current-wrong">0</span></span>
+            <button onclick="confirmExitQuiz()" class="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">終止測驗</button>
+          </div>
+        </div>
+        <!-- Progress bar -->
+        <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2 overflow-hidden">
+          <div id="quiz-progress-bar" class="bg-brand-600 h-2 rounded-full transition-all duration-300" style="width: 10%"></div>
+        </div>
+      </div>
+
+      <!-- 題目主要容器卡片 -->
+      <div id="question-card" class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-6 sm:p-8 shadow-sm space-y-6">
+        <!-- 動態題目注入區 -->
+        <div id="question-body"></div>
+
+        <!-- 解析與反饋區 (預設隱藏) -->
+        <div id="feedback-container" class="hidden rounded-2xl p-4 sm:p-5 border transition-all space-y-2">
+          <div class="flex items-center space-x-2 font-bold text-sm" id="feedback-title"></div>
+          <div class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed" id="feedback-explanation"></div>
+        </div>
+
+        <!-- 下一題 / 確認按鈕 -->
+        <div class="flex justify-end pt-2" id="action-buttons">
+          <button id="btn-submit-answer" onclick="checkCurrentAnswer()" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm shadow transition">
+            送出作答
+          </button>
+          <button id="btn-next-question" onclick="nextQuestion()" class="hidden w-full sm:w-auto px-6 py-3 rounded-xl bg-slate-900 hover:bg-black dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900 text-white font-bold text-sm shadow transition items-center justify-center space-x-1.5">
+            <span>下一題</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= 區塊 3: 測驗結果報告 ================= -->
+    <div id="section-result" class="w-full max-w-2xl mx-auto hidden flex-col space-y-6">
+      <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-8 shadow-sm text-center space-y-6">
+        <div id="result-icon-wrapper" class="w-20 h-20 rounded-full mx-auto flex items-center justify-center bg-emerald-100 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-400">
+          <i data-lucide="award" class="w-10 h-10"></i>
+        </div>
+        
+        <div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white" id="result-title">測驗完成！太棒了</h2>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mt-1" id="result-subtitle">以下為本次測驗的詳細成果</p>
+        </div>
+
+        <!-- 分數板 -->
+        <div class="grid grid-cols-3 gap-3 p-4 rounded-2xl bg-slate-50 dark:bg-slate-700/50">
+          <div class="p-3">
+            <div class="text-xs text-slate-400 font-medium">總得分</div>
+            <div class="text-2xl sm:text-3xl font-black text-brand-600 dark:text-brand-400" id="result-score">90%</div>
+          </div>
+          <div class="p-3 border-x border-slate-200 dark:border-slate-600">
+            <div class="text-xs text-slate-400 font-medium">答對題數</div>
+            <div class="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400" id="result-correct-count">9</div>
+          </div>
+          <div class="p-3">
+            <div class="text-xs text-slate-400 font-medium">錯題數</div>
+            <div class="text-2xl sm:text-3xl font-black text-rose-500" id="result-wrong-count">1</div>
+          </div>
+        </div>
+
+        <!-- 錯題清單檢視 -->
+        <div id="wrong-answers-container" class="space-y-3 text-left"></div>
+
+        <!-- 操作按鈕 -->
+        <div class="flex flex-col sm:flex-row gap-3 pt-2">
+          <button id="btn-retry-wrong" onclick="retryWrongQuestions()" class="hidden flex-1 py-3.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm shadow transition items-center justify-center space-x-2">
+            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+            <span>僅重測錯題 (<span id="wrong-retry-count">0</span>)</span>
+          </button>
+          <button onclick="resetToSetup()" class="flex-1 py-3.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm shadow transition flex items-center justify-center space-x-2">
+            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+            <span>再來一輪全新練習</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= 區塊 4: 100動詞三態速查字典 ================= -->
+    <div id="section-dictionary" class="w-full hidden flex-col space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-2xl font-extrabold text-slate-900 dark:text-white">100 動詞三態對照檢索</h2>
+          <p class="text-sm text-slate-500 dark:text-slate-400">支援中文意思、原形、過去式、分詞及 AAA / ABB / ABC 分類快篩</p>
+        </div>
+        <div class="flex items-center space-x-2">
+          <div class="relative w-full sm:w-64">
+            <i data-lucide="search" class="w-4 h-4 absolute left-3 top-3 text-slate-400"></i>
+            <input id="dict-search-input" oninput="renderDictionary()" type="text" placeholder="搜尋動詞或中文..." class="w-full pl-9 pr-4 py-2 rounded-xl text-sm border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
+          </div>
+        </div>
+      </div>
+
+      <!-- 分類標籤篩選器 -->
+      <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+        <button onclick="setDictFilter('ALL')" class="dict-filter active px-3 py-1.5 rounded-lg text-xs font-semibold border transition" data-dict="ALL">全部 (100)</button>
+        <button onclick="setDictFilter('AAA')" class="dict-filter px-3 py-1.5 rounded-lg text-xs font-semibold border transition" data-dict="AAA">AAA 三態同形 (8)</button>
+        <button onclick="setDictFilter('ABA')" class="dict-filter px-3 py-1.5 rounded-lg text-xs font-semibold border transition" data-dict="ABA">ABA/AAB (4)</button>
+        <button onclick="setDictFilter('ABB')" class="dict-filter px-3 py-1.5 rounded-lg text-xs font-semibold border transition" data-dict="ABB">ABB 過去式/分詞同 (51)</button>
+        <button onclick="setDictFilter('ABC')" class="dict-filter px-3 py-1.5 rounded-lg text-xs font-semibold border transition" data-dict="ABC">ABC 三態全異 (37)</button>
+      </div>
+
+      <!-- 字典表格卡片 -->
+      <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-slate-50 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 font-semibold border-b border-slate-200 dark:border-slate-700">
+              <tr>
+                <th class="py-3 px-4 w-12 text-center">#</th>
+                <th class="py-3 px-4">原形 (Base)</th>
+                <th class="py-3 px-4">過去式 (Past)</th>
+                <th class="py-3 px-4">過去分詞 (P.P.)</th>
+                <th class="py-3 px-4">中文涵義</th>
+                <th class="py-3 px-4 text-center">型態分類</th>
+              </tr>
+            </thead>
+            <tbody id="dict-table-body" class="divide-y divide-slate-100 dark:divide-slate-700/60 font-medium">
+              <!-- 動態渲染動詞列表 -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- 全域訊息提示浮層 -->
+  <div id="toast" class="fixed bottom-6 right-6 px-4 py-3 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 text-sm font-semibold shadow-2xl opacity-0 pointer-events-none transition-all duration-300 z-50 flex items-center space-x-2">
+    <i data-lucide="info" class="w-4 h-4"></i>
+    <span id="toast-text">提示訊息</span>
+  </div>
+
+  <script>
+    // ==========================================
+    // 1. 完整 100 個不規則動詞標準資料庫
+    // ==========================================
+    const VERB_DATABASE = [
+      // AAA
+      { base: "cost", past: "cost", pp: "cost", zh: "花費", type: "AAA" },
+      { base: "cut", past: "cut", pp: "cut", zh: "剪、分割", type: "AAA" },
+      { base: "hit", past: "hit", pp: "hit", zh: "打、擊", type: "AAA" },
+      { base: "let", past: "let", pp: "let", zh: "讓", type: "AAA" },
+      { base: "put", past: "put", pp: "put", zh: "放", type: "AAA" },
+      { base: "read", past: "read", pp: "read", zh: "閱讀", type: "AAA" },
+      { base: "set", past: "set", pp: "set", zh: "設置", type: "AAA" },
+      { base: "hurt", past: "hurt", pp: "hurt", zh: "傷害", type: "AAA" },
+
+      // AAB / ABA
+      { base: "beat", past: "beat", pp: "beaten", zh: "擊敗、敲擊", type: "ABA" }, // AAB
+      { base: "come", past: "came", pp: "come", zh: "來", type: "ABA" },
+      { base: "become", past: "became", pp: "become", zh: "成為", type: "ABA" },
+      { base: "run", past: "ran", pp: "run", zh: "跑", type: "ABA" },
+
+      // ABB
+      { base: "dig", past: "dug", pp: "dug", zh: "挖掘", type: "ABB" },
+      { base: "get", past: "got", pp: "got", zh: "得到", type: "ABB" },
+      { base: "have", past: "had", pp: "had", zh: "有", type: "ABB" },
+      { base: "sit", past: "sat", pp: "sat", zh: "坐", type: "ABB" },
+      { base: "win", past: "won", pp: "won", zh: "贏", type: "ABB" },
+      { base: "feed", past: "fed", pp: "fed", zh: "餵", type: "ABB" },
+      { base: "build", past: "built", pp: "built", zh: "建造", type: "ABB" },
+      { base: "feel", past: "felt", pp: "felt", zh: "感覺", type: "ABB" },
+      { base: "sleep", past: "slept", pp: "slept", zh: "睡覺", type: "ABB" },
+      { base: "keep", past: "kept", pp: "kept", zh: "維持、保留", type: "ABB" },
+      { base: "sweep", past: "swept", pp: "swept", zh: "掃", type: "ABB" },
+      { base: "kneel", past: "knelt", pp: "knelt", zh: "跪", type: "ABB" },
+      { base: "spend", past: "spent", pp: "spent", zh: "花費", type: "ABB" },
+      { base: "smell", past: "smelt", pp: "smelt", zh: "聞", type: "ABB" },
+      { base: "spell", past: "spelt", pp: "spelt", zh: "拼字", type: "ABB" },
+      { base: "deal", past: "dealt", pp: "dealt", zh: "處理、對付", type: "ABB" },
+      { base: "mean", past: "meant", pp: "meant", zh: "意指", type: "ABB" },
+      { base: "learn", past: "learnt", pp: "learnt", zh: "學習", type: "ABB" },
+      { base: "burn", past: "burnt", pp: "burnt", zh: "燒", type: "ABB" },
+      { base: "lead", past: "led", pp: "led", zh: "帶領", type: "ABB" },
+      { base: "leave", past: "left", pp: "left", zh: "離開", type: "ABB" },
+      { base: "bleed", past: "bled", pp: "bled", zh: "流血", type: "ABB" },
+      { base: "flee", past: "fled", pp: "fled", zh: "逃離", type: "ABB" },
+      { base: "slide", past: "slid", pp: "slid", zh: "滑行", type: "ABB" },
+      { base: "hang", past: "hung", pp: "hung", zh: "懸掛", type: "ABB" },
+      { base: "sting", past: "stung", pp: "stung", zh: "叮咬", type: "ABB" },
+      { base: "swing", past: "swung", pp: "swung", zh: "滑翔、擺盪", type: "ABB" },
+      { base: "hear", past: "heard", pp: "heard", zh: "聽見", type: "ABB" },
+      { base: "hold", past: "held", pp: "held", zh: "拿著", type: "ABB" },
+      { base: "make", past: "made", pp: "made", zh: "做", type: "ABB" },
+      { base: "meet", past: "met", pp: "met", zh: "見面", type: "ABB" },
+      { base: "send", past: "sent", pp: "sent", zh: "傳送", type: "ABB" },
+      { base: "lend", past: "lent", pp: "lent", zh: "借", type: "ABB" },
+      { base: "lay", past: "laid", pp: "laid", zh: "放著、孵蛋", type: "ABB" },
+      { base: "pay", past: "paid", pp: "paid", zh: "付款", type: "ABB" },
+      { base: "say", past: "said", pp: "said", zh: "說", type: "ABB" },
+      { base: "sell", past: "sold", pp: "sold", zh: "販賣", type: "ABB" },
+      { base: "tell", past: "told", pp: "told", zh: "告訴", type: "ABB" },
+      { base: "stand", past: "stood", pp: "stood", zh: "站立", type: "ABB" },
+      { base: "understand", past: "understood", pp: "understood", zh: "了解", type: "ABB" },
+      { base: "strike", past: "struck", pp: "struck", zh: "打擊、罷工", type: "ABB" },
+      { base: "stick", past: "stuck", pp: "stuck", zh: "黏", type: "ABB" },
+      { base: "bring", past: "brought", pp: "brought", zh: "帶來", type: "ABB" },
+      { base: "buy", past: "bought", pp: "bought", zh: "買", type: "ABB" },
+      { base: "fight", past: "fought", pp: "fought", zh: "打鬥", type: "ABB" },
+      { base: "think", past: "thought", pp: "thought", zh: "想", type: "ABB" },
+      { base: "seek", past: "sought", pp: "sought", zh: "尋求", type: "ABB" },
+      { base: "catch", past: "caught", pp: "caught", zh: "抓", type: "ABB" },
+      { base: "teach", past: "taught", pp: "taught", zh: "教", type: "ABB" },
+      { base: "find", past: "found", pp: "found", zh: "找", type: "ABB" },
+      { base: "shine", past: "shone", pp: "shone", zh: "發亮", type: "ABB" },
+      { base: "shoot", past: "shot", pp: "shot", zh: "射擊", type: "ABB" },
+
+      // ABC
+      { base: "be", past: "was", pp: "been", zh: "是", type: "ABC" },
+      { base: "bear", past: "bore", pp: "born", zh: "承受", type: "ABC" },
+      { base: "begin", past: "began", pp: "begun", zh: "開始", type: "ABC" },
+      { base: "bite", past: "bit", pp: "bitten", zh: "咬", type: "ABC" },
+      { base: "blow", past: "blew", pp: "blown", zh: "吹", type: "ABC" },
+      { base: "choose", past: "chose", pp: "chosen", zh: "選擇", type: "ABC" },
+      { base: "do", past: "did", pp: "done", zh: "做", type: "ABC" },
+      { base: "draw", past: "drew", pp: "drawn", zh: "畫畫", type: "ABC" },
+      { base: "drink", past: "drank", pp: "drunk", zh: "喝", type: "ABC" },
+      { base: "drive", past: "drove", pp: "driven", zh: "開車", type: "ABC" },
+      { base: "eat", past: "ate", pp: "eaten", zh: "吃", type: "ABC" },
+      { base: "fall", past: "fell", pp: "fallen", zh: "掉落、跌倒", type: "ABC" },
+      { base: "fly", past: "flew", pp: "flown", zh: "飛", type: "ABC" },
+      { base: "give", past: "gave", pp: "given", zh: "給", type: "ABC" },
+      { base: "forgive", past: "forgave", pp: "forgiven", zh: "原諒", type: "ABC" },
+      { base: "grow", past: "grew", pp: "grown", zh: "生長", type: "ABC" },
+      { base: "hide", past: "hid", pp: "hidden", zh: "躲、藏匿", type: "ABC" },
+      { base: "know", past: "knew", pp: "known", zh: "知道", type: "ABC" },
+      { base: "lie", past: "lay", pp: "lain", zh: "躺", type: "ABC" },
+      { base: "ride", past: "rode", pp: "ridden", zh: "騎", type: "ABC" },
+      { base: "ring", past: "rang", pp: "rung", zh: "響", type: "ABC" },
+      { base: "rise", past: "rose", pp: "risen", zh: "升起", type: "ABC" },
+      { base: "see", past: "saw", pp: "seen", zh: "看", type: "ABC" },
+      { base: "shake", past: "shook", pp: "shaken", zh: "搖動", type: "ABC" },
+      { base: "show", past: "showed", pp: "shown", zh: "表現", type: "ABC" },
+      { base: "speak", past: "spoke", pp: "spoken", zh: "說", type: "ABC" },
+      { base: "swim", past: "swam", pp: "swum", zh: "游泳", type: "ABC" },
+      { base: "take", past: "took", pp: "taken", zh: "拿", type: "ABC" },
+      { base: "throw", past: "threw", pp: "thrown", zh: "丟", type: "ABC" },
+      { base: "wake", past: "woke", pp: "waken", zh: "醒來", type: "ABC" },
+      { base: "wear", past: "wore", pp: "worn", zh: "穿", type: "ABC" },
+      { base: "write", past: "wrote", pp: "written", zh: "寫", type: "ABC" },
+      { base: "sing", past: "sang", pp: "sung", zh: "唱歌", type: "ABC" },
+      { base: "break", past: "broke", pp: "broken", zh: "破壞", type: "ABC" },
+      { base: "steal", past: "stole", pp: "stolen", zh: "偷", type: "ABC" },
+      { base: "swear", past: "swore", pp: "sworn", zh: "發誓", type: "ABC" }
+    ];
+
+    // ==========================================
+    // 2. 應用狀態管理 (State)
+    // ==========================================
+    let selectedType = 'ALL';
+    let selectedCount = 10;
+    let quizQuestions = [];
+    let currentIndex = 0;
+    let score = 0;
+    let answeredCurrent = false;
+    let wrongList = [];
+    let dictCurrentType = 'ALL';
+
+    // 句子樣板產生庫 (支援各動詞過去式與完成式語境)
+    const SENTENCE_TEMPLATES = {
+      PAST: [
+        { pre: "Yesterday, they accidentally ", post: " the item during class." },
+        { pre: "Two days ago, she ", post: " everything she needed to finish the project." },
+        { pre: "Last night, the loud noise ", post: " throughout the whole street." },
+        { pre: "The student carefully ", post: " the task before leaving school yesterday." },
+        { pre: "When he was seven years old, he often ", post: " with his younger brother." }
+      ],
+      PP: [
+        { pre: "They have already ", post: " the entire process several times." },
+        { pre: "She has not ", post: " anyone about what happened this morning." },
+        { pre: "The team has successfully ", post: " the challenge this week." },
+        { pre: "Have you ever ", post: " such an impressive scene before?" },
+        { pre: "He has finally ", post: " the importance of hard work." }
+      ]
+    };
+
+    // ==========================================
+    // 3. 題型產生演算法
+    // ==========================================
+    function shuffleArray(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    // 產生選擇題
+    function generateChoiceQuestion(verb) {
+      const isPast = Math.random() > 0.45;
+      const targetTense = isPast ? "過去式 (Past Tense)" : "過去分詞 (P.P.)";
+      const correctAnswer = isPast ? verb.past : verb.pp;
+
+      // 產生混淆選項
+      const distractors = new Set();
+      // 加入常規錯誤規則 (如加上-ed, 原形, 或同組其他動詞的變形)
+      if (verb.base + "ed" !== correctAnswer) distractors.add(verb.base + "ed");
+      if (verb.base !== correctAnswer) distractors.add(verb.base);
+      if (verb.past !== verb.pp) {
+        distractors.add(isPast ? verb.pp : verb.past);
+      }
+      
+      // 從資料庫中隨機抓其他動詞的形式來湊滿 4 個選項
+      const shuffledOthers = shuffleArray(VERB_DATABASE.filter(v => v.base !== verb.base));
+      for (const other of shuffledOthers) {
+        if (distractors.size >= 3) break;
+        const candidate = isPast ? other.past : other.pp;
+        if (candidate !== correctAnswer) {
+          distractors.add(candidate);
+        }
+      }
+
+      const options = shuffleArray([correctAnswer, ...Array.from(distractors).slice(0, 3)]);
+
+      return {
+        type: 'CHOICE',
+        typeName: '選擇題',
+        verb: verb,
+        title: `請選出動詞 <span class="text-brand-600 dark:text-brand-400 font-bold underline decoration-brand-400 underline-offset-4">${verb.base}</span>（${verb.zh}）的正確【${targetTense}】：`,
+        subText: `此動詞屬於 ${verb.type} 型變化`,
+        options: options,
+        correctAnswer: correctAnswer,
+        explanation: `<b>${verb.base}</b> 的三態為：原形 <code>${verb.base}</code> / 過去式 <code>${verb.past}</code> / 過去分詞 <code>${verb.pp}</code>。中文為「${verb.zh}」，屬於 ${verb.type} 變化型態。`
+      };
+    }
+
+    // 產生挑錯改錯題 (Error Correction)
+    function generateErrorQuestion(verb) {
+      const isPast = Math.random() > 0.5;
+      const targetForm = isPast ? verb.past : verb.pp;
+      
+      // 故意製造的典型錯誤型態 (例如加上 ed，或者混淆 did/have 後的用法)
+      let incorrectForm = verb.base + "ed";
+      if (verb.type === "ABB" && verb.past === verb.base) incorrectForm = verb.base + "s";
+      if (incorrectForm === targetForm) incorrectForm = verb.base + "ing";
+
+      let sentenceBefore = "";
+      let sentenceAfter = "";
+
+      if (isPast) {
+        sentenceBefore = "Yesterday afternoon, our teacher ";
+        sentenceAfter = " the important notice to all classmates.";
+      } else {
+        sentenceBefore = "The scientist has already ";
+        sentenceAfter = " many difficult problems in recent years.";
+      }
+
+      return {
+        type: 'ERROR',
+        typeName: '挑錯改錯題',
+        verb: verb,
+        title: `找出句子中【錯誤的動詞形式】並修正：`,
+        subText: `原形動詞提示：<b>${verb.base}</b>（${verb.zh}）`,
+        displaySentence: `${sentenceBefore}<span class="px-2 py-0.5 mx-1 rounded bg-rose-100 text-rose-700 dark:bg-rose-900/60 dark:text-rose-300 font-bold underline decoration-wavy decoration-rose-500">${incorrectForm}</span>${sentenceAfter}`,
+        wrongWord: incorrectForm,
+        correctAnswer: targetForm,
+        explanation: `句子中的「<code>${incorrectForm}</code>」是不規則動詞的常見誤用！<br>動詞 <b>${verb.base}</b> 是不規則變化（${verb.type} 型），正確的形式應為：<code>${targetForm}</code>。完整三態為：${verb.base} - ${verb.past} - ${verb.pp}。`
+      };
+    }
+
+    // 產生克漏字填空題 (Cloze)
+    function generateClozeQuestion(verb) {
+      const isPast = Math.random() > 0.45;
+      const targetForm = isPast ? verb.past : verb.pp;
+      const tenseDesc = isPast ? "一般過去式 (Past Tense)" : "現在完成式 (Past Participle - P.P.)";
+
+      let sentenceObj;
+      if (isPast) {
+        sentenceObj = SENTENCE_TEMPLATES.PAST[Math.floor(Math.random() * SENTENCE_TEMPLATES.PAST.length)];
+      } else {
+        sentenceObj = SENTENCE_TEMPLATES.PP[Math.floor(Math.random() * SENTENCE_TEMPLATES.PP.length)];
+      }
+
+      return {
+        type: 'CLOZE',
+        typeName: '克漏字填空',
+        verb: verb,
+        title: `請根據語境與時態線索，填入動詞的正確形式：`,
+        subText: `提示原形：<b class="text-brand-600 dark:text-brand-400 font-bold">${verb.base}</b>（${verb.zh}）· 需填入：${tenseDesc}`,
+        clozePre: sentenceObj.pre,
+        clozePost: sentenceObj.post,
+        correctAnswer: targetForm,
+        explanation: `依據句意線索判斷本題需要填入【${tenseDesc}】。<br>動詞 <b>${verb.base}</b> 的三態為：<code>${verb.base}</code> / <code>${verb.past}</code> / <code>${verb.pp}</code>，正確填入為 <code>${targetForm}</code>。`
+      };
+    }
+
+    // ==========================================
+    // 4. 測驗控制流程
+    // ==========================================
+    function setTypeFilter(type) {
+      selectedType = type;
+      document.querySelectorAll('.type-btn').forEach(btn => {
+        if (btn.dataset.type === type) {
+          btn.classList.add('active', 'border-brand-500', 'bg-brand-50', 'text-brand-700', 'dark:bg-brand-900/40', 'dark:text-brand-300');
+        } else {
+          btn.classList.remove('active', 'border-brand-500', 'bg-brand-50', 'text-brand-700', 'dark:bg-brand-900/40', 'dark:text-brand-300');
+        }
+      });
+
+      const filtered = getFilteredVerbs();
+      document.getElementById('selected-type-count').textContent = `${filtered.length} 個動詞在庫`;
+    }
+
+    function setCount(num) {
+      selectedCount = num;
+      document.querySelectorAll('.count-btn').forEach(btn => {
+        if (parseInt(btn.dataset.count) === num) {
+          btn.classList.add('active', 'border-brand-500', 'bg-brand-50', 'text-brand-700', 'dark:bg-brand-900/40', 'dark:text-brand-300');
+        } else {
+          btn.classList.remove('active', 'border-brand-500', 'bg-brand-50', 'text-brand-700', 'dark:bg-brand-900/40', 'dark:text-brand-300');
+        }
+      });
+    }
+
+    function getFilteredVerbs() {
+      if (selectedType === 'ALL') return VERB_DATABASE;
+      return VERB_DATABASE.filter(v => v.type === selectedType);
+    }
+
+    function startQuiz(customVerbs = null) {
+      const mode = document.querySelector('input[name="question-mode"]:checked').value;
+      const pool = customVerbs || getFilteredVerbs();
+
+      if (pool.length === 0) {
+        showToast("該分類下沒有足夠的動詞！");
+        return;
+      }
+
+      // 隨機抽取題數
+      const targetNum = Math.min(customVerbs ? customVerbs.length : selectedCount, pool.length);
+      const chosenVerbs = shuffleArray(pool).slice(0, targetNum);
+
+      quizQuestions = chosenVerbs.map(verb => {
+        let questionType = mode;
+        if (mode === 'MIXED') {
+          const types = ['CHOICE', 'ERROR', 'CLOZE'];
+          questionType = types[Math.floor(Math.random() * types.length)];
+        }
+
+        if (questionType === 'CHOICE') return generateChoiceQuestion(verb);
+        if (questionType === 'ERROR') return generateErrorQuestion(verb);
+        return generateClozeQuestion(verb);
+      });
+
+      // 初始化測驗狀態
+      currentIndex = 0;
+      score = 0;
+      wrongList = [];
+      answeredCurrent = false;
+
+      // 切換視圖
+      document.getElementById('section-setup').classList.add('hidden');
+      document.getElementById('section-result').classList.add('hidden');
+      document.getElementById('section-result').classList.remove('flex');
+      document.getElementById('section-quiz').classList.remove('hidden');
+      document.getElementById('section-quiz').classList.add('flex');
+
+      renderCurrentQuestion();
+    }
+
+    function renderCurrentQuestion() {
+      answeredCurrent = false;
+      const q = quizQuestions[currentIndex];
+      const total = quizQuestions.length;
+
+      // 更新進度條與標題
+      document.getElementById('quiz-progress-text').textContent = `第 ${currentIndex + 1} / ${total} 題`;
+      document.getElementById('quiz-progress-bar').style.width = `${((currentIndex + 1) / total) * 100}%`;
+      document.getElementById('quiz-badge-type').textContent = q.typeName;
+      document.getElementById('current-correct').textContent = score;
+      document.getElementById('current-wrong').textContent = wrongList.length;
+
+      // 按鈕重設
+      document.getElementById('btn-submit-answer').classList.remove('hidden');
+      document.getElementById('btn-next-question').classList.add('hidden');
+      document.getElementById('feedback-container').classList.add('hidden');
+
+      const body = document.getElementById('question-body');
+
+      // 根據題型渲染 DOM
+      if (q.type === 'CHOICE') {
+        body.innerHTML = `
+          <div class="space-y-4">
+            <div>
+              <div class="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-relaxed">${q.title}</div>
+              <div class="text-xs text-slate-400 mt-1">${q.subText}</div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+              ${q.options.map((opt, i) => `
+                <button type="button" onclick="selectOption('${opt}')" class="choice-opt-btn p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-brand-500 dark:hover:border-brand-500 bg-slate-50/50 dark:bg-slate-800 text-left font-semibold text-base transition-all flex items-center justify-between" data-val="${opt}">
+                  <span>${String.fromCharCode(65 + i)}. ${opt}</span>
+                  <span class="opt-indicator w-5 h-5 rounded-full border border-slate-300 dark:border-slate-600 flex items-center justify-center text-xs"></span>
+                </button>
+              `).join('')}
+            </div>
+            <input type="hidden" id="user-selected-val" value="">
+          </div>
+        `;
+      } else if (q.type === 'ERROR') {
+        body.innerHTML = `
+          <div class="space-y-4">
+            <div>
+              <div class="text-base sm:text-lg font-bold text-slate-900 dark:text-white">${q.title}</div>
+              <div class="text-xs text-slate-400 mt-1">${q.subText}</div>
+            </div>
+            <div class="p-5 rounded-2xl bg-slate-100 dark:bg-slate-700/40 text-base sm:text-lg text-slate-800 dark:text-slate-100 leading-relaxed border border-dashed border-slate-300 dark:border-slate-600">
+              ${q.displaySentence}
+            </div>
+            <div class="pt-2 space-y-2">
+              <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">請在下方輸入修正後的正確動詞：</label>
+              <input type="text" id="user-text-input" autofocus placeholder="輸入正確動詞型態..." class="w-full sm:w-80 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 font-bold text-base focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            </div>
+          </div>
+        `;
+      } else if (q.type === 'CLOZE') {
+        body.innerHTML = `
+          <div class="space-y-4">
+            <div>
+              <div class="text-base sm:text-lg font-bold text-slate-900 dark:text-white">${q.title}</div>
+              <div class="text-xs text-slate-400 mt-1">${q.subText}</div>
+            </div>
+            <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-700/30 text-base sm:text-lg text-slate-800 dark:text-slate-100 leading-loose border border-slate-200 dark:border-slate-700">
+              ${q.clozePre}
+              <input type="text" id="user-text-input" autofocus placeholder="填入適當形式" class="inline-block mx-1.5 px-3 py-1.5 rounded-lg border-2 border-brand-500 bg-white dark:bg-slate-900 font-bold text-brand-600 dark:text-brand-300 w-40 text-center focus:outline-none focus:ring-2 focus:ring-brand-400">
+              ${q.clozePost}
+            </div>
+          </div>
+        `;
+      }
+
+      // 監聽鍵盤 Enter 作答
+      const textInput = document.getElementById('user-text-input');
+      if (textInput) {
+        textInput.focus();
+        textInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            if (!answeredCurrent) checkCurrentAnswer();
+            else nextQuestion();
+          }
+        });
+      }
+
+      lucide.createIcons();
+    }
+
+    function selectOption(val) {
+      if (answeredCurrent) return;
+      document.getElementById('user-selected-val').value = val;
+      document.querySelectorAll('.choice-opt-btn').forEach(btn => {
+        if (btn.dataset.val === val) {
+          btn.classList.add('border-brand-600', 'bg-brand-50', 'text-brand-700', 'dark:bg-brand-900/40', 'dark:text-brand-300');
+          btn.querySelector('.opt-indicator').innerHTML = '✓';
+        } else {
+          btn.classList.remove('border-brand-600', 'bg-brand-50', 'text-brand-700', 'dark:bg-brand-900/40', 'dark:text-brand-300');
+          btn.querySelector('.opt-indicator').innerHTML = '';
+        }
+      });
+    }
+
+    // 檢查答案
+    function checkCurrentAnswer() {
+      if (answeredCurrent) return;
+
+      const q = quizQuestions[currentIndex];
+      let userAns = "";
+
+      if (q.type === 'CHOICE') {
+        userAns = document.getElementById('user-selected-val').value.trim();
+        if (!userAns) {
+          showToast("請點選一個選項！");
+          return;
+        }
+      } else {
+        const inp = document.getElementById('user-text-input');
+        userAns = inp ? inp.value.trim().toLowerCase() : "";
+        if (!userAns) {
+          showToast("請輸入答案後再送出！");
+          return;
+        }
+      }
+
+      answeredCurrent = true;
+      const isCorrect = userAns.toLowerCase() === q.correctAnswer.toLowerCase();
+
+      // 回饋樣式
+      const feedbackBox = document.getElementById('feedback-container');
+      const feedbackTitle = document.getElementById('feedback-title');
+      const feedbackExp = document.getElementById('feedback-explanation');
+
+      feedbackBox.classList.remove('hidden');
+
+      if (isCorrect) {
+        score++;
+        feedbackBox.className = "rounded-2xl p-4 sm:p-5 border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200 transition-all space-y-1.5";
+        feedbackTitle.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5 text-emerald-600 inline"></i> <span>回答正確！做得好！</span>`;
+      } else {
+        wrongList.push({ question: q, userAns: userAns });
+        feedbackBox.className = "rounded-2xl p-4 sm:p-5 border border-rose-200 dark:border-rose-800 bg-rose-50 dark:bg-rose-950/40 text-rose-900 dark:text-rose-200 transition-all space-y-1.5";
+        feedbackTitle.innerHTML = `<i data-lucide="alert-circle" class="w-5 h-5 text-rose-600 inline"></i> <span>答錯了！正確解答為：<b>${q.correctAnswer}</b></span>`;
+      }
+
+      feedbackExp.innerHTML = q.explanation;
+      lucide.createIcons();
+
+      // 切換按鈕
+      document.getElementById('btn-submit-answer').classList.add('hidden');
+      document.getElementById('btn-next-question').classList.remove('hidden');
+      document.getElementById('btn-next-question').focus();
+    }
+
+    function nextQuestion() {
+      if (currentIndex < quizQuestions.length - 1) {
+        currentIndex++;
+        renderCurrentQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function confirmExitQuiz() {
+      if (confirm("確定要放棄目前的測驗進度並返回首頁嗎？")) {
+        resetToSetup();
+      }
+    }
+
+    function showResults() {
+      document.getElementById('section-quiz').classList.add('hidden');
+      document.getElementById('section-quiz').classList.remove('flex');
+      document.getElementById('section-result').classList.remove('hidden');
+      document.getElementById('section-result').classList.add('flex');
+
+      const total = quizQuestions.length;
+      const rate = Math.round((score / total) * 100);
+
+      document.getElementById('result-score').textContent = `${rate}%`;
+      document.getElementById('result-correct-count').textContent = score;
+      document.getElementById('result-wrong-count').textContent = wrongList.length;
+
+      const titleEl = document.getElementById('result-title');
+      const iconWrap = document.getElementById('result-icon-wrapper');
+
+      if (rate >= 90) {
+        titleEl.textContent = "太神了！完全掌握！🌟";
+        iconWrap.className = "w-20 h-20 rounded-full mx-auto flex items-center justify-center bg-emerald-100 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-400";
+        iconWrap.innerHTML = `<i data-lucide="trophy" class="w-10 h-10"></i>`;
+      } else if (rate >= 60) {
+        titleEl.textContent = "表現不錯！持續保持！💪";
+        iconWrap.className = "w-20 h-20 rounded-full mx-auto flex items-center justify-center bg-brand-100 text-brand-600 dark:bg-brand-900/40 dark:text-brand-400";
+        iconWrap.innerHTML = `<i data-lucide="award" class="w-10 h-10"></i>`;
+      } else {
+        titleEl.textContent = "多加練習，熟能生巧！📖";
+        iconWrap.className = "w-20 h-20 rounded-full mx-auto flex items-center justify-center bg-amber-100 text-amber-600 dark:bg-amber-900/40 dark:text-amber-400";
+        iconWrap.innerHTML = `<i data-lucide="book-open" class="w-10 h-10"></i>`;
+      }
+
+      // 錯題列表渲染
+      const wrongContainer = document.getElementById('wrong-answers-container');
+      const retryWrongBtn = document.getElementById('btn-retry-wrong');
+
+      if (wrongList.length > 0) {
+        retryWrongBtn.classList.remove('hidden');
+        retryWrongBtn.classList.add('flex');
+        document.getElementById('wrong-retry-count').textContent = wrongList.length;
+
+        wrongContainer.innerHTML = `
+          <h3 class="text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center">
+            <i data-lucide="alert-octagon" class="w-4 h-4 mr-1 text-rose-500"></i>
+            本次錯題檢視 (${wrongList.length} 題)
+          </h3>
+          <div class="space-y-2 max-h-60 overflow-y-auto pr-1">
+            ${wrongList.map((item, idx) => `
+              <div class="p-3 rounded-xl border border-rose-100 dark:border-rose-900/40 bg-rose-50/50 dark:bg-rose-950/20 text-xs sm:text-sm flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                <div>
+                  <span class="font-bold text-slate-800 dark:text-slate-200">${item.question.verb.base} (${item.question.verb.zh})</span>
+                  <span class="text-slate-400 mx-1">·</span>
+                  <span class="text-rose-600 dark:text-rose-400">你的回答: <del>${item.userAns || '(空白)'}</del></span>
+                </div>
+                <div class="font-bold text-emerald-600 dark:text-emerald-400">
+                  正確: ${item.question.correctAnswer}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } else {
+        retryWrongBtn.classList.add('hidden');
+        retryWrongBtn.classList.remove('flex');
+        wrongContainer.innerHTML = `
+          <div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 text-sm font-semibold flex items-center justify-center space-x-2">
+            <i data-lucide="check-check" class="w-4 h-4"></i>
+            <span>完美全對！本次測驗沒有任何錯誤。</span>
+          </div>
+        `;
+      }
+
+      lucide.createIcons();
+    }
+
+    function retryWrongQuestions() {
+      const verbsToRetry = wrongList.map(w => w.question.verb);
+      startQuiz(verbsToRetry);
+    }
+
+    function resetToSetup() {
+      document.getElementById('section-quiz').classList.add('hidden');
+      document.getElementById('section-quiz').classList.remove('flex');
+      document.getElementById('section-result').classList.add('hidden');
+      document.getElementById('section-result').classList.remove('flex');
+      document.getElementById('section-setup').classList.remove('hidden');
+    }
+
+    // ==========================================
+    // 5. 100 動詞三態字典功能
+    // ==========================================
+    function setDictFilter(type) {
+      dictCurrentType = type;
+      document.querySelectorAll('.dict-filter').forEach(btn => {
+        if (btn.dataset.dict === type) {
+          btn.classList.add('active', 'border-brand-500', 'bg-brand-50', 'text-brand-700', 'dark:bg-brand-900/40', 'dark:text-brand-300');
+        } else {
+          btn.classList.remove('active', 'border-brand-500', 'bg-brand-50', 'text-brand-700', 'dark:bg-brand-900/40', 'dark:text-brand-300');
+        }
+      });
+      renderDictionary();
+    }
+
+    function renderDictionary() {
+      const tbody = document.getElementById('dict-table-body');
+      const searchVal = document.getElementById('dict-search-input').value.trim().toLowerCase();
+
+      let list = VERB_DATABASE;
+
+      if (dictCurrentType !== 'ALL') {
+        list = list.filter(v => v.type === dictCurrentType);
+      }
+
+      if (searchVal) {
+        list = list.filter(v => 
+          v.base.toLowerCase().includes(searchVal) ||
+          v.past.toLowerCase().includes(searchVal) ||
+          v.pp.toLowerCase().includes(searchVal) ||
+          v.zh.includes(searchVal)
+        );
+      }
+
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-slate-400">沒有符合搜尋條件的動詞</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map((v, i) => {
+        let badgeColor = "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300";
+        if (v.type === 'AAA') badgeColor = "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300";
+        if (v.type === 'ABA') badgeColor = "bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300";
+        if (v.type === 'ABB') badgeColor = "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300";
+        if (v.type === 'ABC') badgeColor = "bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300";
+
+        return `
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-750 transition-colors">
+            <td class="py-3 px-4 text-center text-xs text-slate-400">${i + 1}</td>
+            <td class="py-3 px-4 font-bold text-brand-600 dark:text-brand-400">${v.base}</td>
+            <td class="py-3 px-4 text-slate-700 dark:text-slate-300 font-semibold">${v.past}</td>
+            <td class="py-3 px-4 text-slate-700 dark:text-slate-300 font-semibold">${v.pp}</td>
+            <td class="py-3 px-4 text-slate-600 dark:text-slate-400 text-sm">${v.zh}</td>
+            <td class="py-3 px-4 text-center">
+              <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold ${badgeColor}">
+                ${v.type}
+              </span>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ==========================================
+    // 6. UI 標籤頁與系統功能
+    // ==========================================
+    function switchTab(tab) {
+      const setup = document.getElementById('section-setup');
+      const quiz = document.getElementById('section-quiz');
+      const result = document.getElementById('section-result');
+      const dict = document.getElementById('section-dictionary');
+
+      const btnQuiz = document.getElementById('nav-btn-quiz');
+      const btnDict = document.getElementById('nav-btn-dictionary');
+
+      if (tab === 'quiz') {
+        dict.classList.add('hidden');
+        dict.classList.remove('flex');
+
+        btnQuiz.className = "px-3.5 py-2 rounded-lg text-sm font-semibold flex items-center space-x-1.5 transition-all bg-brand-50 text-brand-700 dark:bg-brand-900/40 dark:text-brand-300";
+        btnDict.className = "px-3.5 py-2 rounded-lg text-sm font-semibold flex items-center space-x-1.5 transition-all text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white";
+
+        // 若測驗進行中則回到測驗，否則回到設定頁
+        if (quizQuestions.length > 0 && currentIndex < quizQuestions.length && !document.getElementById('section-result').classList.contains('flex')) {
+          quiz.classList.remove('hidden');
+          quiz.classList.add('flex');
+        } else if (document.getElementById('section-result').classList.contains('flex')) {
+          result.classList.remove('hidden');
+        } else {
+          setup.classList.remove('hidden');
+        }
+      } else if (tab === 'dictionary') {
+        setup.classList.add('hidden');
+        quiz.classList.add('hidden');
+        quiz.classList.remove('flex');
+        result.classList.add('hidden');
+        result.classList.remove('flex');
+
+        dict.classList.remove('hidden');
+        dict.classList.add('flex');
+
+        btnDict.className = "px-3.5 py-2 rounded-lg text-sm font-semibold flex items-center space-x-1.5 transition-all bg-brand-50 text-brand-700 dark:bg-brand-900/40 dark:text-brand-300";
+        btnQuiz.className = "px-3.5 py-2 rounded-lg text-sm font-semibold flex items-center space-x-1.5 transition-all text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white";
+
+        renderDictionary();
+      }
+    }
+
+    function toggleDarkMode() {
+      const html = document.documentElement;
+      const themeIcon = document.getElementById('theme-icon');
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        themeIcon.setAttribute('data-lucide', 'moon');
+      } else {
+        html.classList.add('dark');
+        themeIcon.setAttribute('data-lucide', 'sun');
+      }
+      lucide.createIcons();
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-text').textContent = msg;
+      toast.classList.remove('opacity-0', 'pointer-events-none');
+      toast.classList.add('opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('opacity-100');
+        toast.classList.add('opacity-0', 'pointer-events-none');
+      }, 2500);
+    }
+
+    // 初始化
+    window.onload = function () {
+      lucide.createIcons();
+      setTypeFilter('ALL');
+      setCount(10);
+      renderDictionary();
+    };
+  </script>
+</body>
+</html>
