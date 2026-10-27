@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VerbCraft 224 - 英語不規則動詞三態特訓站（美式標準版）</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Chakra Petch', 'Noto Sans TC', sans-serif;
+      background-color: #1a1a1a;
+      background-image: 
+        linear-gradient(45deg, #141414 25%, transparent 25%), 
+        linear-gradient(-45deg, #141414 25%, transparent 25%), 
+        linear-gradient(45deg, transparent 75%, #141414 75%), 
+        linear-gradient(-45deg, transparent 75%, #141414 75%);
+      background-size: 32px 32px;
+      background-position: 0 0, 0 16px, 16px -16px, -16px 0px;
+    }
+
+    .mc-btn {
+      position: relative;
+      background-color: #6a6a6a;
+      color: #ffffff;
+      border: 3px solid #000;
+      box-shadow: inset 3px 3px 0px #9e9e9e, inset -3px -3px 0px #383838;
+      font-weight: 700;
+      transition: filter 0.05s, transform 0.05s;
+    }
+    .mc-btn:hover {
+      background-color: #7d7d7d;
+      box-shadow: inset 3px 3px 0px #b5b5b5, inset -3px -3px 0px #444444;
+    }
+    .mc-btn:active {
+      box-shadow: inset 3px 3px 0px #2a2a2a, inset -3px -3px 0px #888888;
+      transform: translateY(2px);
+    }
+    .mc-btn.active, .mc-btn-green {
+      background-color: #2e7d1d;
+      color: #ffffff;
+      border: 3px solid #000;
+      box-shadow: inset 3px 3px 0px #5ec44b, inset -3px -3px 0px #184c0e;
+    }
+    .mc-btn.active:hover, .mc-btn-green:hover {
+      background-color: #389523;
+      box-shadow: inset 3px 3px 0px #70db5b, inset -3px -3px 0px #1d5f12;
+    }
+
+    .mc-panel {
+      background-color: #c4c4c4;
+      border: 4px solid #000;
+      box-shadow: inset 4px 4px 0px #ffffff, inset -4px -4px 0px #505050;
+    }
+
+    .mc-slot {
+      background-color: #7b7b7b;
+      border: 3px solid #2b2b2b;
+      box-shadow: inset 3px 3px 0px #2a2a2a, inset -3px -3px 0px #b0b0b0;
+    }
+
+    .mc-xp-container {
+      background-color: #101010;
+      border: 3px solid #363636;
+      position: relative;
+    }
+    .mc-xp-fill {
+      background: linear-gradient(180deg, #99ff33 0%, #55cc00 60%, #338800 100%);
+      box-shadow: 0 0 10px rgba(85, 204, 0, 0.5);
+    }
+
+    .mc-board {
+      background-color: #8c6439;
+      border: 4px solid #3a220d;
+      box-shadow: inset 4px 4px 0px #af8353, inset -4px -4px 0px #4d2f14;
+      color: #ffffff;
+    }
+
+    .no-shadow {
+      text-shadow: none !important;
+    }
+  </style>
+</head>
+<body class="h-full text-slate-100 flex flex-col select-none">
+
+  <!-- 頂部導航 -->
+  <header class="border-b-4 border-black bg-[#3c3c3c] shadow-2xl sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 h-20 flex items-center justify-between py-2">
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="playMcSound('click'); switchTab('quiz')">
+        <div class="w-12 h-12 bg-[#2d572c] border-2 border-black flex items-center justify-center text-emerald-400 shadow-[inset_2px_2px_0px_#4fa34d,inset_-2px_-2px_0px_#183318]">
+          <i data-lucide="book-open-check" class="w-7 h-7"></i>
+        </div>
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-black tracking-wider text-[#55ff55] no-shadow">VERBCRAFT 224</h1>
+          <p class="text-sm sm:text-base text-gray-300">台灣升學考試標準美式英語 · 真實例句題庫串接版</p>
+        </div>
+      </div>
+
+      <nav class="flex items-center space-x-3">
+        <button id="nav-btn-quiz" onclick="playMcSound('click'); switchTab('quiz')" class="mc-btn active px-4 py-2 text-lg sm:text-xl flex items-center space-x-2">
+          <i data-lucide="swords" class="w-5 h-5"></i>
+          <span>特訓場</span>
+        </button>
+        <button id="nav-btn-dictionary" onclick="playMcSound('click'); switchTab('dictionary')" class="mc-btn px-4 py-2 text-lg sm:text-xl flex items-center space-x-2">
+          <i data-lucide="book" class="w-5 h-5"></i>
+          <span>動詞圖鑑 (<span id="dict-total-count">...</span>)</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- 主內容視窗 -->
+  <main class="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 flex flex-col justify-start">
+
+    <!-- 區塊 1: 測驗設定介面 -->
+    <div id="section-setup" class="w-full max-w-2xl mx-auto space-y-6 my-auto">
+      
+      <div class="text-center space-y-2">
+        <div class="inline-block bg-[#113110] border-2 border-[#55ff55] px-4 py-1 text-base text-[#55ff55] font-bold">
+          結合試算表「*動詞三態句」真實語境出題
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-[#ffff55] tracking-wide no-shadow">設定特訓範圍與模式</h2>
+      </div>
+
+      <div class="mc-panel p-6 sm:p-8 text-black space-y-6">
+        
+        <!-- 1. 動詞深度範圍選擇 -->
+        <div class="space-y-2">
+          <div class="text-xl font-bold">1. 選擇單字範圍：</div>
+          <div class="grid grid-cols-2 gap-3">
+            <button type="button" onclick="playMcSound('click'); setScope('COMMON')" id="scope-btn-common" class="mc-btn active py-3 text-lg sm:text-xl font-bold flex items-center justify-center space-x-2">
+              <span id="scope-common-label">🔥 核心常用動詞</span>
+            </button>
+            <button type="button" onclick="playMcSound('click'); setScope('ALL')" id="scope-btn-all" class="mc-btn py-3 text-lg sm:text-xl font-bold flex items-center justify-center space-x-2">
+              <span id="scope-all-label">🌐 完整全收錄動詞</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. 動詞型態聯集多選 -->
+        <div class="space-y-2">
+          <div class="flex justify-between items-center text-xl font-bold">
+            <span>2. 變化型態 (支援點擊多選聯集)：</span>
+            <span id="selected-type-count" class="text-base bg-black text-[#55ff55] px-2.5 py-0.5 border border-gray-600">0 個動詞</span>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
+            <button type="button" onclick="playMcSound('click'); toggleTypeFilter('AAA')" id="type-btn-AAA" class="type-toggle-btn mc-btn active py-2.5 text-base sm:text-lg font-bold">AAA</button>
+            <button type="button" onclick="playMcSound('click'); toggleTypeFilter('AAB')" id="type-btn-AAB" class="type-toggle-btn mc-btn active py-2.5 text-base sm:text-lg font-bold">AAB</button>
+            <button type="button" onclick="playMcSound('click'); toggleTypeFilter('ABA')" id="type-btn-ABA" class="type-toggle-btn mc-btn active py-2.5 text-base sm:text-lg font-bold">ABA</button>
+            <button type="button" onclick="playMcSound('click'); toggleTypeFilter('ABB')" id="type-btn-ABB" class="type-toggle-btn mc-btn active py-2.5 text-base sm:text-lg font-bold">ABB</button>
+            <button type="button" onclick="playMcSound('click'); toggleTypeFilter('ABC')" id="type-btn-ABC" class="type-toggle-btn mc-btn active py-2.5 text-base sm:text-lg font-bold">ABC</button>
+          </div>
+          <div class="flex justify-end space-x-2 pt-1 text-sm font-bold">
+            <button type="button" onclick="playMcSound('click'); selectAllTypes(true)" class="underline text-blue-900 hover:text-black">全選型態</button>
+            <span class="text-gray-500">|</span>
+            <button type="button" onclick="playMcSound('click'); selectAllTypes(false)" class="underline text-red-900 hover:text-black">清空型態</button>
+          </div>
+        </div>
+
+        <!-- 3. 題型選擇 -->
+        <div class="space-y-2">
+          <div class="text-xl font-bold">3. 測驗題型模式：</div>
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
+            <label class="mc-slot p-3 flex items-center cursor-pointer text-white font-bold hover:brightness-110">
+              <input type="radio" name="question-mode" value="MIXED" checked class="accent-[#55ff55] w-5 h-5">
+              <span class="ml-2 text-lg">混合挑戰</span>
+            </label>
+            <label class="mc-slot p-3 flex items-center cursor-pointer text-white font-bold hover:brightness-110">
+              <input type="radio" name="question-mode" value="CHOICE" class="accent-[#55ff55] w-5 h-5">
+              <span class="ml-2 text-lg">三態單選</span>
+            </label>
+            <label class="mc-slot p-3 flex items-center cursor-pointer text-white font-bold hover:brightness-110">
+              <input type="radio" name="question-mode" value="ERROR" class="accent-[#55ff55] w-5 h-5">
+              <span class="ml-2 text-lg">例句改錯</span>
+            </label>
+            <label class="mc-slot p-3 flex items-center cursor-pointer text-white font-bold hover:brightness-110">
+              <input type="radio" name="question-mode" value="CLOZE" class="accent-[#55ff55] w-5 h-5">
+              <span class="ml-2 text-lg">例句填空</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- 4. 題數選擇 -->
+        <div class="space-y-2">
+          <div class="text-xl font-bold">4. 本輪題目數量：</div>
+          <div class="grid grid-cols-4 gap-2">
+            <button type="button" onclick="playMcSound('click'); setCount(10)" class="count-btn active mc-btn py-2.5 text-lg font-bold" data-count="10">10 題</button>
+            <button type="button" onclick="playMcSound('click'); setCount(20)" class="count-btn mc-btn py-2.5 text-lg font-bold" data-count="20">20 題</button>
+            <button type="button" onclick="playMcSound('click'); setCount(30)" class="count-btn mc-btn py-2.5 text-lg font-bold" data-count="30">30 題</button>
+            <button type="button" onclick="playMcSound('click'); setCount(50)" class="count-btn mc-btn py-2.5 text-lg font-bold" data-count="50">50 題</button>
+          </div>
+        </div>
+
+        <!-- 開始按鈕 -->
+        <div class="pt-2">
+          <button onclick="playMcSound('levelup'); startQuiz()" class="w-full py-4 mc-btn-green text-2xl sm:text-3xl font-black flex items-center justify-center space-x-3 tracking-wider">
+            <i data-lucide="play" class="w-7 h-7 fill-current"></i>
+            <span>進入特訓 · 開始作答！</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 區塊 2: 進行中測驗 -->
+    <div id="section-quiz" class="w-full max-w-3xl mx-auto hidden flex-col space-y-4">
+      <div class="bg-[#2b2b2b] p-4 border-4 border-black space-y-2.5">
+        <div class="flex items-center justify-between text-lg sm:text-xl font-bold">
+          <div class="flex items-center space-x-3">
+            <span id="quiz-badge-type" class="bg-[#3b124a] text-[#ff88ff] border border-[#a22da8] px-3 py-0.5 text-base font-bold">題型</span>
+            <span id="quiz-progress-text" class="text-[#ffff55]">第 1 / 10 題</span>
+          </div>
+          <div class="flex items-center space-x-5">
+            <span class="flex items-center text-[#55ff55]"><i data-lucide="check" class="w-6 h-6 mr-1"></i><span id="current-correct">0</span></span>
+            <span class="flex items-center text-[#ff5555]"><i data-lucide="x" class="w-6 h-6 mr-1"></i><span id="current-wrong">0</span></span>
+            <button onclick="playMcSound('click'); confirmExitQuiz()" class="text-gray-400 hover:text-white underline text-base">終止測驗</button>
+          </div>
+        </div>
+        
+        <div class="w-full mc-xp-container h-5">
+          <div id="quiz-progress-bar" class="mc-xp-fill h-full transition-all duration-300" style="width: 10%"></div>
+        </div>
+      </div>
+
+      <div id="question-card" class="mc-board p-6 sm:p-8 space-y-6">
+        <div id="question-body"></div>
+
+        <div id="feedback-container" class="hidden p-4 sm:p-5 border-4 transition-all space-y-2 text-xl font-bold">
+          <div class="flex items-center space-x-2 text-2xl font-black" id="feedback-title"></div>
+          <div class="text-lg leading-relaxed text-yellow-100" id="feedback-explanation"></div>
+        </div>
+
+        <div class="flex justify-end pt-2" id="action-buttons">
+          <button id="btn-submit-answer" onclick="checkCurrentAnswer()" class="w-full sm:w-auto px-8 py-3.5 mc-btn text-2xl font-black">
+            送出作答
+          </button>
+          <button id="btn-next-question" onclick="playMcSound('click'); nextQuestion()" class="hidden w-full sm:w-auto px-8 py-3.5 mc-btn-green text-2xl font-black flex items-center justify-center space-x-2">
+            <span>下一題</span>
+            <i data-lucide="arrow-right" class="w-6 h-6"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 區塊 3: 結算報告 -->
+    <div id="section-result" class="w-full max-w-2xl mx-auto hidden flex-col space-y-6 my-auto">
+      <div class="mc-panel p-8 text-black text-center space-y-6">
+        <div id="result-icon-wrapper" class="w-20 h-20 mx-auto flex items-center justify-center bg-[#2b2b2b] border-4 border-[#ffff55] text-[#ffff55]">
+          <i data-lucide="trophy" class="w-12 h-12"></i>
+        </div>
+        
+        <div>
+          <h2 class="text-3xl sm:text-4xl font-black text-black no-shadow tracking-wide" id="result-title">測驗完成！成果結算</h2>
+          <p class="text-lg text-gray-700 mt-1 font-bold" id="result-subtitle">以下為本次練習的詳細表現</p>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3 p-4 bg-[#7a7a7a] border-4 border-black text-white">
+          <div class="p-2">
+            <div class="text-base sm:text-lg text-gray-300 font-bold">總命中率</div>
+            <div class="text-3xl sm:text-4xl font-black text-[#ffff55] no-shadow" id="result-score">0%</div>
+          </div>
+          <div class="p-2 border-x-4 border-black">
+            <div class="text-base sm:text-lg text-gray-300 font-bold">答對題數</div>
+            <div class="text-3xl sm:text-4xl font-black text-[#55ff55] no-shadow" id="result-correct-count">0</div>
+          </div>
+          <div class="p-2">
+            <div class="text-base sm:text-lg text-gray-300 font-bold">答錯題數</div>
+            <div class="text-3xl sm:text-4xl font-black text-[#ff5555] no-shadow" id="result-wrong-count">0</div>
+          </div>
+        </div>
+
+        <div id="wrong-answers-container" class="space-y-2 text-left"></div>
+
+        <div class="flex flex-col sm:flex-row gap-3 pt-2">
+          <button id="btn-retry-wrong" onclick="playMcSound('click'); retryWrongQuestions()" class="hidden flex-1 py-4 mc-btn text-xl sm:text-2xl font-black text-[#ffcc00] flex items-center justify-center space-x-2">
+            <i data-lucide="rotate-ccw" class="w-6 h-6"></i>
+            <span>僅重測錯題 (<span id="wrong-retry-count">0</span>)</span>
+          </button>
+          <button onclick="playMcSound('click'); resetToSetup()" class="flex-1 py-4 mc-btn-green text-xl sm:text-2xl font-black flex items-center justify-center space-x-2">
+            <i data-lucide="refresh-cw" class="w-6 h-6"></i>
+            <span>再來一輪全新練習</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 區塊 4: 完整動詞速查字典 -->
+    <div id="section-dictionary" class="w-full hidden flex-col space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-[#ffff55] no-shadow">不規則動詞檢索圖鑑</h2>
+          <p class="text-base sm:text-lg text-gray-300">支援 AAA~ABC 分類快篩與例句即時檢視</p>
+        </div>
+        <div class="flex items-center space-x-2">
+          <input id="dict-search-input" oninput="renderDictionary()" type="text" placeholder="🔍 搜尋動詞或中文..." class="w-full sm:w-72 px-4 py-2.5 bg-black border-2 border-gray-500 text-lg text-[#55ff55] focus:outline-none focus:border-[#55ff55]">
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <button onclick="playMcSound('click'); setDictFilter('ALL')" class="dict-filter active mc-btn px-4 py-2 text-base font-bold" data-dict="ALL">全部型態</button>
+        <button onclick="playMcSound('click'); setDictFilter('AAA')" class="dict-filter mc-btn px-4 py-2 text-base font-bold" data-dict="AAA">AAA 三態同形</button>
+        <button onclick="playMcSound('click'); setDictFilter('AAB')" class="dict-filter mc-btn px-4 py-2 text-base font-bold" data-dict="AAB">AAB 分詞變</button>
+        <button onclick="playMcSound('click'); setDictFilter('ABA')" class="dict-filter mc-btn px-4 py-2 text-base font-bold" data-dict="ABA">ABA 首尾同</button>
+        <button onclick="playMcSound('click'); setDictFilter('ABB')" class="dict-filter mc-btn px-4 py-2 text-base font-bold" data-dict="ABB">ABB 過去/分詞同</button>
+        <button onclick="playMcSound('click'); setDictFilter('ABC')" class="dict-filter mc-btn px-4 py-2 text-base font-bold" data-dict="ABC">ABC 三態全異</button>
+      </div>
+
+      <div class="mc-panel overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-lg text-black">
+            <thead class="bg-[#8b8b8b] border-b-4 border-black font-bold">
+              <tr>
+                <th class="py-3 px-4 w-12 text-center">#</th>
+                <th class="py-3 px-4">原形 (Base)</th>
+                <th class="py-3 px-4">過去式 (Past)</th>
+                <th class="py-3 px-4">過去分詞 (P.P.)</th>
+                <th class="py-3 px-4">中文涵義</th>
+                <th class="py-3 px-4 text-center">分類</th>
+                <th class="py-3 px-4 text-center">收錄例句數</th>
+              </tr>
+            </thead>
+            <tbody id="dict-table-body" class="divide-y-2 divide-gray-400 font-bold bg-[#c6c6c6]">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // ==========================================
+    // 0. 音效系統 (Web Audio API)
+    // ==========================================
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playMcSound(type) {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const now = audioCtx.currentTime;
+
+      if (type === 'click') {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(320, now);
+        osc.frequency.exponentialRampToValueAtTime(120, now + 0.05);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.05);
+      } else if (type === 'correct') {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, now);
+        osc.frequency.setValueAtTime(1174.66, now + 0.08);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.35);
+      } else if (type === 'wrong') {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(140, now);
+        osc.frequency.exponentialRampToValueAtTime(40, now + 0.25);
+        gain.gain.setValueAtTime(0.35, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.25);
+      } else if (type === 'levelup') {
+        [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(freq, now + i * 0.08);
+          gain.gain.setValueAtTime(0.12, now + i * 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.3);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now + i * 0.08);
+          osc.stop(now + i * 0.08 + 0.3);
+        });
+      }
+    }
+
+    // ==========================================
+    // 1. GAS 串接網址設定
+    // ==========================================
+    const GAS_ENDPOINT_URL = "https://script.google.com/macros/s/AKfycbwdRf5bUnTQuShcpT9F1sLWJp8HTkfJfO3_3JKGf-PypJ2SoJUwIQkK3GPnw96vJbH2MQ/exec";
+    let VERB_DATABASE = [];
+
+    // ==========================================
+    // 2. 背景同步雲端試算表資料
+    // ==========================================
+    async function syncDataFromGAS() {
+      try {
+        const response = await fetch(GAS_ENDPOINT_URL);
+        const result = await response.json();
+
+        if (result.status === 'success' && Array.isArray(result.data) && result.data.length > 0) {
+          VERB_DATABASE = result.data;
+          updateFilterCount();
+          renderDictionary();
+        } else {
+          throw new Error(result.message || '回傳格式不正確');
+        }
+      } catch (err) {
+        console.warn("GAS 背景同步失敗:", err);
+      }
+    }
+
+    // ==========================================
+    // 3. 狀態管理 (範圍、聯集、題數)
+    // ==========================================
+    let currentScope = 'COMMON';
+    let selectedTypes = new Set(['AAA', 'AAB', 'ABA', 'ABB', 'ABC']);
+    let selectedCount = 10;
+    let quizQuestions = [];
+    let currentIndex = 0;
+    let score = 0;
+    let answeredCurrent = false;
+    let wrongList = [];
+    let dictCurrentType = 'ALL';
+
+    function setScope(scope) {
+      currentScope = scope;
+      document.getElementById('scope-btn-common').className = scope === 'COMMON' ? 'mc-btn active py-3 text-lg sm:text-xl font-bold flex items-center justify-center space-x-2' : 'mc-btn py-3 text-lg sm:text-xl font-bold flex items-center justify-center space-x-2';
+      document.getElementById('scope-btn-all').className = scope === 'ALL' ? 'mc-btn active py-3 text-lg sm:text-xl font-bold flex items-center justify-center space-x-2' : 'mc-btn py-3 text-lg sm:text-xl font-bold flex items-center justify-center space-x-2';
+      updateFilterCount();
+    }
+
+    function toggleTypeFilter(type) {
+      if (selectedTypes.has(type)) {
+        selectedTypes.delete(type);
+        document.getElementById(`type-btn-${type}`).classList.remove('active');
+      } else {
+        selectedTypes.add(type);
+        document.getElementById(`type-btn-${type}`).classList.add('active');
+      }
+      updateFilterCount();
+    }
+
+    function selectAllTypes(isSelectAll) {
+      const all = ['AAA', 'AAB', 'ABA', 'ABB', 'ABC'];
+      if (isSelectAll) {
+        selectedTypes = new Set(all);
+        all.forEach(t => document.getElementById(`type-btn-${t}`).classList.add('active'));
+      } else {
+        selectedTypes.clear();
+        all.forEach(t => document.getElementById(`type-btn-${t}`).classList.remove('active'));
+      }
+      updateFilterCount();
+    }
+
+    function getFilteredVerbs() {
+      return VERB_DATABASE.filter(v => {
+        const scopeMatch = currentScope === 'ALL' ? true : v.common;
+        const typeMatch = selectedTypes.has(v.type);
+        return scopeMatch && typeMatch;
+      });
+    }
+
+    function updateFilterCount() {
+      const pool = getFilteredVerbs();
+      const commonCount = VERB_DATABASE.filter(v => v.common).length;
+      const allCount = VERB_DATABASE.length;
+
+      const commonLabel = document.getElementById('scope-common-label');
+      const allLabel = document.getElementById('scope-all-label');
+      const typeCountEl = document.getElementById('selected-type-count');
+      const dictCountEl = document.getElementById('dict-total-count');
+
+      if (commonLabel) commonLabel.textContent = `🔥 核心常用 (${commonCount}字)`;
+      if (allLabel) allLabel.textContent = `🌐 完整全收錄 (${allCount}字)`;
+      if (typeCountEl) typeCountEl.textContent = `${pool.length} 個動詞在庫`;
+      if (dictCountEl) dictCountEl.textContent = allCount;
+    }
+
+    function setCount(num) {
+      selectedCount = num;
+      document.querySelectorAll('.count-btn').forEach(btn => {
+        if (parseInt(btn.dataset.count) === num) btn.classList.add('active');
+        else btn.classList.remove('active');
+      });
+    }
+
+    function shuffleArray(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    // ==========================================
+    // 4. 題型產生器
+    // ==========================================
+
+    function generateChoiceQuestion(verb) {
+      const isPast = Math.random() > 0.45;
+      const targetTense = isPast ? "過去式 (Past Tense)" : "過去分詞 (P.P.)";
+      const correctAnswer = isPast ? verb.past : verb.pp;
+
+      const distractors = new Set();
+      if (verb.base + "ed" !== correctAnswer) distractors.add(verb.base + "ed");
+      if (verb.base !== correctAnswer) distractors.add(verb.base);
+      if (verb.past !== verb.pp) {
+        const alt = isPast ? verb.pp : verb.past;
+        if (alt !== correctAnswer) distractors.add(alt);
+      }
+
+      const others = shuffleArray(VERB_DATABASE.filter(v => v.base !== verb.base));
+      for (const o of others) {
+        if (distractors.size >= 3) break;
+        const cand = isPast ? o.past : o.pp;
+        if (cand && cand !== correctAnswer) distractors.add(cand);
+      }
+
+      const options = shuffleArray([correctAnswer, ...Array.from(distractors).slice(0, 3)]);
+
+      return {
+        type: 'CHOICE',
+        typeName: '三態單選',
+        verb: verb,
+        title: `選出動詞 <span class="text-[#ffff55] underline decoration-yellow-400 font-black">${verb.base}</span>（${verb.zh}）的正確【${targetTense}】：`,
+        subText: `提示：注意原形與三態變化規則`,
+        options: options,
+        correctAnswer: correctAnswer,
+        explanation: `<b>${verb.base}</b> 的三態變化為：原形 <code>${verb.base}</code> / 過去式 <code>${verb.past}</code> / 過去分詞 <code>${verb.pp}</code>。中文為「${verb.zh}」。`
+      };
+    }
+
+    function generateErrorQuestion(verb) {
+      const isPast = Math.random() > 0.5;
+      const sentenceList = (isPast ? verb.ptSentences : verb.ppSentences) || [];
+      const tenseDesc = isPast ? "過去式 (Past Tense)" : "完成式／分詞 (P.P.)";
+
+      let sampleObj = null;
+      if (sentenceList.length > 0) {
+        sampleObj = sentenceList[Math.floor(Math.random() * sentenceList.length)];
+      }
+
+      const correctAnswer = sampleObj ? sampleObj.answer : (isPast ? verb.past : verb.pp);
+
+      let incorrectForm = verb.base + "ed";
+      if (incorrectForm.toLowerCase() === correctAnswer.toLowerCase()) {
+        incorrectForm = verb.base + "ing";
+      }
+
+      let rawSentence = sampleObj ? sampleObj.sentence : "The student (_____) the assignment.";
+      
+      const displaySentenceHtml = rawSentence.replace(
+        /\([_]+\)/g, 
+        `<span class="px-2 py-0.5 mx-1 bg-red-900 border border-red-500 text-red-200 font-bold underline decoration-wavy decoration-red-400">${incorrectForm}</span>`
+      );
+
+      return {
+        type: 'ERROR',
+        typeName: '例句改錯',
+        verb: verb,
+        title: `找出句子中【錯誤的動詞形式】並在下方輸入正確拼法：`,
+        subText: `提示原形：<b>${verb.base}</b>（${verb.zh}）· 時態：${tenseDesc}`,
+        displaySentence: displaySentenceHtml,
+        wrongWord: incorrectForm,
+        correctAnswer: correctAnswer,
+        explanation: `句中「<code>${incorrectForm}</code>」為錯誤拼法。<br>正確完整句子：<b>${rawSentence.replace(/\([_]+\)/g, correctAnswer)}</b><br>動詞三態為：<code>${verb.base}</code> - <code>${verb.past}</code> - <code>${verb.pp}</code>。`
+      };
+    }
+
+    function generateClozeQuestion(verb) {
+      const isPast = Math.random() > 0.5;
+      const sentenceList = (isPast ? verb.ptSentences : verb.ppSentences) || [];
+      const tenseDesc = isPast ? "過去式 (Past Tense)" : "完成式／分詞 (P.P.)";
+
+      let sampleObj = null;
+      if (sentenceList.length > 0) {
+        sampleObj = sentenceList[Math.floor(Math.random() * sentenceList.length)];
+      }
+
+      const correctAnswer = sampleObj ? sampleObj.answer : (isPast ? verb.past : verb.pp);
+      let rawSentence = sampleObj ? sampleObj.sentence : "They (_____) very quickly.";
+
+      const parts = rawSentence.split(/\([_]+\)/);
+      const clozePre = parts[0] || "";
+      const clozePost = parts.slice(1).join("") || "";
+
+      return {
+        type: 'CLOZE',
+        typeName: '例句填空',
+        verb: verb,
+        title: `依據真實句意線索，填入適當的動詞三態形式：`,
+        subText: `提示原形：<b class="text-[#ffff55]">${verb.base}</b>（${verb.zh}）· 時態要求：${tenseDesc}`,
+        clozePre: clozePre,
+        clozePost: clozePost,
+        correctAnswer: correctAnswer,
+        explanation: `完整句子：<b>${rawSentence.replace(/\([_]+\)/g, correctAnswer)}</b><br>動詞三態為：<code>${verb.base}</code> / <code>${verb.past}</code> / <code>${verb.pp}</code>。`
+      };
+    }
+
+    // ==========================================
+    // 5. 測驗控制流程
+    // ==========================================
+    function startQuiz(customVerbs = null) {
+      const pool = customVerbs || getFilteredVerbs();
+
+      if (pool.length === 0) {
+        alert("目前勾選的條件下沒有任何動詞！請至少勾選一種變化型態。");
+        return;
+      }
+
+      const mode = document.querySelector('input[name="question-mode"]:checked').value;
+      const targetNum = Math.min(customVerbs ? customVerbs.length : selectedCount, pool.length);
+      const chosenVerbs = shuffleArray(pool).slice(0, targetNum);
+
+      quizQuestions = chosenVerbs.map(verb => {
+        let questionType = mode;
+        if (mode === 'MIXED') {
+          const types = ['CHOICE', 'ERROR', 'CLOZE'];
+          questionType = types[Math.floor(Math.random() * types.length)];
+        }
+        if (questionType === 'CHOICE') return generateChoiceQuestion(verb);
+        if (questionType === 'ERROR') return generateErrorQuestion(verb);
+        return generateClozeQuestion(verb);
+      });
+
+      currentIndex = 0;
+      score = 0;
+      wrongList = [];
+      answeredCurrent = false;
+
+      document.getElementById('section-setup').classList.add('hidden');
+      document.getElementById('section-result').classList.add('hidden');
+      document.getElementById('section-result').classList.remove('flex');
+      document.getElementById('section-quiz').classList.remove('hidden');
+      document.getElementById('section-quiz').classList.add('flex');
+
+      renderCurrentQuestion();
+    }
+
+    function renderCurrentQuestion() {
+      answeredCurrent = false;
+      const q = quizQuestions[currentIndex];
+      const total = quizQuestions.length;
+
+      document.getElementById('quiz-progress-text').textContent = `第 ${currentIndex + 1} / ${total} 題`;
+      document.getElementById('quiz-progress-bar').style.width = `${((currentIndex + 1) / total) * 100}%`;
+      document.getElementById('quiz-badge-type').textContent = q.typeName;
+      document.getElementById('current-correct').textContent = score;
+      document.getElementById('current-wrong').textContent = wrongList.length;
+
+      document.getElementById('btn-submit-answer').classList.remove('hidden');
+      document.getElementById('btn-next-question').classList.add('hidden');
+      document.getElementById('feedback-container').classList.add('hidden');
+
+      const body = document.getElementById('question-body');
+
+      if (q.type === 'CHOICE') {
+        body.innerHTML = `
+          <div class="space-y-5">
+            <div>
+              <div class="text-xl sm:text-2xl font-bold leading-relaxed text-white">${q.title}</div>
+              <div class="text-base text-yellow-200 mt-1">${q.subText}</div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+              ${q.options.map((opt, i) => `
+                <button type="button" onclick="selectOption('${opt}')" class="choice-opt-btn mc-btn p-4 text-left text-xl sm:text-2xl font-bold flex items-center justify-between" data-val="${opt}">
+                  <span>(${String.fromCharCode(65 + i)})${opt}</span>
+                  <span class="opt-indicator w-6 h-6 border-2 border-black bg-[#404040] flex items-center justify-center text-sm font-bold"></span>
+                </button>
+              `).join('')}
+            </div>
+            <input type="hidden" id="user-selected-val" value="">
+          </div>
+        `;
+      } else if (q.type === 'ERROR') {
+        body.innerHTML = `
+          <div class="space-y-5">
+            <div>
+              <div class="text-xl sm:text-2xl font-bold text-white">${q.title}</div>
+              <div class="text-base text-yellow-200 mt-1">${q.subText}</div>
+            </div>
+            <div class="p-5 mc-slot text-xl sm:text-2xl text-white leading-relaxed font-medium">
+              ${q.displaySentence}
+            </div>
+            <div class="pt-1 space-y-2">
+              <label class="block text-lg font-bold text-yellow-200">請在下方輸入修正後的正確動詞：</label>
+              <input type="text" id="user-text-input" autofocus placeholder="輸入正確動詞..." class="w-full sm:w-80 px-4 py-2.5 bg-black border-4 border-[#373737] text-white font-bold text-xl sm:text-2xl focus:border-[#55ff55] focus:outline-none">
+            </div>
+          </div>
+        `;
+      } else if (q.type === 'CLOZE') {
+        body.innerHTML = `
+          <div class="space-y-5">
+            <div>
+              <div class="text-xl sm:text-2xl font-bold text-white">${q.title}</div>
+              <div class="text-base text-yellow-200 mt-1">${q.subText}</div>
+            </div>
+            <div class="p-5 mc-slot text-xl sm:text-2xl text-white leading-loose font-medium">
+              ${q.clozePre}
+              <input type="text" id="user-text-input" autofocus placeholder="填入形式" class="inline-block mx-2 px-3 py-1 bg-black border-2 border-[#55ff55] font-bold text-[#55ff55] w-48 text-center focus:outline-none">
+              ${q.clozePost}
+            </div>
+          </div>
+        `;
+      }
+
+      const textInput = document.getElementById('user-text-input');
+      if (textInput) {
+        textInput.focus();
+        textInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            if (!answeredCurrent) checkCurrentAnswer();
+            else nextQuestion();
+          }
+        });
+      }
+
+      lucide.createIcons();
+    }
+
+    function selectOption(val) {
+      if (answeredCurrent) return;
+      playMcSound('click');
+      document.getElementById('user-selected-val').value = val;
+      document.querySelectorAll('.choice-opt-btn').forEach(btn => {
+        if (btn.dataset.val === val) {
+          btn.classList.add('active');
+          btn.querySelector('.opt-indicator').innerHTML = '✓';
+        } else {
+          btn.classList.remove('active');
+          btn.querySelector('.opt-indicator').innerHTML = '';
+        }
+      });
+    }
+
+    function checkCurrentAnswer() {
+      if (answeredCurrent) return;
+
+      const q = quizQuestions[currentIndex];
+      let userAns = "";
+
+      if (q.type === 'CHOICE') {
+        userAns = document.getElementById('user-selected-val').value.trim();
+        if (!userAns) return;
+      } else {
+        const inp = document.getElementById('user-text-input');
+        userAns = inp ? inp.value.trim().toLowerCase() : "";
+        if (!userAns) return;
+      }
+
+      answeredCurrent = true;
+      const isCorrect = userAns.toLowerCase() === q.correctAnswer.toLowerCase();
+
+      const feedbackBox = document.getElementById('feedback-container');
+      const feedbackTitle = document.getElementById('feedback-title');
+      const feedbackExp = document.getElementById('feedback-explanation');
+
+      feedbackBox.classList.remove('hidden');
+
+      if (isCorrect) {
+        score++;
+        playMcSound('correct');
+        feedbackBox.className = "p-4 sm:p-5 border-4 border-black bg-[#20551e] text-[#55ff55]";
+        feedbackTitle.innerHTML = `<i data-lucide="check-circle" class="w-6 h-6 inline"></i> <span>回答正確！太棒了！</span>`;
+      } else {
+        wrongList.push({ question: q, userAns: userAns });
+        playMcSound('wrong');
+        feedbackBox.className = "p-4 sm:p-5 border-4 border-black bg-[#6e1e1e] text-[#ff8888]";
+        feedbackTitle.innerHTML = `<i data-lucide="alert-circle" class="w-6 h-6 inline"></i> <span>答錯了！正確解答為：<b>${q.correctAnswer}</b></span>`;
+      }
+
+      feedbackExp.innerHTML = q.explanation;
+      lucide.createIcons();
+
+      document.getElementById('btn-submit-answer').classList.add('hidden');
+      document.getElementById('btn-next-question').classList.remove('hidden');
+      document.getElementById('btn-next-question').focus();
+    }
+
+    function nextQuestion() {
+      if (currentIndex < quizQuestions.length - 1) {
+        currentIndex++;
+        renderCurrentQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function retryWrongQuestions() {
+      if (!wrongList || wrongList.length === 0) return;
+      const wrongVerbs = wrongList.map(item => item.question.verb);
+      startQuiz(wrongVerbs);
+    }
+
+    function resetToSetup() {
+      document.getElementById('section-quiz').classList.add('hidden');
+      document.getElementById('section-quiz').classList.remove('flex');
+      document.getElementById('section-result').classList.add('hidden');
+      document.getElementById('section-result').classList.remove('flex');
+      document.getElementById('section-setup').classList.remove('hidden');
+    }
+
+    function confirmExitQuiz() {
+      if (confirm("確定要放棄目前的測驗進度並返回首頁嗎？")) {
+        resetToSetup();
+      }
+    }
+
+    function showResults() {
+      playMcSound('levelup');
+      document.getElementById('section-quiz').classList.add('hidden');
+      document.getElementById('section-quiz').classList.remove('flex');
+      document.getElementById('section-result').classList.remove('hidden');
+      document.getElementById('section-result').classList.add('flex');
+
+      const total = quizQuestions.length;
+      const rate = Math.round((score / total) * 100);
+
+      document.getElementById('result-score').textContent = `${rate}%`;
+      document.getElementById('result-correct-count').textContent = score;
+      document.getElementById('result-wrong-count').textContent = wrongList.length;
+
+      const titleEl = document.getElementById('result-title');
+      if (rate >= 90) titleEl.textContent = "太厲害了！完全精通！";
+      else if (rate >= 60) titleEl.textContent = "表現不錯！持之以恆！";
+      else titleEl.textContent = "多加複習，熟能生巧！";
+
+      const wrongContainer = document.getElementById('wrong-answers-container');
+      const retryWrongBtn = document.getElementById('btn-retry-wrong');
+
+      if (wrongList.length > 0) {
+        retryWrongBtn.classList.remove('hidden');
+        retryWrongBtn.classList.add('flex');
+        document.getElementById('wrong-retry-count').textContent = wrongList.length;
+
+        wrongContainer.innerHTML = `
+          <div class="text-xl font-bold text-black flex items-center">
+            <i data-lucide="alert-triangle" class="w-5 h-5 mr-1 text-red-600"></i>
+            本次錯題檢視 (${wrongList.length} 題)：
+          </div>
+          <div class="space-y-2 max-h-56 overflow-y-auto pr-1">
+            ${wrongList.map(item => `
+              <div class="p-3 bg-[#3f3f3f] text-white border-2 border-black text-lg flex justify-between items-center font-bold">
+                <div>
+                  <span class="text-[#ffff55]">${item.question.verb.base} (${item.question.verb.zh})</span>
+                  <span class="text-gray-300 ml-2">你的回答: <span class="text-red-400 line-through">${item.userAns || "(未作答)"}</span></span>
+                </div>
+                <div class="text-[#55ff55]">正解: ${item.question.correctAnswer}</div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } else {
+        retryWrongBtn.classList.add('hidden');
+        wrongContainer.innerHTML = `<div class="p-4 bg-[#234c20] text-[#55ff55] font-bold text-xl border-2 border-black">全對通關！無任何錯題記錄！</div>`;
+      }
+      lucide.createIcons();
+    }
+
+    // ==========================================
+    // 6. 圖鑑展示與頁籤切換
+    // ==========================================
+    function switchTab(tab) {
+      if (tab === 'quiz') {
+        document.getElementById('section-dictionary').classList.add('hidden');
+        document.getElementById('section-dictionary').classList.remove('flex');
+        document.getElementById('section-setup').classList.remove('hidden');
+        document.getElementById('nav-btn-quiz').classList.add('active');
+        document.getElementById('nav-btn-dictionary').classList.remove('active');
+      } else if (tab === 'dictionary') {
+        document.getElementById('section-setup').classList.add('hidden');
+        document.getElementById('section-quiz').classList.add('hidden');
+        document.getElementById('section-result').classList.add('hidden');
+        document.getElementById('section-dictionary').classList.remove('hidden');
+        document.getElementById('section-dictionary').classList.add('flex');
+        document.getElementById('nav-btn-quiz').classList.remove('active');
+        document.getElementById('nav-btn-dictionary').classList.add('active');
+        renderDictionary();
+      }
+    }
+
+    function setDictFilter(type) {
+      dictCurrentType = type;
+      document.querySelectorAll('.dict-filter').forEach(btn => {
+        if (btn.dataset.dict === type) btn.classList.add('active');
+        else btn.classList.remove('active');
+      });
+      renderDictionary();
+    }
+
+    function renderDictionary() {
+      const searchKey = (document.getElementById('dict-search-input')?.value || "").toLowerCase().trim();
+      const tbody = document.getElementById('dict-table-body');
+      if (!tbody) return;
+
+      const filtered = VERB_DATABASE.filter(v => {
+        const matchesType = dictCurrentType === 'ALL' || v.type === dictCurrentType;
+        const matchesSearch = !searchKey || 
+          v.base.toLowerCase().includes(searchKey) ||
+          v.past.toLowerCase().includes(searchKey) ||
+          v.pp.toLowerCase().includes(searchKey) ||
+          v.zh.toLowerCase().includes(searchKey);
+        return matchesType && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-gray-700 font-bold text-xl">無符合條件的動詞</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map((v, idx) => {
+        const ptCount = v.ptSentences ? v.ptSentences.length : 0;
+        const ppCount = v.ppSentences ? v.ppSentences.length : 0;
+        return `
+          <tr class="hover:bg-[#d8d8d8] transition-colors">
+            <td class="py-3 px-4 text-center text-gray-600">${idx + 1}</td>
+            <td class="py-3 px-4 text-black font-extrabold">${v.base}</td>
+            <td class="py-3 px-4 text-blue-900">${v.past}</td>
+            <td class="py-3 px-4 text-emerald-900">${v.pp}</td>
+            <td class="py-3 px-4 text-gray-800">${v.zh}</td>
+            <td class="py-3 px-4 text-center"><span class="bg-[#3c3c3c] text-[#55ff55] px-2 py-0.5 text-sm rounded">${v.type}</span></td>
+            <td class="py-3 px-4 text-center text-gray-700">${ptCount + ppCount} 句</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // 頁面載入完成後自動在背景抓取資料庫
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      syncDataFromGAS();
+    });
+  </script>
+</body>
+</html>
