@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>英語不規則動詞特訓站 - 多主題大字版</title>
+  <title>多主題英語不規則動詞特訓站</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons -->
@@ -11,7 +11,7 @@
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@500;600;700&family=VT323&family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Inter:wght@600;700&family=VT323&family=Noto+Sans+TC:wght@600;700;900&display=swap" rel="stylesheet">
 
   <style>
     *, *::before, *::after {
@@ -178,91 +178,99 @@
     }
 
     /* ========================================================
-       3. 麥塊像素風 (theme-minecraft) - 全面強化高對比清晰度
+       3. 麥塊像素風 (theme-minecraft) - 無重影、字體大幅增強
        ======================================================== */
     body.theme-minecraft {
       font-family: 'VT323', 'Noto Sans TC', monospace;
-      background-color: #181818;
+      background-color: #1a1a1a;
       background-image: 
-        radial-gradient(#2c2c2c 15%, transparent 16%),
-        radial-gradient(#2c2c2c 15%, transparent 16%);
+        radial-gradient(#262626 15%, transparent 16%),
+        radial-gradient(#262626 15%, transparent 16%);
       background-size: 16px 16px;
       background-position: 0 0, 8px 8px;
-      color: #ffffff !important;
+      color: #f1f5f9 !important;
+      font-size: 1.15rem; /* 整體放大 */
+      letter-spacing: 0.5px;
     }
+    /* 移除所有文字陰影，徹底解決重影發虛問題 */
+    body.theme-minecraft * {
+      text-shadow: none !important;
+    }
+
     body.theme-minecraft .th-header {
-      background-color: #262626;
-      border-bottom: 4px solid #0d0d0d;
-      box-shadow: inset 0 -3px 0 #3d3d3d;
+      background-color: #27272a;
+      border-bottom: 4px solid #09090b;
+      box-shadow: inset 0 -3px 0 #3f3f46;
     }
     body.theme-minecraft .th-card {
-      background-color: #2b2b2b;
-      border: 4px solid #111111;
+      background-color: #27272a;
+      border: 3px solid #09090b;
       border-radius: 0px !important;
       box-shadow: 
-        inset 3px 3px 0 #444444,
-        inset -3px -3px 0 #181818,
-        0 6px 0 rgba(0, 0, 0, 0.6);
-      color: #ffffff !important;
+        inset 2px 2px 0 #3f3f46,
+        inset -2px -2px 0 #18181b,
+        0 4px 0 rgba(0, 0, 0, 0.7);
+      color: #f8fafc !important;
     }
     body.theme-minecraft .th-btn {
       transition: none;
       border: 2px solid #000000;
-      background-color: #4a4a4a;
+      background-color: #3f3f46;
       color: #ffffff !important;
       border-radius: 0px !important;
-      box-shadow: inset 2px 2px 0 #6e6e6e, inset -2px -2px 0 #2b2b2b, 0 3px 0 #000;
+      box-shadow: inset 2px 2px 0 #52525b, inset -2px -2px 0 #27272a, 0 3px 0 #000;
+      font-size: 1.15rem;
     }
     body.theme-minecraft .th-btn:hover {
-      background-color: #5c5c5c;
+      background-color: #52525b;
     }
     body.theme-minecraft .th-btn:active {
       transform: translateY(2px);
-      box-shadow: inset 2px 2px 0 #1c1c1c, inset -2px -2px 0 #333333, 0 1px 0 #000;
+      box-shadow: inset 2px 2px 0 #18181b, inset -2px -2px 0 #27272a, 0 1px 0 #000;
     }
     body.theme-minecraft .th-btn.active {
-      background-color: #3b661e;
-      color: #ffff55 !important;
+      background-color: #2e7d32;
+      color: #fef08a !important; /* 高亮金黃 */
       border-color: #000000;
-      box-shadow: inset 2px 2px 0 #609b30, inset -2px -2px 0 #1f3710, 0 3px 0 #000;
+      box-shadow: inset 2px 2px 0 #4ade80, inset -2px -2px 0 #14532d, 0 3px 0 #000;
     }
     body.theme-minecraft .th-btn-primary {
-      background: #477724;
+      background: #3b7e22;
       color: #ffffff !important;
       border: 2px solid #000;
       border-radius: 0px !important;
-      box-shadow: inset 2px 2px 0 #6eb538, inset -2px -2px 0 #284414, 0 4px 0 #000;
+      box-shadow: inset 2px 2px 0 #68b83e, inset -2px -2px 0 #235212, 0 4px 0 #000;
+      font-size: 1.35rem;
     }
     body.theme-minecraft .th-btn-primary:hover {
-      background: #538c2a;
+      background: #469628;
     }
     body.theme-minecraft .th-btn-success {
-      background: #1d7287;
+      background: #0284c7;
       color: #ffffff !important;
       border: 2px solid #000;
       border-radius: 0px !important;
-      box-shadow: inset 2px 2px 0 #3eb4d4, inset -2px -2px 0 #10414d, 0 4px 0 #000;
+      box-shadow: inset 2px 2px 0 #38bdf8, inset -2px -2px 0 #0369a1, 0 4px 0 #000;
+      font-size: 1.35rem;
     }
     body.theme-minecraft .th-progress {
-      background: #55ff55;
-      box-shadow: 0 0 8px #55ff55;
+      background: #4ade80;
+      box-shadow: 0 0 8px #4ade80;
     }
     body.theme-minecraft .th-input {
-      background-color: #121212 !important;
-      border: 2px solid #55ff55 !important;
+      background-color: #09090b !important;
+      border: 2px solid #4ade80 !important;
       border-radius: 0px !important;
-      color: #ffff55 !important;
+      color: #fef08a !important;
+      font-size: 1.35rem !important;
       box-shadow: inset 2px 2px 0 #000;
     }
     body.theme-minecraft .th-input:focus {
       outline: none;
-      box-shadow: 0 0 10px #55ff55;
+      box-shadow: 0 0 10px #4ade80;
     }
 
-    /* 麥塊主題下的所有文字與背景色強制覆蓋，避免暗字 */
-    body.theme-minecraft * {
-      text-shadow: 1px 1px 0px #000000;
-    }
+    /* 麥塊各部分高對比上色 */
     body.theme-minecraft .text-slate-900,
     body.theme-minecraft .text-amber-950,
     body.theme-minecraft .text-slate-800,
@@ -273,26 +281,29 @@
     body.theme-minecraft .text-slate-500,
     body.theme-minecraft .text-amber-800,
     body.theme-minecraft .text-slate-600 {
-      color: #cccccc !important;
+      color: #cbd5e1 !important;
     }
     body.theme-minecraft .bg-slate-50,
     body.theme-minecraft .bg-amber-50,
     body.theme-minecraft .bg-white {
-      background-color: #242424 !important;
-      border-color: #444444 !important;
-      color: #ffffff !important;
+      background-color: #18181b !important;
+      border-color: #3f3f46 !important;
+      color: #f8fafc !important;
     }
     body.theme-minecraft .table-row-item:hover {
-      background-color: #383838 !important;
+      background-color: #3f3f46 !important;
     }
     body.theme-minecraft .text-past {
-      color: #55ffff !important; /* 鑽石青藍 */
+      color: #38bdf8 !important; /* 鑽石青藍 */
+      font-weight: 700;
     }
     body.theme-minecraft .text-pp {
-      color: #55ff55 !important; /* 附魔綠 */
+      color: #4ade80 !important; /* 附魔草綠 */
+      font-weight: 700;
     }
     body.theme-minecraft .text-zh {
-      color: #ffff55 !important; /* 金幣黃 */
+      color: #fef08a !important; /* 純金亮黃 */
+      font-weight: 600;
     }
   </style>
 </head>
@@ -318,8 +329,6 @@
 
       <!-- 右側控制群：主題選單、頁籤 -->
       <div class="flex items-center space-x-2 sm:space-x-3">
-        
-        <!-- 主題切換下拉選單 -->
         <div class="relative inline-block text-left">
           <select id="theme-select" onchange="changeTheme(this.value)" class="th-btn px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs sm:text-base font-bold cursor-pointer pr-7 bg-no-repeat bg-[right_0.4rem_center] border appearance-none shadow-sm">
             <option value="default">💼 正常風</option>
@@ -444,7 +453,7 @@
             <button type="button" onclick="playSound('click'); toggleTypeFilter('ABB')" id="type-btn-ABB" class="type-toggle-btn th-btn active py-2.5 text-xs sm:text-base font-bold">ABB</button>
             <button type="button" onclick="playSound('click'); toggleTypeFilter('ABC')" id="type-btn-ABC" class="type-toggle-btn th-btn active py-2.5 text-xs sm:text-base font-bold">ABC</button>
           </div>
-          <div class="flex justify-end space-x-3 pt-0.5 text-xs sm:text-sm font-bold opacity-80">
+          <div class="flex justify-end space-x-3 pt-0.5 text-xs font-bold opacity-80">
             <button type="button" onclick="playSound('click'); selectAllTypes(true)" class="hover:underline">全選</button>
             <span>|</span>
             <button type="button" onclick="playSound('click'); selectAllTypes(false)" class="hover:underline">清空</button>
@@ -511,8 +520,8 @@
             <span id="quiz-progress-text" class="font-bold ml-1 text-sm sm:text-base">第 1 / 10 題</span>
           </div>
           <div class="flex items-center space-x-4">
-            <span class="flex items-center text-emerald-500 font-extrabold text-base sm:text-lg"><span id="badge-stat-correct">✓</span><span id="current-correct" class="ml-1">0</span></span>
-            <span class="flex items-center text-rose-500 font-extrabold text-base sm:text-lg"><span id="badge-stat-wrong">✗</span><span id="current-wrong" class="ml-1">0</span></span>
+            <span class="flex items-center text-emerald-400 font-extrabold text-base sm:text-lg"><span id="badge-stat-correct">✓</span><span id="current-correct" class="ml-1">0</span></span>
+            <span class="flex items-center text-rose-400 font-extrabold text-base sm:text-lg"><span id="badge-stat-wrong">✗</span><span id="current-wrong" class="ml-1">0</span></span>
             <button onclick="playSound('click'); confirmExitQuiz()" id="btn-exit-quiz" class="hover:underline text-xs sm:text-sm font-semibold opacity-75">退出</button>
           </div>
         </div>
@@ -522,7 +531,7 @@
         </div>
       </div>
 
-      <!-- 題目主卡片 (字體全面大幅放大) -->
+      <!-- 題目主卡片 (字體清晰無重影) -->
       <div id="question-card" class="th-card p-5 sm:p-8 space-y-6">
         <div id="question-body"></div>
 
@@ -562,11 +571,11 @@
           </div>
           <div class="p-2 border-x border-slate-300 dark:border-slate-700">
             <div id="result-label-correct" class="text-xs sm:text-sm font-bold opacity-80">答對題數</div>
-            <div class="text-2xl sm:text-4xl font-black text-emerald-500 mt-1" id="result-correct-count">0</div>
+            <div class="text-2xl sm:text-4xl font-black text-emerald-400 mt-1" id="result-correct-count">0</div>
           </div>
           <div class="p-2">
             <div id="result-label-wrong" class="text-xs sm:text-sm font-bold opacity-80">答錯題數</div>
-            <div class="text-2xl sm:text-4xl font-black text-rose-500 mt-1" id="result-wrong-count">0</div>
+            <div class="text-2xl sm:text-4xl font-black text-rose-400 mt-1" id="result-wrong-count">0</div>
           </div>
         </div>
 
@@ -585,7 +594,7 @@
       </div>
     </div>
 
-    <!-- 區塊 4: 完整動詞檢索圖鑑 (全面大字版) -->
+    <!-- 區塊 4: 完整動詞檢索圖鑑 -->
     <div id="section-dictionary" class="w-full hidden flex-col space-y-4">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
@@ -624,7 +633,7 @@
         </div>
       </div>
 
-      <!-- 表格清單 (字體全面放大，麥塊主題採用高亮鑽石藍、附魔綠、金幣黃) -->
+      <!-- 表格清單 -->
       <div class="th-card overflow-hidden">
         <div class="overflow-x-auto">
           <table class="w-full text-left whitespace-nowrap sm:whitespace-normal">
@@ -1393,7 +1402,7 @@
     }
 
     // ========================================================
-    // 6. 題目渲染 (全面調大題目字級)
+    // 6. 題目渲染 (大字體)
     // ========================================================
     function startQuiz(customVerbs = null) {
       if (selectedLevels.size === 0) {
@@ -1683,22 +1692,22 @@
                 <div>
                   <span class="font-bold text-base sm:text-lg">${item.question.verb.base} (${item.question.verb.zh})</span>
                   <span class="text-xs px-2 py-0.5 rounded ml-1 border font-bold">Lv.${item.question.level}</span>
-                  <div class="opacity-75 text-sm mt-0.5">你的回答: <span class="text-rose-500 line-through">${item.userAns || "(未作答)"}</span></div>
+                  <div class="opacity-75 text-sm mt-0.5">你的回答: <span class="text-rose-400 line-through">${item.userAns || "(未作答)"}</span></div>
                 </div>
-                <div class="text-emerald-500 font-bold shrink-0 text-right text-base sm:text-lg">正解: ${item.question.correctAnswer}</div>
+                <div class="text-emerald-400 font-bold shrink-0 text-right text-base sm:text-lg">正解: ${item.question.correctAnswer}</div>
               </div>
             `).join('')}
           </div>
         `;
       } else {
         retryWrongBtn.classList.add('hidden');
-        wrongContainer.innerHTML = `<div class="p-4 th-card text-emerald-500 font-bold text-center text-sm sm:text-base">🎉 完美通關！本次沒有任何錯題記錄！</div>`;
+        wrongContainer.innerHTML = `<div class="p-4 th-card text-emerald-400 font-bold text-center text-sm sm:text-base">🎉 完美通關！本次沒有任何錯題記錄！</div>`;
       }
       lucide.createIcons();
     }
 
     // ========================================================
-    // 7. 圖鑑展示 (字體全面放大，麥塊高對比上色)
+    // 7. 圖鑑展示 (全面調大字級)
     // ========================================================
     function switchTab(tab) {
       if (tab === 'quiz') {
@@ -1754,15 +1763,15 @@
       tbody.innerHTML = filtered.map((v, idx) => {
         return `
           <tr class="table-row-item hover:bg-black/5 transition-colors">
-            <td class="py-3 px-3 sm:px-4 text-center opacity-60 text-xs sm:text-sm font-bold">${idx + 1}</td>
-            <td class="py-3 px-3 sm:px-5 font-bold flex items-center space-x-2 text-base sm:text-xl">
+            <td class="py-3.5 px-3 sm:px-4 text-center opacity-60 text-xs sm:text-sm font-bold">${idx + 1}</td>
+            <td class="py-3.5 px-3 sm:px-5 font-bold flex items-center space-x-2 text-base sm:text-xl">
               <span>${v.base}</span>
               ${v.common ? '<span class="text-xs px-2 py-0.5 rounded-full font-bold border border-amber-300 bg-amber-100 text-amber-900">核心</span>' : ''}
             </td>
-            <td class="py-3 px-3 sm:px-5 text-past font-bold text-base sm:text-xl text-indigo-600">${v.past}</td>
-            <td class="py-3 px-3 sm:px-5 text-pp font-bold text-base sm:text-xl text-emerald-600">${v.pp}</td>
-            <td class="py-3 px-3 sm:px-5 text-zh font-semibold text-base sm:text-lg">${v.zh}</td>
-            <td class="py-3 px-3 sm:px-4 text-center"><span class="px-2.5 py-1 rounded text-xs sm:text-sm font-bold border">${v.type}</span></td>
+            <td class="py-3.5 px-3 sm:px-5 text-past font-bold text-base sm:text-xl text-indigo-600">${v.past}</td>
+            <td class="py-3.5 px-3 sm:px-5 text-pp font-bold text-base sm:text-xl text-emerald-600">${v.pp}</td>
+            <td class="py-3.5 px-3 sm:px-5 text-zh font-semibold text-base sm:text-lg">${v.zh}</td>
+            <td class="py-3.5 px-3 sm:px-4 text-center"><span class="px-2.5 py-1 rounded text-xs sm:text-sm font-bold border">${v.type}</span></td>
           </tr>
         `;
       }).join('');
