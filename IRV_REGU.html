@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Irregular Verbs - 英語不規則動詞分級特訓站</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Fonts: Inter & Noto Sans TC -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Inter', 'Noto Sans TC', system-ui, -apple-system, sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+
+    /* 現代扁平按鈕 */
+    .app-btn {
+      transition: all 0.15s ease-in-out;
+      border: 1px solid #e2e8f0;
+      background-color: #ffffff;
+      color: #334155;
+    }
+    .app-btn:hover {
+      background-color: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+    .app-btn:active {
+      transform: scale(0.98);
+    }
+    .app-btn.active {
+      background-color: #4f46e5;
+      color: #ffffff;
+      border-color: #4338ca;
+      box-shadow: 0 1px 3px 0 rgba(79, 70, 229, 0.3);
+    }
+    .app-btn.active:hover {
+      background-color: #4338ca;
+    }
+
+    /* 主操作按鈕 (Primary Indigo) */
+    .app-btn-primary {
+      background-color: #4f46e5;
+      color: #ffffff;
+      border: 1px solid #4338ca;
+      box-shadow: 0 2px 4px rgba(79, 70, 229, 0.25);
+      transition: all 0.15s ease;
+    }
+    .app-btn-primary:hover {
+      background-color: #4338ca;
+      box-shadow: 0 4px 6px rgba(79, 70, 229, 0.3);
+    }
+    .app-btn-primary:active {
+      transform: scale(0.98);
+    }
+
+    /* 成功色按鈕 (Emerald) */
+    .app-btn-success {
+      background-color: #059669;
+      color: #ffffff;
+      border: 1px solid #047857;
+      box-shadow: 0 2px 4px rgba(5, 150, 105, 0.25);
+      transition: all 0.15s ease;
+    }
+    .app-btn-success:hover {
+      background-color: #047857;
+      box-shadow: 0 4px 6px rgba(5, 150, 105, 0.3);
+    }
+    .app-btn-success:active {
+      transform: scale(0.98);
+    }
+
+    /* 卡片容器 */
+    .app-card {
+      background-color: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    /* 旋轉動畫 */
+    @keyframes spin-normal {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .animate-spin-custom {
+      animation: spin-normal 1s linear infinite;
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col select-none antialiased">
+
+  <!-- 頂部導航列 -->
+  <header class="border-b border-slate-200 bg-white sticky top-0 z-40 shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="playSound('click'); switchTab('quiz')">
+        <div class="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center text-white shadow-sm">
+          <i data-lucide="book-marked" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 leading-none">Irregular Verbs</h1>
+          <p class="text-xs text-slate-500 font-medium mt-0.5">英語不規則動詞分級特訓站</p>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <!-- 雲端同步狀態小標籤 -->
+        <div id="top-sync-status" class="hidden sm:flex items-center space-x-1.5 px-3 py-1 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold rounded-full">
+          <i data-lucide="refresh-cw" class="w-3.5 h-3.5 animate-spin-custom"></i>
+          <span id="top-sync-text">連線中...</span>
+        </div>
+
+        <nav class="flex items-center space-x-2">
+          <button id="nav-btn-quiz" onclick="playSound('click'); switchTab('quiz')" class="app-btn active px-4 py-2 rounded-lg text-sm sm:text-base font-semibold flex items-center space-x-2">
+            <i data-lucide="pen-tool" class="w-4 h-4"></i>
+            <span>特訓場</span>
+          </button>
+          <button id="nav-btn-dictionary" onclick="playSound('click'); switchTab('dictionary')" class="app-btn px-4 py-2 rounded-lg text-sm sm:text-base font-semibold flex items-center space-x-2">
+            <i data-lucide="library" class="w-4 h-4"></i>
+            <span>動詞圖鑑 (<span id="dict-total-count">...</span>)</span>
+          </button>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主內容視窗 -->
+  <main class="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 flex flex-col justify-start">
+
+    <!-- 區塊 1: 測驗設定介面 -->
+    <div id="section-setup" class="w-full max-w-2xl mx-auto space-y-6 my-auto py-2">
+      
+      <!-- 雲端試算表連線提示卡 -->
+      <div id="db-loading-banner" class="p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 flex items-center justify-between shadow-sm transition-all">
+        <div class="flex items-center space-x-3">
+          <div class="w-9 h-9 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+            <i id="db-status-icon" data-lucide="loader-2" class="w-5 h-5 animate-spin-custom"></i>
+          </div>
+          <div>
+            <div id="db-loading-title" class="text-sm sm:text-base font-bold text-amber-900">正在與雲端 Google 試算表連線...</div>
+            <div id="db-loading-desc" class="text-xs text-amber-700">正在同步全等級題庫，完成後即可自由練習。</div>
+          </div>
+        </div>
+        <button id="btn-manual-sync" onclick="playSound('click'); syncDataFromGAS(true)" class="hidden sm:inline-flex app-btn px-3 py-1.5 text-xs font-semibold rounded-lg bg-white">
+          重新整理
+        </button>
+      </div>
+
+      <div class="text-center space-y-1">
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">特訓設定與範圍選擇</h2>
+        <p class="text-sm text-slate-500 font-normal">結合真實語境例句，依程度精準強化不規則動詞記憶</p>
+      </div>
+
+      <div class="app-card p-6 sm:p-8 space-y-6">
+        
+        <!-- 1. 動詞單字範圍選擇 -->
+        <div class="space-y-2.5">
+          <label class="text-base font-bold text-slate-800 flex items-center space-x-1.5">
+            <span class="w-5 h-5 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center text-xs">1</span>
+            <span>選擇單字收錄範圍</span>
+          </label>
+          <div class="grid grid-cols-2 gap-3">
+            <button type="button" onclick="playSound('click'); setScope('COMMON')" id="scope-btn-common" class="app-btn active py-3 px-4 rounded-xl text-base font-bold flex items-center justify-center space-x-2">
+              <span id="scope-common-label">🔥 核心常用動詞</span>
+            </button>
+            <button type="button" onclick="playSound('click'); setScope('ALL')" id="scope-btn-all" class="app-btn py-3 px-4 rounded-xl text-base font-bold flex items-center justify-center space-x-2">
+              <span id="scope-all-label">🌐 完整全收錄動詞</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. 等級 1~5 聯集選擇 -->
+        <div class="space-y-2.5">
+          <div class="flex justify-between items-center">
+            <label class="text-base font-bold text-slate-800 flex items-center space-x-1.5">
+              <span class="w-5 h-5 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center text-xs">2</span>
+              <span>例句難度等級（可多選聯集）</span>
+            </label>
+            <span id="selected-level-desc" class="text-xs bg-indigo-50 text-indigo-700 border border-indigo-200 px-2.5 py-0.5 rounded-full font-semibold">已選：Lv.1 ~ Lv.5</span>
+          </div>
+          <div class="grid grid-cols-5 gap-2">
+            <button type="button" onclick="playSound('click'); toggleLevelFilter(1)" id="level-btn-1" class="level-toggle-btn app-btn active py-2.5 rounded-xl flex flex-col items-center justify-center space-y-0.5">
+              <span class="text-base sm:text-lg font-bold leading-tight">Lv. 1</span>
+              <span class="text-sm sm:text-base font-medium opacity-90">基礎</span>
+            </button>
+            <button type="button" onclick="playSound('click'); toggleLevelFilter(2)" id="level-btn-2" class="level-toggle-btn app-btn active py-2.5 rounded-xl flex flex-col items-center justify-center space-y-0.5">
+              <span class="text-base sm:text-lg font-bold leading-tight">Lv. 2</span>
+              <span class="text-sm sm:text-base font-medium opacity-90">初級</span>
+            </button>
+            <button type="button" onclick="playSound('click'); toggleLevelFilter(3)" id="level-btn-3" class="level-toggle-btn app-btn active py-2.5 rounded-xl flex flex-col items-center justify-center space-y-0.5">
+              <span class="text-base sm:text-lg font-bold leading-tight">Lv. 3</span>
+              <span class="text-sm sm:text-base font-medium opacity-90">中級</span>
+            </button>
+            <button type="button" onclick="playSound('click'); toggleLevelFilter(4)" id="level-btn-4" class="level-toggle-btn app-btn active py-2.5 rounded-xl flex flex-col items-center justify-center space-y-0.5">
+              <span class="text-base sm:text-lg font-bold leading-tight">Lv. 4</span>
+              <span class="text-sm sm:text-base font-medium opacity-90">中高</span>
+            </button>
+            <button type="button" onclick="playSound('click'); toggleLevelFilter(5)" id="level-btn-5" class="level-toggle-btn app-btn active py-2.5 rounded-xl flex flex-col items-center justify-center space-y-0.5">
+              <span class="text-base sm:text-lg font-bold leading-tight">Lv. 5</span>
+              <span class="text-sm sm:text-base font-medium opacity-90">高階</span>
+            </button>
+          </div>
+          <div class="flex justify-end space-x-3 pt-0.5 text-xs font-semibold text-slate-500">
+            <button type="button" onclick="playSound('click'); selectAllLevels(true)" class="hover:text-indigo-600">全選等級</button>
+            <span>|</span>
+            <button type="button" onclick="playSound('click'); selectAllLevels(false)" class="hover:text-rose-600">清空等級</button>
+          </div>
+        </div>
+
+        <!-- 3. 動詞型態聯集多選 -->
+        <div class="space-y-2.5">
+          <div class="flex justify-between items-center">
+            <label class="text-base font-bold text-slate-800 flex items-center space-x-1.5">
+              <span class="w-5 h-5 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center text-xs">3</span>
+              <span>變化型態（多選聯集）</span>
+            </label>
+            <span id="selected-type-count" class="text-xs bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-full font-semibold">0 個動詞在庫</span>
+          </div>
+          <div class="grid grid-cols-5 gap-2">
+            <button type="button" onclick="playSound('click'); toggleTypeFilter('AAA')" id="type-btn-AAA" class="type-toggle-btn app-btn active py-2.5 rounded-xl text-base font-bold">AAA</button>
+            <button type="button" onclick="playSound('click'); toggleTypeFilter('AAB')" id="type-btn-AAB" class="type-toggle-btn app-btn active py-2.5 rounded-xl text-base font-bold">AAB</button>
+            <button type="button" onclick="playSound('click'); toggleTypeFilter('ABA')" id="type-btn-ABA" class="type-toggle-btn app-btn active py-2.5 rounded-xl text-base font-bold">ABA</button>
+            <button type="button" onclick="playSound('click'); toggleTypeFilter('ABB')" id="type-btn-ABB" class="type-toggle-btn app-btn active py-2.5 rounded-xl text-base font-bold">ABB</button>
+            <button type="button" onclick="playSound('click'); toggleTypeFilter('ABC')" id="type-btn-ABC" class="type-toggle-btn app-btn active py-2.5 rounded-xl text-base font-bold">ABC</button>
+          </div>
+          <div class="flex justify-end space-x-3 pt-0.5 text-xs font-semibold text-slate-500">
+            <button type="button" onclick="playSound('click'); selectAllTypes(true)" class="hover:text-indigo-600">全選型態</button>
+            <span>|</span>
+            <button type="button" onclick="playSound('click'); selectAllTypes(false)" class="hover:text-rose-600">清空型態</button>
+          </div>
+        </div>
+
+        <!-- 4. 題型選擇 (2x2 工整兩行佈局) -->
+        <div class="space-y-2.5">
+          <label class="text-base font-bold text-slate-800 flex items-center space-x-1.5">
+            <span class="w-5 h-5 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center text-xs">4</span>
+            <span>測驗題型模式</span>
+          </label>
+          <div class="grid grid-cols-2 gap-3">
+            <label class="app-btn p-3.5 sm:p-4 rounded-xl flex items-center cursor-pointer hover:border-indigo-300">
+              <input type="radio" name="question-mode" value="MIXED" checked class="accent-indigo-600 w-4 h-4 shrink-0">
+              <span class="ml-2.5 text-base sm:text-lg font-bold text-slate-800">混合挑戰</span>
+            </label>
+            <label class="app-btn p-3.5 sm:p-4 rounded-xl flex items-center cursor-pointer hover:border-indigo-300">
+              <input type="radio" name="question-mode" value="CHOICE" class="accent-indigo-600 w-4 h-4 shrink-0">
+              <span class="ml-2.5 text-base sm:text-lg font-bold text-slate-800">三態單選</span>
+            </label>
+            <label class="app-btn p-3.5 sm:p-4 rounded-xl flex items-center cursor-pointer hover:border-indigo-300">
+              <input type="radio" name="question-mode" value="ERROR" class="accent-indigo-600 w-4 h-4 shrink-0">
+              <span class="ml-2.5 text-base sm:text-lg font-bold text-slate-800">例句改錯</span>
+            </label>
+            <label class="app-btn p-3.5 sm:p-4 rounded-xl flex items-center cursor-pointer hover:border-indigo-300">
+              <input type="radio" name="question-mode" value="CLOZE" class="accent-indigo-600 w-4 h-4 shrink-0">
+              <span class="ml-2.5 text-base sm:text-lg font-bold text-slate-800">例句填空</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- 5. 題數選擇 -->
+        <div class="space-y-2.5">
+          <label class="text-base font-bold text-slate-800 flex items-center space-x-1.5">
+            <span class="w-5 h-5 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center text-xs">5</span>
+            <span>本輪題目數量</span>
+          </label>
+          <div class="grid grid-cols-4 gap-2">
+            <button type="button" onclick="playSound('click'); setCount(10)" class="count-btn active app-btn py-2.5 rounded-xl text-base font-bold" data-count="10">10 題</button>
+            <button type="button" onclick="playSound('click'); setCount(20)" class="count-btn app-btn py-2.5 rounded-xl text-base font-bold" data-count="20">20 題</button>
+            <button type="button" onclick="playSound('click'); setCount(30)" class="count-btn app-btn py-2.5 rounded-xl text-base font-bold" data-count="30">30 題</button>
+            <button type="button" onclick="playSound('click'); setCount(50)" class="count-btn app-btn py-2.5 rounded-xl text-base font-bold" data-count="50">50 題</button>
+          </div>
+        </div>
+
+        <!-- 開始按鈕 -->
+        <div class="pt-2">
+          <button id="btn-start-quiz" onclick="playSound('levelup'); startQuiz()" class="w-full py-4 app-btn-primary rounded-xl text-lg sm:text-xl font-bold flex items-center justify-center space-x-2">
+            <i data-lucide="play" class="w-5 h-5 fill-current"></i>
+            <span id="btn-start-text">開始特訓作答</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 區塊 2: 進行中測驗 -->
+    <div id="section-quiz" class="w-full max-w-3xl mx-auto hidden flex-col space-y-4 my-auto py-2">
+      <!-- 頂部資訊與進度條 -->
+      <div class="app-card p-4 sm:p-5 space-y-3">
+        <div class="flex items-center justify-between text-base font-bold">
+          <div class="flex items-center space-x-2">
+            <span id="quiz-badge-type" class="bg-indigo-50 text-indigo-700 border border-indigo-200 px-3 py-1 rounded-full text-xs sm:text-sm font-semibold">題型</span>
+            <span id="quiz-badge-level" class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-full text-xs sm:text-sm font-semibold">Lv.1</span>
+            <span id="quiz-progress-text" class="text-slate-600 font-semibold ml-1">第 1 / 10 題</span>
+          </div>
+          <div class="flex items-center space-x-4">
+            <span class="flex items-center text-emerald-600 font-bold"><i data-lucide="check" class="w-4 h-4 mr-1"></i><span id="current-correct">0</span></span>
+            <span class="flex items-center text-rose-500 font-bold"><i data-lucide="x" class="w-4 h-4 mr-1"></i><span id="current-wrong">0</span></span>
+            <button onclick="playSound('click'); confirmExitQuiz()" class="text-slate-400 hover:text-slate-700 text-sm font-medium underline">結束</button>
+          </div>
+        </div>
+        
+        <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+          <div id="quiz-progress-bar" class="bg-indigo-600 h-full rounded-full transition-all duration-300" style="width: 10%"></div>
+        </div>
+      </div>
+
+      <!-- 題目主卡片 -->
+      <div id="question-card" class="app-card p-6 sm:p-8 space-y-6">
+        <div id="question-body"></div>
+
+        <div id="feedback-container" class="hidden p-4 sm:p-5 rounded-xl border transition-all space-y-2">
+          <div class="flex items-center space-x-2 text-lg font-bold" id="feedback-title"></div>
+          <div class="text-sm sm:text-base leading-relaxed" id="feedback-explanation"></div>
+        </div>
+
+        <div class="flex justify-end pt-2" id="action-buttons">
+          <button id="btn-submit-answer" onclick="checkCurrentAnswer()" class="w-full sm:w-auto px-8 py-3.5 app-btn-primary rounded-xl text-base sm:text-lg font-bold">
+            送出答案
+          </button>
+          <button id="btn-next-question" onclick="playSound('click'); nextQuestion()" class="hidden w-full sm:w-auto px-8 py-3.5 app-btn-success rounded-xl text-base sm:text-lg font-bold flex items-center justify-center space-x-2">
+            <span>下一題</span>
+            <i data-lucide="arrow-right" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 區塊 3: 結算報告 -->
+    <div id="section-result" class="w-full max-w-2xl mx-auto hidden flex-col space-y-6 my-auto py-2">
+      <div class="app-card p-6 sm:p-8 text-center space-y-6">
+        <div id="result-icon-wrapper" class="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center bg-indigo-50 border border-indigo-200 text-indigo-600 shadow-sm">
+          <i data-lucide="award" class="w-8 h-8"></i>
+        </div>
+        
+        <div>
+          <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight" id="result-title">測驗完成！成果結算</h2>
+          <p class="text-sm text-slate-500 mt-1" id="result-subtitle">以下為本次特訓的詳細答題統計</p>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3 p-4 bg-slate-50 border border-slate-200 rounded-xl">
+          <div class="p-2">
+            <div class="text-xs sm:text-sm text-slate-500 font-medium">答對率</div>
+            <div class="text-2xl sm:text-3xl font-extrabold text-indigo-600 mt-1" id="result-score">0%</div>
+          </div>
+          <div class="p-2 border-x border-slate-200">
+            <div class="text-xs sm:text-sm text-slate-500 font-medium">答對題數</div>
+            <div class="text-2xl sm:text-3xl font-extrabold text-emerald-600 mt-1" id="result-correct-count">0</div>
+          </div>
+          <div class="p-2">
+            <div class="text-xs sm:text-sm text-slate-500 font-medium">答錯題數</div>
+            <div class="text-2xl sm:text-3xl font-extrabold text-rose-500 mt-1" id="result-wrong-count">0</div>
+          </div>
+        </div>
+
+        <div id="wrong-answers-container" class="space-y-2 text-left"></div>
+
+        <div class="flex flex-col sm:flex-row gap-3 pt-2">
+          <button id="btn-retry-wrong" onclick="playSound('click'); retryWrongQuestions()" class="hidden flex-1 py-3.5 app-btn rounded-xl text-base font-bold text-amber-700 bg-amber-50 border-amber-200 hover:bg-amber-100 flex items-center justify-center space-x-2">
+            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+            <span>僅重測錯題 (<span id="wrong-retry-count">0</span>)</span>
+          </button>
+          <button onclick="playSound('click'); resetToSetup()" class="flex-1 py-3.5 app-btn-primary rounded-xl text-base font-bold flex items-center justify-center space-x-2">
+            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+            <span>再來一輪練習</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 區塊 4: 完整動詞檢索圖鑑 -->
+    <div id="section-dictionary" class="w-full hidden flex-col space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-2xl font-bold text-slate-900 tracking-tight">不規則動詞檢索圖鑑</h2>
+          <p class="text-sm text-slate-500">支援快速篩選三態型態與即時搜尋中英文</p>
+        </div>
+        <div class="flex items-center space-x-2">
+          <div class="relative w-full sm:w-72">
+            <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400"></i>
+            <input id="dict-search-input" oninput="renderDictionary()" type="text" placeholder="搜尋動詞或中文..." class="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm">
+          </div>
+        </div>
+      </div>
+
+      <!-- 圖鑑過濾工具列 -->
+      <div class="app-card p-3 sm:p-4 flex flex-wrap items-center justify-between gap-3">
+        <!-- 範圍切換 -->
+        <div class="flex items-center space-x-2">
+          <span class="text-xs font-semibold text-slate-500">收錄範圍：</span>
+          <button type="button" onclick="playSound('click'); setDictScope('ALL')" id="dict-scope-btn-all" class="dict-scope-btn app-btn active px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold">
+            🌐 全部收錄 (<span id="dict-scope-all-count">0</span>)
+          </button>
+          <button type="button" onclick="playSound('click'); setDictScope('COMMON')" id="dict-scope-btn-common" class="dict-scope-btn app-btn px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold">
+            🔥 核心常用 (<span id="dict-scope-common-count">0</span>)
+          </button>
+        </div>
+
+        <!-- AAA~ABC 型態按鈕 -->
+        <div class="flex flex-wrap items-center gap-1.5">
+          <button onclick="playSound('click'); setDictFilter('ALL')" class="dict-filter active app-btn px-2.5 py-1 rounded-lg text-xs sm:text-sm font-semibold" data-dict="ALL">全部</button>
+          <button onclick="playSound('click'); setDictFilter('AAA')" class="dict-filter app-btn px-2.5 py-1 rounded-lg text-xs sm:text-sm font-semibold" data-dict="AAA">AAA 三態同形</button>
+          <button onclick="playSound('click'); setDictFilter('AAB')" class="dict-filter app-btn px-2.5 py-1 rounded-lg text-xs sm:text-sm font-semibold" data-dict="AAB">AAB 分詞變</button>
+          <button onclick="playSound('click'); setDictFilter('ABA')" class="dict-filter app-btn px-2.5 py-1 rounded-lg text-xs sm:text-sm font-semibold" data-dict="ABA">ABA 首尾同</button>
+          <button onclick="playSound('click'); setDictFilter('ABB')" class="dict-filter app-btn px-2.5 py-1 rounded-lg text-xs sm:text-sm font-semibold" data-dict="ABB">ABB 過去/分詞同</button>
+          <button onclick="playSound('click'); setDictFilter('ABC')" class="dict-filter app-btn px-2.5 py-1 rounded-lg text-xs sm:text-sm font-semibold" data-dict="ABC">ABC 全異</button>
+        </div>
+      </div>
+
+      <!-- 表格清單 -->
+      <div class="app-card overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-slate-800">
+            <thead class="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
+              <tr>
+                <th class="py-3 px-4 w-12 text-center">#</th>
+                <th class="py-3 px-4">原形 (Base)</th>
+                <th class="py-3 px-4">過去式 (Past)</th>
+                <th class="py-3 px-4">過去分詞 (P.P.)</th>
+                <th class="py-3 px-4">中文涵義</th>
+                <th class="py-3 px-4 text-center">型態分類</th>
+                <th class="py-3 px-4 text-center">例句難度</th>
+              </tr>
+            </thead>
+            <tbody id="dict-table-body" class="divide-y divide-slate-100 font-medium">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // ==========================================
+    // 0. 音效系統 (Web Audio API - 現代簡約提示音)
+    // ==========================================
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const now = audioCtx.currentTime;
+
+      if (type === 'click') {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, now);
+        osc.frequency.exponentialRampToValueAtTime(300, now + 0.04);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.04);
+      } else if (type === 'correct') {
+        // 清脆悅耳雙音階 (Success)
+        [523.25, 783.99].forEach((freq, i) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now + i * 0.09);
+          gain.gain.setValueAtTime(0.2, now + i * 0.09);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.09 + 0.25);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now + i * 0.09);
+          osc.stop(now + i * 0.09 + 0.25);
+        });
+      } else if (type === 'wrong') {
+        // 低調柔和的提示音 (Soft warning)
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(220, now);
+        osc.frequency.exponentialRampToValueAtTime(160, now + 0.2);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.2);
+      } else if (type === 'levelup') {
+        // 三重通關和弦 (Completion)
+        [440, 554.37, 659.25, 880].forEach((freq, i) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now + i * 0.08);
+          gain.gain.setValueAtTime(0.18, now + i * 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.35);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now + i * 0.08);
+          osc.stop(now + i * 0.08 + 0.35);
+        });
+      }
+    }
+
+    // ==========================================
+    // 1. 本地備援資料庫
+    // ==========================================
+    const GAS_ENDPOINT_URL = "https://script.google.com/macros/s/AKfycbwdRf5bUnTQuShcpT9F1sLWJp8HTkfJfO3_3JKGf-PypJ2SoJUwIQkK3GPnw96vJbH2MQ/exec";
+
+    let VERB_DATABASE = [
+      {
+        base: "be", past: "was", pp: "been", zh: "是、在", type: "ABC", common: true,
+        ptSentences: [
+          { level: 1, sentence: "Kevin (_____) absent from school yesterday because of a cold.", answer: "was" },
+          { level: 2, sentence: "All the students (_____) very excited about the field trip last Friday.", answer: "were" },
+          { level: 3, sentence: "The weather (_____) surprisingly chilly during our mountain hike last weekend.", answer: "was" },
+          { level: 4, sentence: "Both of his parents (_____) extraordinarily proud when he received the scholarship.", answer: "were" },
+          { level: 5, sentence: "The economic indicators from that fiscal quarter (_____) indicative of a broader crisis.", answer: "were" }
+        ],
+        ppSentences: [
+          { level: 1, sentence: "She has (_____) to Japan with her family twice.", answer: "been" },
+          { level: 2, sentence: "How long have you (_____) a student at this school?", answer: "been" },
+          { level: 3, sentence: "He has (_____) my best friend since our elementary school days.", answer: "been" },
+          { level: 4, sentence: "There have (_____) remarkable improvements in public health across the country this year.", answer: "been" },
+          { level: 5, sentence: "Theoretical physics has (_____) fundamentally reshaped by recent discoveries.", answer: "been" }
+        ]
+      },
+      {
+        base: "become", past: "became", pp: "become", zh: "成為", type: "ABA", common: true,
+        ptSentences: [
+          { level: 1, sentence: "He (_____) very happy when he got the birthday gift.", answer: "became" },
+          { level: 2, sentence: "The classroom (_____) quiet as soon as the teacher walked in.", answer: "became" },
+          { level: 3, sentence: "The quiet countryside town (_____) a popular tourist spot last year.", answer: "became" },
+          { level: 4, sentence: "After years of rigorous clinical training, she finally (_____) a qualified surgeon.", answer: "became" },
+          { level: 5, sentence: "What initially seemed like a minor discrepancy soon (_____) a catastrophic system failure.", answer: "became" }
+        ],
+        ppSentences: [
+          { level: 1, sentence: "The little puppy has (_____) very big and strong.", answer: "become" },
+          { level: 2, sentence: "English has (_____) my favorite subject this semester.", answer: "become" },
+          { level: 3, sentence: "She has (_____) much more confident since joining the drama club.", answer: "become" },
+          { level: 4, sentence: "Smartphones have (_____) an indispensable tool in modern daily communication.", answer: "become" },
+          { level: 5, sentence: "Biodiversity loss has (_____) an existential crisis requiring urgent global cooperation.", answer: "become" }
+        ]
+      },
+      {
+        base: "begin", past: "began", pp: "begun", zh: "開始", type: "ABC", common: true,
+        ptSentences: [
+          { level: 1, sentence: "The movie (_____) ten minutes ago.", answer: "began" },
+          { level: 2, sentence: "She (_____) learning the piano when she was seven years old.", answer: "began" },
+          { level: 3, sentence: "The heavy rain (_____) just when we stepped out of the metro station yesterday.", answer: "began" },
+          { level: 4, sentence: "As soon as the proctor gave the signal, candidates (_____) writing their compositions.", answer: "began" },
+          { level: 5, sentence: "The diplomatic summit (_____) under tense circumstances due to escalating border disputes.", answer: "began" }
+        ],
+        ppSentences: [
+          { level: 1, sentence: "The English test has already (_____).", answer: "begun" },
+          { level: 2, sentence: "Have you (_____) reading the new novel yet?", answer: "begun" },
+          { level: 3, sentence: "The flowers in the park have (_____) to bloom under the warm spring sun.", answer: "begun" },
+          { level: 4, sentence: "Scientists have recently (_____) a comprehensive investigation into marine pollution.", answer: "begun" },
+          { level: 5, sentence: "Negotiations have tentatively (_____) between the conflicting parties following the ceasefire.", answer: "begun" }
+        ]
+      },
+      {
+        base: "cut", past: "cut", pp: "cut", zh: "切、剪", type: "AAA", common: true,
+        ptSentences: [
+          { level: 1, sentence: "She (_____) the paper with scissors five minutes ago.", answer: "cut" },
+          { level: 2, sentence: "Dad (_____) the sweet watermelon for dessert after dinner.", answer: "cut" },
+          { level: 3, sentence: "The chef (_____) the fresh beef into thin slices carefully.", answer: "cut" },
+          { level: 4, sentence: "The sudden budget reduction (_____) our department's resources significantly.", answer: "cut" },
+          { level: 5, sentence: "The administration decisively (_____) tariffs to mitigate inflationary pressures.", answer: "cut" }
+        ],
+        ppSentences: [
+          { level: 1, sentence: "The birthday cake has already been (_____).", answer: "cut" },
+          { level: 2, sentence: "Have you (_____) your finger with that sharp knife?", answer: "cut" },
+          { level: 3, sentence: "The grass in the soccer field has been (_____) neatly.", answer: "cut" },
+          { level: 4, sentence: "Funding for public transportation has been drastically (_____) this quarter.", answer: "cut" },
+          { level: 5, sentence: "Having been completely (_____) off from external communication, the outpost faced severe isolation.", answer: "cut" }
+        ]
+      }
+    ];
+
+    // ==========================================
+    // 2. 雲端資料庫連線
+    // ==========================================
+    function setDbLoadingState(state, infoText = "") {
+      const banner = document.getElementById('db-loading-banner');
+      const title = document.getElementById('db-loading-title');
+      const desc = document.getElementById('db-loading-desc');
+      const icon = document.getElementById('db-status-icon');
+      const topBadge = document.getElementById('top-sync-status');
+      const topText = document.getElementById('top-sync-text');
+
+      if (state === 'loading') {
+        banner.className = "p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 flex items-center justify-between shadow-sm";
+        title.textContent = "正在與雲端 Google 試算表連線載入中...";
+        desc.textContent = "正在讀取分級題庫與 1~5 級例句，請稍候片刻即可開始！";
+        icon.className = "w-5 h-5 animate-spin-custom";
+        icon.setAttribute('data-lucide', 'loader-2');
+        if (topBadge) {
+          topBadge.classList.remove('hidden');
+          topBadge.className = "hidden sm:flex items-center space-x-1.5 px-3 py-1 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold rounded-full";
+          topText.textContent = "題庫載入中...";
+        }
+      } else if (state === 'success') {
+        banner.className = "p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-900 flex items-center justify-between shadow-sm";
+        title.textContent = `✅ 雲端題庫已連線 (共收錄 ${VERB_DATABASE.length} 個動詞)`;
+        desc.textContent = infoText || "已備妥分級例句，可自由選擇 Lv.1~Lv.5 與變化型態開始練習！";
+        icon.className = "w-5 h-5 text-emerald-600";
+        icon.setAttribute('data-lucide', 'check-circle');
+        if (topBadge) {
+          topBadge.classList.remove('hidden');
+          topBadge.className = "hidden sm:flex items-center space-x-1.5 px-3 py-1 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold rounded-full";
+          topText.textContent = `已連線 (${VERB_DATABASE.length}字)`;
+        }
+      } else if (state === 'offline') {
+        banner.className = "p-4 bg-rose-50 border border-rose-200 rounded-xl text-rose-900 flex items-center justify-between shadow-sm";
+        title.textContent = "⚠️ 雲端連線失敗，目前已啟用本地離線題庫";
+        desc.textContent = "若需最新試算表資料，請確認 GAS 網址是否正確並點選重新整理。";
+        icon.className = "w-5 h-5 text-rose-600";
+        icon.setAttribute('data-lucide', 'alert-circle');
+        if (topBadge) {
+          topBadge.classList.remove('hidden');
+          topBadge.className = "hidden sm:flex items-center space-x-1.5 px-3 py-1 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold rounded-full";
+          topText.textContent = "離線模式";
+        }
+      }
+      lucide.createIcons();
+    }
+
+    async function syncDataFromGAS(isManual = false) {
+      setDbLoadingState('loading');
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 12000);
+
+        const response = await fetch(GAS_ENDPOINT_URL, { signal: controller.signal });
+        clearTimeout(timeoutId);
+
+        const result = await response.json();
+
+        if (result.status === 'success' && Array.isArray(result.data) && result.data.length > 0) {
+          VERB_DATABASE = result.data.map(item => {
+            const ptList = [];
+            const ppList = [];
+
+            for (let lvl = 1; lvl <= 5; lvl++) {
+              const ptSentence = item[`pt${lvl}`] || item[`PT例句${lvl}`] || (item.ptSentences && item.ptSentences[lvl - 1]?.sentence);
+              const ppSentence = item[`pp${lvl}`] || item[`PP例句${lvl}`] || (item.ppSentences && item.ppSentences[lvl - 1]?.sentence);
+              
+              if (ptSentence) {
+                ptList.push({
+                  level: lvl,
+                  sentence: ptSentence,
+                  answer: item.past || item.PT
+                });
+              }
+              if (ppSentence) {
+                ppList.push({
+                  level: lvl,
+                  sentence: ppSentence,
+                  answer: item.pp || item.PP
+                });
+              }
+            }
+
+            return {
+              base: item.base || item['原型'],
+              past: item.past || item.PT,
+              pp: item.pp || item.PP,
+              zh: item.zh || item['中文'],
+              type: item.type || item['類型'],
+              common: item.common !== undefined ? item.common : (item['核心／全收錄'] === '核心'),
+              ptSentences: ptList.length > 0 ? ptList : (item.ptSentences || []),
+              ppSentences: ppList.length > 0 ? ppList : (item.ppSentences || [])
+            };
+          });
+
+          setDbLoadingState('success');
+          updateFilterCount();
+          renderDictionary();
+        } else {
+          throw new Error("回傳格式不符");
+        }
+      } catch (err) {
+        console.warn("GAS 連線失敗，切換至備援資料庫:", err);
+        setDbLoadingState('offline');
+        updateFilterCount();
+        renderDictionary();
+      }
+    }
+
+    // ==========================================
+    // 3. 狀態管理
+    // ==========================================
+    let currentScope = 'COMMON';
+    let selectedLevels = new Set([1, 2, 3, 4, 5]);
+    let selectedTypes = new Set(['AAA', 'AAB', 'ABA', 'ABB', 'ABC']);
+    let selectedCount = 10;
+    let quizQuestions = [];
+    let currentIndex = 0;
+    let score = 0;
+    let answeredCurrent = false;
+    let wrongList = [];
+
+    let dictCurrentType = 'ALL';
+    let dictCurrentScope = 'ALL';
+
+    function setScope(scope) {
+      currentScope = scope;
+      document.getElementById('scope-btn-common').className = scope === 'COMMON' ? 'app-btn active py-3 px-4 rounded-xl text-base font-bold flex items-center justify-center space-x-2' : 'app-btn py-3 px-4 rounded-xl text-base font-bold flex items-center justify-center space-x-2';
+      document.getElementById('scope-btn-all').className = scope === 'ALL' ? 'app-btn active py-3 px-4 rounded-xl text-base font-bold flex items-center justify-center space-x-2' : 'app-btn py-3 px-4 rounded-xl text-base font-bold flex items-center justify-center space-x-2';
+      updateFilterCount();
+    }
+
+    function setDictScope(scope) {
+      dictCurrentScope = scope;
+      const btnAll = document.getElementById('dict-scope-btn-all');
+      const btnCommon = document.getElementById('dict-scope-btn-common');
+
+      if (scope === 'ALL') {
+        btnAll.classList.add('active');
+        btnCommon.classList.remove('active');
+      } else {
+        btnCommon.classList.add('active');
+        btnAll.classList.remove('active');
+      }
+      renderDictionary();
+    }
+
+    function toggleLevelFilter(lvl) {
+      if (selectedLevels.has(lvl)) {
+        selectedLevels.delete(lvl);
+        document.getElementById(`level-btn-${lvl}`).classList.remove('active');
+      } else {
+        selectedLevels.add(lvl);
+        document.getElementById(`level-btn-${lvl}`).classList.add('active');
+      }
+      updateLevelBadge();
+    }
+
+    function selectAllLevels(isSelectAll) {
+      const all = [1, 2, 3, 4, 5];
+      if (isSelectAll) {
+        selectedLevels = new Set(all);
+        all.forEach(l => document.getElementById(`level-btn-${l}`).classList.add('active'));
+      } else {
+        selectedLevels.clear();
+        all.forEach(l => document.getElementById(`level-btn-${l}`).classList.remove('active'));
+      }
+      updateLevelBadge();
+    }
+
+    function updateLevelBadge() {
+      const sorted = Array.from(selectedLevels).sort((a, b) => a - b);
+      const descEl = document.getElementById('selected-level-desc');
+      if (sorted.length === 0) {
+        descEl.textContent = "未選擇任何等級";
+        descEl.className = "text-xs bg-rose-50 text-rose-700 border border-rose-200 px-2.5 py-0.5 rounded-full font-semibold";
+      } else if (sorted.length === 5) {
+        descEl.textContent = "已選：Lv.1 ~ Lv.5 (全部)";
+        descEl.className = "text-xs bg-indigo-50 text-indigo-700 border border-indigo-200 px-2.5 py-0.5 rounded-full font-semibold";
+      } else {
+        descEl.textContent = `已選聯集：Lv.${sorted.join(', ')}`;
+        descEl.className = "text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-0.5 rounded-full font-semibold";
+      }
+    }
+
+    function toggleTypeFilter(type) {
+      if (selectedTypes.has(type)) {
+        selectedTypes.delete(type);
+        document.getElementById(`type-btn-${type}`).classList.remove('active');
+      } else {
+        selectedTypes.add(type);
+        document.getElementById(`type-btn-${type}`).classList.add('active');
+      }
+      updateFilterCount();
+    }
+
+    function selectAllTypes(isSelectAll) {
+      const all = ['AAA', 'AAB', 'ABA', 'ABB', 'ABC'];
+      if (isSelectAll) {
+        selectedTypes = new Set(all);
+        all.forEach(t => document.getElementById(`type-btn-${t}`).classList.add('active'));
+      } else {
+        selectedTypes.clear();
+        all.forEach(t => document.getElementById(`type-btn-${t}`).classList.remove('active'));
+      }
+      updateFilterCount();
+    }
+
+    function getFilteredVerbs() {
+      return VERB_DATABASE.filter(v => {
+        const scopeMatch = currentScope === 'ALL' ? true : v.common;
+        const typeMatch = selectedTypes.has(v.type);
+        return scopeMatch && typeMatch;
+      });
+    }
+
+    function updateFilterCount() {
+      const pool = getFilteredVerbs();
+      const commonCount = VERB_DATABASE.filter(v => v.common).length;
+      const allCount = VERB_DATABASE.length;
+
+      const commonLabel = document.getElementById('scope-common-label');
+      const allLabel = document.getElementById('scope-all-label');
+      const typeCountEl = document.getElementById('selected-type-count');
+      const dictCountEl = document.getElementById('dict-total-count');
+
+      const dictScopeAll = document.getElementById('dict-scope-all-count');
+      const dictScopeCommon = document.getElementById('dict-scope-common-count');
+
+      if (commonLabel) commonLabel.textContent = `🔥 核心常用 (${commonCount}字)`;
+      if (allLabel) allLabel.textContent = `🌐 完整全收錄 (${allCount}字)`;
+      if (typeCountEl) typeCountEl.textContent = `${pool.length} 個動詞在庫`;
+      if (dictCountEl) dictCountEl.textContent = allCount;
+      if (dictScopeAll) dictScopeAll.textContent = allCount;
+      if (dictScopeCommon) dictScopeCommon.textContent = commonCount;
+    }
+
+    function setCount(num) {
+      selectedCount = num;
+      document.querySelectorAll('.count-btn').forEach(btn => {
+        if (parseInt(btn.dataset.count) === num) btn.classList.add('active');
+        else btn.classList.remove('active');
+      });
+    }
+
+    function shuffleArray(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function pickSentenceByLevel(sentenceList) {
+      if (!sentenceList || sentenceList.length === 0) return null;
+      const matched = sentenceList.filter(s => selectedLevels.has(s.level));
+      if (matched.length > 0) {
+        return matched[Math.floor(Math.random() * matched.length)];
+      }
+      return sentenceList[Math.floor(Math.random() * sentenceList.length)];
+    }
+
+    // ==========================================
+    // 4. 題目產生邏輯
+    // ==========================================
+    function generateChoiceQuestion(verb) {
+      const isPast = Math.random() > 0.45;
+      const targetTense = isPast ? "過去式 (Past Tense)" : "過去分詞 (P.P.)";
+      const correctAnswer = isPast ? verb.past : verb.pp;
+
+      const distractors = new Set();
+      if (verb.base + "ed" !== correctAnswer) distractors.add(verb.base + "ed");
+      if (verb.base !== correctAnswer) distractors.add(verb.base);
+      if (verb.past !== verb.pp) {
+        const alt = isPast ? verb.pp : verb.past;
+        if (alt !== correctAnswer) distractors.add(alt);
+      }
+
+      const others = shuffleArray(VERB_DATABASE.filter(v => v.base !== verb.base));
+      for (const o of others) {
+        if (distractors.size >= 3) break;
+        const cand = isPast ? o.past : o.pp;
+        if (cand && cand !== correctAnswer) distractors.add(cand);
+      }
+
+      const options = shuffleArray([correctAnswer, ...Array.from(distractors).slice(0, 3)]);
+
+      return {
+        type: 'CHOICE',
+        typeName: '三態單選',
+        level: Array.from(selectedLevels)[0] || 1,
+        verb: verb,
+        title: `選出動詞 <span class="text-indigo-600 font-bold underline">${verb.base}</span>（${verb.zh}）的正確【${targetTense}】：`,
+        subText: `提示：注意動詞三態變化規則`,
+        options: options,
+        correctAnswer: correctAnswer,
+        explanation: `<b>${verb.base}</b> 的三態變化為：原形 <code>${verb.base}</code> / 過去式 <code>${verb.past}</code> / 過去分詞 <code>${verb.pp}</code>。中文涵義為「${verb.zh}」。`
+      };
+    }
+
+    function generateErrorQuestion(verb) {
+      const isPast = Math.random() > 0.5;
+      const sentenceList = (isPast ? verb.ptSentences : verb.ppSentences) || [];
+
+      const sampleObj = pickSentenceByLevel(sentenceList);
+      const chosenLevel = sampleObj ? sampleObj.level : 1;
+      const correctAnswer = sampleObj ? sampleObj.answer : (isPast ? verb.past : verb.pp);
+
+      let incorrectForm = verb.base + "ed";
+      if (incorrectForm.toLowerCase() === correctAnswer.toLowerCase()) {
+        incorrectForm = verb.base + "ing";
+      }
+
+      let rawSentence = sampleObj ? sampleObj.sentence : "The student (_____) the assignment.";
+      
+      const displaySentenceHtml = rawSentence.replace(
+        /\([_]+\)/g, 
+        `<span class="px-2 py-0.5 mx-1 bg-rose-50 border border-rose-300 text-rose-700 font-bold rounded underline decoration-wavy decoration-rose-500">${incorrectForm}</span>`
+      );
+
+      return {
+        type: 'ERROR',
+        typeName: '例句改錯',
+        level: chosenLevel,
+        verb: verb,
+        title: `找出句子中【錯誤拼法】並輸入正確的動詞變化：`,
+        subText: `根據句子語境與前後文時態，寫出正確動詞拼法`,
+        displaySentence: displaySentenceHtml,
+        wrongWord: incorrectForm,
+        correctAnswer: correctAnswer,
+        explanation: `句中「<code>${incorrectForm}</code>」為錯誤拼法。<br>正確完整句子：<b>${rawSentence.replace(/\([_]+\)/g, correctAnswer)}</b><br>動詞「${verb.base}（${verb.zh}）」三態為：<code>${verb.base}</code> - <code>${verb.past}</code> - <code>${verb.pp}</code>。`
+      };
+    }
+
+    function generateClozeQuestion(verb) {
+      const isPast = Math.random() > 0.5;
+      const sentenceList = (isPast ? verb.ptSentences : verb.ppSentences) || [];
+
+      const sampleObj = pickSentenceByLevel(sentenceList);
+      const chosenLevel = sampleObj ? sampleObj.level : 1;
+      const correctAnswer = sampleObj ? sampleObj.answer : (isPast ? verb.past : verb.pp);
+      let rawSentence = sampleObj ? sampleObj.sentence : "They (_____) very quickly.";
+
+      const parts = rawSentence.split(/\([_]+\)/);
+      const clozePre = parts[0] || "";
+      const clozePost = parts.slice(1).join("") || "";
+
+      return {
+        type: 'CLOZE',
+        typeName: '例句填空',
+        level: chosenLevel,
+        verb: verb,
+        title: `閱讀上下文線索，在空格中填入正確的動詞形式：`,
+        subText: `考查動詞：<b class="text-indigo-600 underline">${verb.base}</b>（${verb.zh}）· 請依句意填入過去式或過去分詞`,
+        clozePre: clozePre,
+        clozePost: clozePost,
+        correctAnswer: correctAnswer,
+        explanation: `完整句子：<b>${rawSentence.replace(/\([_]+\)/g, correctAnswer)}</b><br>動詞「${verb.base}」三態為：<code>${verb.base}</code> / <code>${verb.past}</code> / <code>${verb.pp}</code>。`
+      };
+    }
+
+    // ==========================================
+    // 5. 測驗控制流程
+    // ==========================================
+    function startQuiz(customVerbs = null) {
+      if (selectedLevels.size === 0) {
+        alert("請至少選擇一個難度等級 (Lv. 1 ~ Lv. 5)！");
+        return;
+      }
+
+      const pool = customVerbs || getFilteredVerbs();
+
+      if (pool.length === 0) {
+        alert("目前設定條件下沒有符合的動詞！請至少勾選一種變化型態。");
+        return;
+      }
+
+      const mode = document.querySelector('input[name="question-mode"]:checked').value;
+      const targetNum = Math.min(customVerbs ? customVerbs.length : selectedCount, pool.length);
+      const chosenVerbs = shuffleArray(pool).slice(0, targetNum);
+
+      quizQuestions = chosenVerbs.map(verb => {
+        let questionType = mode;
+        if (mode === 'MIXED') {
+          const types = ['CHOICE', 'ERROR', 'CLOZE'];
+          questionType = types[Math.floor(Math.random() * types.length)];
+        }
+        if (questionType === 'CHOICE') return generateChoiceQuestion(verb);
+        if (questionType === 'ERROR') return generateErrorQuestion(verb);
+        return generateClozeQuestion(verb);
+      });
+
+      currentIndex = 0;
+      score = 0;
+      wrongList = [];
+      answeredCurrent = false;
+
+      document.getElementById('section-setup').classList.add('hidden');
+      document.getElementById('section-result').classList.add('hidden');
+      document.getElementById('section-result').classList.remove('flex');
+      document.getElementById('section-quiz').classList.remove('hidden');
+      document.getElementById('section-quiz').classList.add('flex');
+
+      renderCurrentQuestion();
+    }
+
+    function renderCurrentQuestion() {
+      answeredCurrent = false;
+      const q = quizQuestions[currentIndex];
+      const total = quizQuestions.length;
+
+      document.getElementById('quiz-progress-text').textContent = `第 ${currentIndex + 1} / ${total} 題`;
+      document.getElementById('quiz-progress-bar').style.width = `${((currentIndex + 1) / total) * 100}%`;
+      document.getElementById('quiz-badge-type').textContent = q.typeName;
+      
+      const badgeLevel = document.getElementById('quiz-badge-level');
+      if (badgeLevel) badgeLevel.textContent = `Lv.${q.level}`;
+
+      document.getElementById('current-correct').textContent = score;
+      document.getElementById('current-wrong').textContent = wrongList.length;
+
+      document.getElementById('btn-submit-answer').classList.remove('hidden');
+      document.getElementById('btn-next-question').classList.add('hidden');
+      document.getElementById('feedback-container').classList.add('hidden');
+
+      const body = document.getElementById('question-body');
+
+      if (q.type === 'CHOICE') {
+        body.innerHTML = `
+          <div class="space-y-5">
+            <div>
+              <div class="text-xl sm:text-2xl font-bold leading-relaxed text-slate-900">${q.title}</div>
+              <div class="text-sm text-slate-500 mt-1">${q.subText}</div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+              ${q.options.map((opt, i) => `
+                <button type="button" onclick="selectOption('${opt}')" class="choice-opt-btn app-btn p-4 rounded-xl text-left text-lg font-bold flex items-center justify-between" data-val="${opt}">
+                  <span>(${String.fromCharCode(65 + i)}) ${opt}</span>
+                  <span class="opt-indicator w-5 h-5 rounded-full border border-slate-300 flex items-center justify-center text-xs"></span>
+                </button>
+              `).join('')}
+            </div>
+            <input type="hidden" id="user-selected-val" value="">
+          </div>
+        `;
+      } else if (q.type === 'ERROR') {
+        body.innerHTML = `
+          <div class="space-y-5">
+            <div>
+              <div class="text-xl sm:text-2xl font-bold text-slate-900">${q.title}</div>
+              <div class="text-sm text-slate-500 mt-1">${q.subText}</div>
+            </div>
+            <div class="p-5 bg-slate-50 border border-slate-200 rounded-xl text-lg sm:text-xl text-slate-800 leading-relaxed font-medium">
+              ${q.displaySentence}
+            </div>
+            <div class="pt-1 space-y-2">
+              <label class="block text-sm font-bold text-slate-700">請在下方輸入修正後的動詞拼法：</label>
+              <input type="text" id="user-text-input" autofocus placeholder="輸入正確動詞..." class="w-full sm:w-80 px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-900 font-bold text-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none shadow-sm">
+            </div>
+          </div>
+        `;
+      } else if (q.type === 'CLOZE') {
+        body.innerHTML = `
+          <div class="space-y-5">
+            <div>
+              <div class="text-xl sm:text-2xl font-bold text-slate-900">${q.title}</div>
+              <div class="text-sm text-slate-500 mt-1">${q.subText}</div>
+            </div>
+            <div class="p-5 bg-slate-50 border border-slate-200 rounded-xl text-lg sm:text-xl text-slate-800 leading-loose font-medium">
+              ${q.clozePre}
+              <input type="text" id="user-text-input" autofocus placeholder="填入形式" class="inline-block mx-2 px-3 py-1 bg-white border-b-2 border-indigo-600 font-bold text-indigo-700 w-44 text-center focus:outline-none">
+              ${q.clozePost}
+            </div>
+          </div>
+        `;
+      }
+
+      const textInput = document.getElementById('user-text-input');
+      if (textInput) {
+        textInput.focus();
+        textInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            if (!answeredCurrent) checkCurrentAnswer();
+            else nextQuestion();
+          }
+        });
+      }
+
+      lucide.createIcons();
+    }
+
+    function selectOption(val) {
+      if (answeredCurrent) return;
+      playSound('click');
+      document.getElementById('user-selected-val').value = val;
+      document.querySelectorAll('.choice-opt-btn').forEach(btn => {
+        if (btn.dataset.val === val) {
+          btn.classList.add('active');
+          btn.querySelector('.opt-indicator').innerHTML = '✓';
+          btn.querySelector('.opt-indicator').className = 'opt-indicator w-5 h-5 rounded-full bg-white text-indigo-600 flex items-center justify-center text-xs font-bold';
+        } else {
+          btn.classList.remove('active');
+          btn.querySelector('.opt-indicator').innerHTML = '';
+          btn.querySelector('.opt-indicator').className = 'opt-indicator w-5 h-5 rounded-full border border-slate-300 flex items-center justify-center text-xs';
+        }
+      });
+    }
+
+    function checkCurrentAnswer() {
+      if (answeredCurrent) return;
+
+      const q = quizQuestions[currentIndex];
+      let userAns = "";
+
+      if (q.type === 'CHOICE') {
+        userAns = document.getElementById('user-selected-val').value.trim();
+        if (!userAns) return;
+      } else {
+        const inp = document.getElementById('user-text-input');
+        userAns = inp ? inp.value.trim().toLowerCase() : "";
+        if (!userAns) return;
+      }
+
+      answeredCurrent = true;
+      const isCorrect = userAns.toLowerCase() === q.correctAnswer.toLowerCase();
+
+      const feedbackBox = document.getElementById('feedback-container');
+      const feedbackTitle = document.getElementById('feedback-title');
+      const feedbackExp = document.getElementById('feedback-explanation');
+
+      feedbackBox.classList.remove('hidden');
+
+      if (isCorrect) {
+        score++;
+        playSound('correct');
+        feedbackBox.className = "p-4 sm:p-5 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-900";
+        feedbackTitle.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5 text-emerald-600 inline"></i> <span class="text-emerald-800">回答正確！</span>`;
+      } else {
+        wrongList.push({ question: q, userAns: userAns });
+        playSound('wrong');
+        feedbackBox.className = "p-4 sm:p-5 rounded-xl border border-rose-200 bg-rose-50 text-rose-900";
+        feedbackTitle.innerHTML = `<i data-lucide="x-circle" class="w-5 h-5 text-rose-600 inline"></i> <span class="text-rose-800">回答錯誤，正確答案為：<b class="underline">${q.correctAnswer}</b></span>`;
+      }
+
+      feedbackExp.innerHTML = q.explanation;
+      lucide.createIcons();
+
+      document.getElementById('btn-submit-answer').classList.add('hidden');
+      document.getElementById('btn-next-question').classList.remove('hidden');
+      document.getElementById('btn-next-question').focus();
+    }
+
+    function nextQuestion() {
+      if (currentIndex < quizQuestions.length - 1) {
+        currentIndex++;
+        renderCurrentQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function retryWrongQuestions() {
+      if (!wrongList || wrongList.length === 0) return;
+      const wrongVerbs = wrongList.map(item => item.question.verb);
+      startQuiz(wrongVerbs);
+    }
+
+    function resetToSetup() {
+      document.getElementById('section-quiz').classList.add('hidden');
+      document.getElementById('section-quiz').classList.remove('flex');
+      document.getElementById('section-result').classList.add('hidden');
+      document.getElementById('section-result').classList.remove('flex');
+      document.getElementById('section-setup').classList.remove('hidden');
+    }
+
+    function confirmExitQuiz() {
+      if (confirm("確定要放棄目前的測驗進度並返回設定頁嗎？")) {
+        resetToSetup();
+      }
+    }
+
+    function showResults() {
+      playSound('levelup');
+      document.getElementById('section-quiz').classList.add('hidden');
+      document.getElementById('section-quiz').classList.remove('flex');
+      document.getElementById('section-result').classList.remove('hidden');
+      document.getElementById('section-result').classList.add('flex');
+
+      const total = quizQuestions.length;
+      const rate = Math.round((score / total) * 100);
+
+      document.getElementById('result-score').textContent = `${rate}%`;
+      document.getElementById('result-correct-count').textContent = score;
+      document.getElementById('result-wrong-count').textContent = wrongList.length;
+
+      const titleEl = document.getElementById('result-title');
+      if (rate >= 90) titleEl.textContent = "表現極佳！完全精通！";
+      else if (rate >= 60) titleEl.textContent = "表現不錯！持之以恆！";
+      else titleEl.textContent = "再接再厲，多加練習！";
+
+      const wrongContainer = document.getElementById('wrong-answers-container');
+      const retryWrongBtn = document.getElementById('btn-retry-wrong');
+
+      if (wrongList.length > 0) {
+        retryWrongBtn.classList.remove('hidden');
+        retryWrongBtn.classList.add('flex');
+        document.getElementById('wrong-retry-count').textContent = wrongList.length;
+
+        wrongContainer.innerHTML = `
+          <div class="text-sm font-bold text-slate-700 flex items-center mb-1">
+            <i data-lucide="alert-circle" class="w-4 h-4 mr-1 text-rose-500"></i>
+            本次錯題檢視 (${wrongList.length} 題)：
+          </div>
+          <div class="space-y-2 max-h-56 overflow-y-auto pr-1">
+            ${wrongList.map(item => `
+              <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm flex justify-between items-center font-medium">
+                <div>
+                  <span class="font-bold text-slate-900">${item.question.verb.base} (${item.question.verb.zh})</span>
+                  <span class="text-xs bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded ml-1">Lv.${item.question.level}</span>
+                  <span class="text-slate-500 ml-2">你的回答: <span class="text-rose-500 line-through">${item.userAns || "(未作答)"}</span></span>
+                </div>
+                <div class="text-emerald-600 font-bold">正解: ${item.question.correctAnswer}</div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } else {
+        retryWrongBtn.classList.add('hidden');
+        wrongContainer.innerHTML = `<div class="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 font-bold text-center text-sm">恭喜全部答對！沒有任何錯題記錄！</div>`;
+      }
+      lucide.createIcons();
+    }
+
+    // ==========================================
+    // 6. 圖鑑展示與頁籤切換
+    // ==========================================
+    function switchTab(tab) {
+      if (tab === 'quiz') {
+        document.getElementById('section-dictionary').classList.add('hidden');
+        document.getElementById('section-dictionary').classList.remove('flex');
+        document.getElementById('section-setup').classList.remove('hidden');
+        document.getElementById('nav-btn-quiz').classList.add('active');
+        document.getElementById('nav-btn-dictionary').classList.remove('active');
+      } else if (tab === 'dictionary') {
+        document.getElementById('section-setup').classList.add('hidden');
+        document.getElementById('section-quiz').classList.add('hidden');
+        document.getElementById('section-result').classList.add('hidden');
+        document.getElementById('section-dictionary').classList.remove('hidden');
+        document.getElementById('section-dictionary').classList.add('flex');
+        document.getElementById('nav-btn-quiz').classList.remove('active');
+        document.getElementById('nav-btn-dictionary').classList.add('active');
+        renderDictionary();
+      }
+    }
+
+    function setDictFilter(type) {
+      dictCurrentType = type;
+      document.querySelectorAll('.dict-filter').forEach(btn => {
+        if (btn.dataset.dict === type) btn.classList.add('active');
+        else btn.classList.remove('active');
+      });
+      renderDictionary();
+    }
+
+    function renderDictionary() {
+      const searchKey = (document.getElementById('dict-search-input')?.value || "").toLowerCase().trim();
+      const tbody = document.getElementById('dict-table-body');
+      if (!tbody) return;
+
+      const filtered = VERB_DATABASE.filter(v => {
+        const matchesScope = dictCurrentScope === 'ALL' ? true : v.common;
+        const matchesType = dictCurrentType === 'ALL' || v.type === dictCurrentType;
+        const matchesSearch = !searchKey || 
+          v.base.toLowerCase().includes(searchKey) ||
+          v.past.toLowerCase().includes(searchKey) ||
+          v.pp.toLowerCase().includes(searchKey) ||
+          v.zh.toLowerCase().includes(searchKey);
+
+        return matchesScope && matchesType && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-500 font-medium">無符合條件的動詞</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map((v, idx) => {
+        return `
+          <tr class="hover:bg-slate-50 transition-colors">
+            <td class="py-3 px-4 text-center text-slate-400 text-xs">${idx + 1}</td>
+            <td class="py-3 px-4 text-slate-900 font-bold flex items-center space-x-1.5">
+              <span>${v.base}</span>
+              ${v.common ? '<span class="text-xs bg-amber-50 text-amber-700 border border-amber-200 px-1.5 py-0.2 rounded font-semibold">核心</span>' : ''}
+            </td>
+            <td class="py-3 px-4 text-indigo-700 font-semibold">${v.past}</td>
+            <td class="py-3 px-4 text-emerald-700 font-semibold">${v.pp}</td>
+            <td class="py-3 px-4 text-slate-600">${v.zh}</td>
+            <td class="py-3 px-4 text-center"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-xs font-semibold">${v.type}</span></td>
+            <td class="py-3 px-4 text-center text-xs text-slate-500">Lv.1 ~ Lv.5</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // 頁面初始化
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      updateFilterCount();
+      updateLevelBadge();
+      syncDataFromGAS();
+    });
+  </script>
+</body>
+</html>
