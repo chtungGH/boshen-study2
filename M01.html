@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>五星探險家：戶外特務大作戰</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Phosphor Icons CDN -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <!-- Google Fonts: Fredoka & Noto Sans TC -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
+  <!-- Canvas Confetti for Celebration -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              yellow: '#FACC15',
+              amber: '#F59E0B',
+              orange: '#FB923C',
+              green: '#22C55E',
+              forest: '#15803D',
+              dark: '#1E293B',
+              sky: '#38BDF8'
+            }
+          },
+          fontFamily: {
+            sans: ['"Noto Sans TC"', 'Fredoka', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .badge-shadow {
+      box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.4), 0 8px 10px -6px rgba(245, 158, 11, 0.2);
+    }
+    .card-shadow {
+      box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.08);
+    }
+    /* 列印證書最佳化樣式 */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #certificate-modal, #certificate-modal * {
+        visibility: visible;
+      }
+      #certificate-modal {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100vw;
+        height: 100vh;
+        background: white !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+    /* 彈跳震動動畫 */
+    @keyframes subtle-bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+    .animate-bounce-subtle {
+      animation: subtle-bounce 2s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-amber-50/50 text-slate-800 min-h-screen pb-24 font-sans antialiased selection:bg-amber-200">
+
+  <!-- 頂部導航列 -->
+  <header class="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-amber-200/80 px-4 py-3 flex items-center justify-between shadow-sm">
+    <div class="flex items-center space-x-2">
+      <span class="text-2xl bg-amber-100 p-1.5 rounded-xl text-amber-600 flex items-center justify-center">
+        <i class="ph-bold ph-compass"></i>
+      </span>
+      <div>
+        <h1 class="text-lg font-black tracking-tight text-slate-900 leading-none">五星探險家</h1>
+        <p class="text-[11px] font-bold text-amber-600 mt-0.5 tracking-wider uppercase">戶外特務大作戰</p>
+      </div>
+    </div>
+
+    <!-- 關主設定 & 重置按鈕 -->
+    <div class="flex items-center space-x-1.5">
+      <button onclick="openConfigModal()" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg flex items-center space-x-1 transition active:scale-95">
+        <i class="ph-bold ph-gear text-sm"></i>
+        <span>關卡設定</span>
+      </button>
+      <button onclick="promptResetProgress()" title="重新開始" class="p-2 text-slate-400 hover:text-red-500 rounded-lg transition active:scale-95">
+        <i class="ph-bold ph-arrows-clockwise text-base"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="max-w-md mx-auto px-4 pt-4 space-y-4">
+
+    <!-- 隊伍狀態與標題橫幅卡片 -->
+    <section id="team-badge-banner" class="bg-gradient-to-br from-amber-400 via-amber-500 to-orange-500 rounded-3xl p-5 text-white shadow-lg relative overflow-hidden">
+      <div class="absolute -right-6 -bottom-6 w-28 h-28 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+      
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3.5">
+          <div id="display-team-avatar" class="w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-3xl shadow-inner border border-white/30 cursor-pointer active:scale-95 transition" onclick="openTeamSetupModal()">
+            🦁
+          </div>
+          <div>
+            <div class="flex items-center space-x-1.5">
+              <span class="text-xs bg-black/20 text-white font-bold px-2 py-0.5 rounded-full">特務分隊</span>
+              <button onclick="openTeamSetupModal()" class="text-white/80 hover:text-white text-xs underline">修改</button>
+            </div>
+            <h2 id="display-team-name" class="text-xl font-black tracking-tight text-white mt-0.5 truncate max-w-[170px]">
+              尚未命名小隊
+            </h2>
+          </div>
+        </div>
+
+        <!-- 計時器 / 狀態 -->
+        <div class="text-right">
+          <div class="text-[11px] font-semibold text-white/80">任務歷時</div>
+          <div id="quest-stopwatch" class="font-mono text-sm font-black tracking-wider bg-black/20 px-2 py-0.5 rounded-lg inline-block mt-0.5">00:00</div>
+        </div>
+      </div>
+
+      <!-- 進度條區塊 -->
+      <div class="mt-4 pt-3 border-t border-white/20">
+        <div class="flex justify-between items-baseline mb-1.5">
+          <span class="text-xs font-bold text-white/90 flex items-center gap-1">
+            <i class="ph-bold ph-target"></i> 任務解鎖進度
+          </span>
+          <span id="progress-text" class="text-xs font-black tracking-wider text-amber-100">0 / 6 完成 (0%)</span>
+        </div>
+        <div class="w-full bg-black/25 h-3.5 rounded-full overflow-hidden p-0.5">
+          <div id="progress-bar-fill" class="bg-gradient-to-r from-yellow-200 to-white h-full rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 快速操作提示與激勵字句 -->
+    <div id="motivational-tip" class="bg-amber-100/80 border border-amber-300/80 rounded-2xl px-4 py-2.5 flex items-center space-x-3 text-amber-900 text-xs font-bold">
+      <span class="text-lg">🧭</span>
+      <p id="motivational-text" class="flex-1 leading-snug">整隊集合完畢！請打開感官，仔細觀察周遭自然環境！</p>
+    </div>
+
+    <!-- 任務清單容器 -->
+    <div class="space-y-3.5" id="quest-list-container">
+      <!-- 任務卡片由 JS 動態渲染 -->
+    </div>
+
+    <!-- 結算領獎大按鈕 -->
+    <div class="pt-3 pb-8">
+      <button id="finish-report-btn" onclick="openCertificateModal()" class="w-full py-4 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-2xl font-black text-lg shadow-lg shadow-emerald-500/25 flex items-center justify-center space-x-2 transition active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none">
+        <i class="ph-bold ph-medal text-2xl"></i>
+        <span>領取特務勳章證書</span>
+      </button>
+    </div>
+  </main>
+
+  <!-- 彈窗：小隊建立與名稱設定 -->
+  <div id="team-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl space-y-4">
+      <div class="text-center">
+        <div class="w-14 h-14 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mx-auto text-2xl mb-2">
+          <i class="ph-bold ph-shield-check"></i>
+        </div>
+        <h3 class="text-xl font-black text-slate-800">建立探險特務隊伍</h3>
+        <p class="text-xs text-slate-500 mt-1">選一個響亮隊名與幸運守護動物！</p>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-600 mb-1.5">隊伍名稱</label>
+        <input type="text" id="team-name-input" maxlength="12" placeholder="例：迅捷獵豹小隊" class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 focus:border-amber-500 rounded-xl text-base font-bold outline-none transition">
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-600 mb-2">選擇隊伍代表隊徽</label>
+        <div class="grid grid-cols-5 gap-2" id="avatar-picker-grid">
+          <!-- JS 動態生成動物選項 -->
+        </div>
+      </div>
+
+      <button onclick="saveTeamInfo()" class="w-full py-3.5 bg-amber-500 hover:bg-amber-600 text-white font-black text-base rounded-xl shadow-md shadow-amber-500/25 transition active:scale-95">
+        出發探險！GO
+      </button>
+    </div>
+  </div>
+
+  <!-- 彈窗：關主/老師自訂任務 -->
+  <div id="config-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white w-full max-w-md rounded-3xl p-5 shadow-2xl flex flex-col max-h-[85vh]">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div class="flex items-center space-x-2">
+          <span class="p-1.5 bg-amber-100 text-amber-600 rounded-lg text-lg"><i class="ph-bold ph-sliders"></i></span>
+          <h3 class="text-base font-black text-slate-800">關主自訂關卡與題目</h3>
+        </div>
+        <button onclick="closeConfigModal()" class="text-slate-400 hover:text-slate-600 p-1 text-xl">
+          <i class="ph-bold ph-x"></i>
+        </button>
+      </div>
+
+      <div class="overflow-y-auto py-3 space-y-4 flex-1 text-left text-xs" id="config-quest-list">
+        <!-- 任務編輯表單區 -->
+      </div>
+
+      <div class="pt-3 border-t border-slate-100 flex items-center space-x-2">
+        <button onclick="restoreDefaultQuests()" class="px-4 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-xl active:scale-95">恢復預設</button>
+        <button onclick="saveCustomQuests()" class="flex-1 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl shadow-md active:scale-95">儲存並套用</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 彈窗：榮譽特務通關勳章證書 -->
+  <div id="certificate-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 hidden overflow-y-auto">
+    <div class="bg-white w-full max-w-lg rounded-3xl p-5 sm:p-7 shadow-2xl border-4 border-amber-400 relative my-auto">
+      
+      <!-- 關閉按鈕 -->
+      <button onclick="closeCertificateModal()" class="no-print absolute top-3 right-3 text-slate-400 hover:text-slate-600 p-2 text-2xl">
+        <i class="ph-bold ph-x"></i>
+      </button>
+
+      <!-- 證書主視覺 -->
+      <div class="text-center space-y-1">
+        <div class="inline-block p-3 bg-amber-100 rounded-full text-amber-500 text-3xl shadow-inner mb-1 animate-bounce-subtle">
+          🏆
+        </div>
+        <div class="text-xs uppercase tracking-widest text-amber-600 font-black">Official Certificate</div>
+        <h2 class="text-2xl font-black text-slate-900 tracking-tight">特務結業探險證書</h2>
+        <p class="text-xs text-slate-500">五星級戶外自然探索活動認證</p>
+      </div>
+
+      <!-- 隊伍資訊與統計 -->
+      <div class="bg-amber-50/70 border border-amber-200/60 rounded-2xl p-4 mt-4 text-center space-y-2">
+        <div class="text-xs text-slate-500">恭喜探險菁英小隊</div>
+        <div class="text-xl font-black text-amber-600 flex items-center justify-center gap-1.5">
+          <span id="cert-team-icon">🦁</span>
+          <span id="cert-team-name">猛獸戰隊</span>
+        </div>
+        <p class="text-xs text-slate-600 leading-relaxed font-medium">
+          在今日的大自然探險任務中，展現了敏銳的觀察力、團隊合作精神與無限創意，成功克服重重考驗！
+        </p>
+        <div class="grid grid-cols-2 gap-2 pt-2 text-xs border-t border-amber-200/60">
+          <div><span class="text-slate-400">通關時間：</span><strong id="cert-time-spent" class="text-slate-800">00:00</strong></div>
+          <div><span class="text-slate-400">任務得分：</span><strong id="cert-score-text" class="text-emerald-600">6 / 6 滿分</strong></div>
+        </div>
+      </div>
+
+      <!-- 照片成果展牆（縮圖預覽） -->
+      <div class="mt-4">
+        <h4 class="text-xs font-bold text-slate-700 mb-2 flex items-center gap-1">
+          <i class="ph-bold ph-images-square text-amber-500"></i>
+          小隊偵查照片紀錄
+        </h4>
+        <div id="cert-gallery-grid" class="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto p-1 bg-slate-50 rounded-xl border border-slate-100">
+          <!-- JS 填入拍照縮圖 -->
+        </div>
+      </div>
+
+      <!-- 頁底印章與操作 -->
+      <div class="mt-5 flex items-center justify-between text-[11px] text-slate-400 pt-2 border-t border-slate-100">
+        <div>
+          <span>特務指導：五年級導師群 & 家長後援會</span><br>
+          <span id="cert-date-string">2026 年 戶外班聚紀念</span>
+        </div>
+        <div class="w-16 h-16 border-2 border-red-500 rounded-full flex flex-col items-center justify-center text-red-500 font-black transform -rotate-12 select-none pointer-events-none opacity-85">
+          <span class="text-[9px] scale-75">TASK PASS</span>
+          <span class="text-xs">特務認證</span>
+        </div>
+      </div>
+
+      <!-- 按鈕操作區 -->
+      <div class="no-print mt-5 flex gap-2">
+        <button onclick="window.print()" class="flex-1 py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl shadow-md flex items-center justify-center space-x-1 active:scale-95 transition">
+          <i class="ph-bold ph-printer text-lg"></i>
+          <span>列印 / 存為PDF證書</span>
+        </button>
+        <button onclick="closeCertificateModal()" class="px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl active:scale-95 transition">
+          返回關卡
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 輕量 Toast 訊息提示元件 -->
+  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900/90 text-white text-xs font-bold px-4 py-2.5 rounded-full shadow-2xl flex items-center space-x-2 pointer-events-none transition-all duration-300 opacity-0 translate-y-4">
+    <span id="toast-icon">✨</span>
+    <span id="toast-msg">提示訊息</span>
+  </div>
+
+  <!-- JavaScript 邏輯 -->
+  <script>
+    // --- 預設任務清單 (符合國小五年級自然、數學、體育與團隊合作) ---
+    const DEFAULT_QUESTS = [
+      {
+        id: 1,
+        type: 'photo',
+        title: '任務 1：大自然的幾何學',
+        tag: '自然觀察',
+        desc: '在草地或樹林間拍下一張自然界的「軸對稱」圖案或特殊幾何圖案（如一片完美對稱的樹葉、花瓣或螺旋樹輪）。',
+        hint: '蹲下身仔細觀察葉脈或花芯喔！',
+        completed: false,
+        photoData: null,
+      },
+      {
+        id: 2,
+        type: 'photo',
+        title: '任務 2：綠野偽裝者',
+        tag: '生態探索',
+        desc: '找出一隻隱藏在自然環境保護色中的生物（昆蟲、小蜥蜴、小鳥或蝴蝶），拍下牠完美隱身的身影！',
+        hint: '不要打擾牠們，用相機放大變焦拍照最棒！',
+        completed: false,
+        photoData: null,
+      },
+      {
+        id: 3,
+        type: 'photo',
+        title: '任務 3：超級怪奇樹皮',
+        tag: '五感體驗',
+        desc: '找出公園裡樹皮紋路最奇特、最深或最滑的一棵樹，隊員觸摸它並拍下具有立體感的特寫照片。',
+        hint: '閉上眼摸摸看是粗糙還是光滑呢？',
+        completed: false,
+        photoData: null,
+      },
+      {
+        id: 4,
+        type: 'photo',
+        title: '任務 4：影子魔法師',
+        tag: '光影合作',
+        desc: '全員站在陽光下，利用肢體與地面的影子，在地上排出一顆「五角星」或代表五年級的「5」！拍下這張魔法影子。',
+        hint: '調整身體距離與手勢，影子的形狀會有驚人變化！',
+        completed: false,
+        photoData: null,
+      },
+      {
+        id: 5,
+        type: 'quiz',
+        title: '任務 5：秘密暗號解鎖',
+        tag: '益智解謎',
+        desc: '請仔細觀察野餐大草坪四周：『現場有幾張木製長椅？』或輸入關主老師今天給予的專屬暗號。',
+        hint: '現場題目可由關主自訂，預設答案是「4」或「探險家」',
+        correctAnswers: ['4', '四', '探險家', '五年級'],
+        userAnswer: '',
+        completed: false,
+        photoData: null,
+      },
+      {
+        id: 6,
+        type: 'photo',
+        title: '任務 6：友情定格大合照',
+        tag: '團隊默契',
+        desc: '全體隊員聚在一起，擺出專屬你們這組最搞怪、最有氣勢的超級英雄姿勢大合照！',
+        hint: '記得找熱心的隊友或家長幫忙掌鏡喔！',
+        completed: false,
+        photoData: null,
+      }
+    ];
+
+    const AVATAR_OPTIONS = ['🦁', '🐯', '🦅', '🐺', '🦊', '🐻', '🐼', '🦄', '🐬', '🦉'];
+
+    // 狀態變數
+    let state = {
+      teamName: '探險先鋒小隊',
+      teamAvatar: '🦁',
+      startTime: Date.now(),
+      quests: JSON.parse(JSON.stringify(DEFAULT_QUESTS))
+    };
+
+    let timerInterval = null;
+
+    // --- Web Audio API 合成音效（歡樂過關聲，免下載外部音檔） ---
+    function playSound(type) {
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        const ctx = new AudioContext();
+        
+        if (type === 'success') {
+          // 升調和弦 (C5 -> E5 -> G5 -> C6)
+          const notes = [523.25, 659.25, 783.99, 1046.50];
+          notes.forEach((freq, idx) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.value = freq;
+            gain.gain.setValueAtTime(0.2, ctx.currentTime + idx * 0.08);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + idx * 0.08 + 0.25);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(ctx.currentTime + idx * 0.08);
+            osc.stop(ctx.currentTime + idx * 0.08 + 0.26);
+          });
+        } else if (type === 'complete-all') {
+          // 狂歡華彩音效
+          const notes = [440, 554, 659, 880, 1108, 1318];
+          notes.forEach((freq, idx) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+            gain.gain.setValueAtTime(0.25, ctx.currentTime + idx * 0.1);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + idx * 0.1 + 0.4);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(ctx.currentTime + idx * 0.1);
+            osc.stop(ctx.currentTime + idx * 0.1 + 0.42);
+          });
+        } else if (type === 'click') {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.value = 800;
+          gain.gain.setValueAtTime(0.1, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.05);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.05);
+        }
+      } catch (e) {
+        console.warn('音效未能播放:', e);
+      }
+    }
+
+    // --- LocalStorage 讀取與儲存 ---
+    function saveStateToStorage() {
+      try {
+        localStorage.setItem('adventure_quest_state_v1', JSON.stringify(state));
+      } catch (e) {
+        console.warn('無法寫入 LocalStorage (可能照片過大):', e);
+        showToast('⚠️ 儲存空間滿，部分高畫質照片已在瀏覽器記憶體中');
+      }
+    }
+
+    function loadStateFromStorage() {
+      const saved = localStorage.getItem('adventure_quest_state_v1');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          state = { ...state, ...parsed };
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+
+    // --- 計時器邏輯 ---
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - state.startTime) / 1000);
+        const mins = String(Math.floor(elapsed / 60)).padStart(2, '0');
+        const secs = String(elapsed % 60).padStart(2, '0');
+        const dom = document.getElementById('quest-stopwatch');
+        if (dom) dom.innerText = `${mins}:${secs}`;
+      }, 1000);
+    }
+
+    // --- Toast 提示功能 ---
+    function showToast(message, icon = '✨') {
+      const toast = document.getElementById('toast');
+      const iconEl = document.getElementById('toast-icon');
+      const msgEl = document.getElementById('toast-msg');
+      if (!toast) return;
+      iconEl.innerText = icon;
+      msgEl.innerText = message;
+      toast.classList.remove('opacity-0', 'translate-y-4');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'translate-y-4');
+      }, 2600);
+    }
+
+    // --- 壓縮圖片 (以維持流暢度並相容 LocalStorage) ---
+    function compressImage(file, maxWidth = 900, maxHeight = 900, quality = 0.75) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            let width = img.width;
+            let height = img.height;
+            if (width > height) {
+              if (width > maxWidth) {
+                height = Math.round((height * maxWidth) / width);
+                width = maxWidth;
+              }
+            } else {
+              if (height > maxHeight) {
+                width = Math.round((width * maxHeight) / height);
+                height = maxHeight;
+              }
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL('image/jpeg', quality));
+          };
+          img.onerror = reject;
+          img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // --- 相片上傳處理 ---
+    async function handlePhotoCapture(event, questId) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const quest = state.quests.find(q => q.id === questId);
+      if (!quest) return;
+
+      showToast('📸 正在處理照片中...', '⏳');
+
+      try {
+        const compressedBase64 = await compressImage(file, 800, 800, 0.72);
+        quest.photoData = compressedBase64;
+        quest.completed = true;
+        
+        playSound('success');
+        saveStateToStorage();
+        renderQuests();
+        updateProgress();
+        showToast(`太棒了！已完成【${quest.title.split('：')[1] || quest.title}】`, '🎉');
+      } catch (err) {
+        console.error(err);
+        showToast('照片讀取失敗，請重新拍攝', '❌');
+      }
+    }
+
+    // --- 移除相片 ---
+    function removePhoto(questId) {
+      const quest = state.quests.find(q => q.id === questId);
+      if (quest) {
+        quest.photoData = null;
+        quest.completed = false;
+        saveStateToStorage();
+        renderQuests();
+        updateProgress();
+        showToast('已移除相片');
+      }
+    }
+
+    // --- 益智題檢查邏輯 ---
+    function checkQuizAnswer(questId) {
+      const inputEl = document.getElementById(`quiz-input-${questId}`);
+      if (!inputEl) return;
+      const val = inputEl.value.trim().toLowerCase();
+      const quest = state.quests.find(q => q.id === questId);
+      if (!quest) return;
+
+      if (!val) {
+        showToast('請輸入答案再提交喔！', '✏️');
+        return;
+      }
+
+      const isMatch = quest.correctAnswers.some(ans => val.includes(ans.toLowerCase()));
+      if (isMatch) {
+        quest.userAnswer = val;
+        quest.completed = true;
+        playSound('success');
+        saveStateToStorage();
+        renderQuests();
+        updateProgress();
+        showToast('恭喜答對！密碼解鎖成功！', '🔓');
+      } else {
+        showToast('答案不太對喔，再觀察看看或問問關主！', '🧐');
+      }
+    }
+
+    // --- 手動切換完成勾選 ---
+    function toggleComplete(questId) {
+      const quest = state.quests.find(q => q.id === questId);
+      if (!quest) return;
+      quest.completed = !quest.completed;
+      if (quest.completed) {
+        playSound('success');
+      }
+      saveStateToStorage();
+      renderQuests();
+      updateProgress();
+    }
+
+    // --- 更新進度與激勵字 ---
+    function updateProgress() {
+      const total = state.quests.length;
+      const completedCount = state.quests.filter(q => q.completed).length;
+      const percent = total > 0 ? Math.round((completedCount / total) * 100) : 0;
+
+      const progressText = document.getElementById('progress-text');
+      const progressBar = document.getElementById('progress-bar-fill');
+      const finishBtn = document.getElementById('finish-report-btn');
+      const tipText = document.getElementById('motivational-text');
+
+      if (progressText) progressText.innerText = `${completedCount} / ${total} 完成 (${percent}%)`;
+      if (progressBar) progressBar.style.width = `${percent}%`;
+
+      // 提示字句隨進度變化
+      if (tipText) {
+        if (completedCount === 0) {
+          tipText.innerText = '整隊集合完畢！請打開感官，仔細觀察周遭自然環境！';
+        } else if (completedCount < 3) {
+          tipText.innerText = '小隊表現出色！繼續保持專注，還有許多隱藏祕密等你們發現！';
+        } else if (completedCount < total) {
+          tipText.innerText = '太厲害了！已突破大半關卡，終點特務勳章就在前方！';
+        } else {
+          tipText.innerText = '全數任務大通關！全隊太優秀了，快點擊下方領取特務證書！';
+        }
+      }
+
+      // 達到全部完成時的彩帶慶祝
+      if (completedCount === total && total > 0 && !state.hasTriggeredFullConfetti) {
+        state.hasTriggeredFullConfetti = true;
+        playSound('complete-all');
+        if (window.confetti) {
+          window.confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 } });
+        }
+      } else if (completedCount < total) {
+        state.hasTriggeredFullConfetti = false;
+      }
+    }
+
+    // --- 渲染所有任務清單 ---
+    function renderQuests() {
+      const container = document.getElementById('quest-list-container');
+      if (!container) return;
+
+      container.innerHTML = state.quests.map((q, idx) => {
+        const isDone = q.completed;
+        const tagColor = isDone ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800';
+        const cardBorder = isDone ? 'border-2 border-emerald-400 bg-white' : 'border border-slate-200 bg-white';
+
+        return `
+          <div class="rounded-2xl p-4 transition-all duration-300 card-shadow ${cardBorder}">
+            <!-- 任務卡片標頭 -->
+            <div class="flex items-start justify-between gap-2">
+              <div class="flex-1">
+                <div class="flex items-center space-x-2 mb-1">
+                  <span class="text-[11px] font-bold px-2 py-0.5 rounded-full ${tagColor}">${q.tag || '戶外任務'}</span>
+                  ${isDone ? '<span class="text-[11px] font-black text-emerald-600 flex items-center gap-0.5"><i class="ph-bold ph-check-circle"></i> 已達成</span>' : ''}
+                </div>
+                <h3 class="text-base font-black text-slate-800 leading-snug">${q.title}</h3>
+              </div>
+
+              <!-- 勾選框 -->
+              <button onclick="toggleComplete(${q.id})" class="p-2 rounded-xl text-xl transition active:scale-90 ${isDone ? 'text-emerald-500 bg-emerald-50' : 'text-slate-300 bg-slate-50'}">
+                <i class="ph-fill ${isDone ? 'ph-check-square' : 'ph-square'}"></i>
+              </button>
+            </div>
+
+            <!-- 任務說明 -->
+            <p class="text-xs text-slate-600 mt-2 leading-relaxed">${q.desc}</p>
+            
+            ${q.hint ? `
+              <div class="mt-2 text-[11px] text-amber-700 bg-amber-50 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5 font-medium">
+                <i class="ph-bold ph-lightbulb"></i>
+                <span>提示：${q.hint}</span>
+              </div>
+            ` : ''}
+
+            <!-- 任務交互區 (拍照 or 答題) -->
+            <div class="mt-3.5 pt-3 border-t border-slate-100">
+              ${q.type === 'photo' ? `
+                <!-- 拍照上傳控制 -->
+                ${q.photoData ? `
+                  <div class="relative rounded-xl overflow-hidden border-2 border-emerald-400 max-h-56 bg-slate-100">
+                    <img src="${q.photoData}" alt="任務照片" class="w-full h-48 object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end justify-between p-2.5">
+                      <span class="text-[11px] text-white font-bold flex items-center gap-1">
+                        <i class="ph-bold ph-camera"></i> 任務快照已鎖定
+                      </span>
+                      <button onclick="removePhoto(${q.id})" class="px-2 py-1 bg-red-500/90 hover:bg-red-600 text-white text-[11px] font-bold rounded-lg shadow backdrop-blur transition active:scale-95">
+                        重新拍攝
+                      </button>
+                    </div>
+                  </div>
+                ` : `
+                  <label class="w-full py-3 px-4 border-2 border-dashed border-amber-300 hover:border-amber-400 bg-amber-50/50 hover:bg-amber-50 rounded-xl flex items-center justify-center space-x-2 text-amber-800 font-bold text-xs cursor-pointer active:scale-[0.99] transition">
+                    <i class="ph-bold ph-camera text-lg text-amber-600"></i>
+                    <span>點此拍照 / 截取現場線索</span>
+                    <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handlePhotoCapture(event, ${q.id})">
+                  </label>
+                `}
+              ` : `
+                <!-- 益智答題控制 -->
+                <div class="space-y-2">
+                  <div class="flex items-center space-x-2">
+                    <input type="text" id="quiz-input-${q.id}" value="${q.userAnswer || ''}" placeholder="輸入數字或現場暗號..." ${isDone ? 'disabled' : ''} class="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none focus:border-amber-500 disabled:bg-slate-100 disabled:text-slate-500">
+                    <button onclick="checkQuizAnswer(${q.id})" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xl transition active:scale-95">
+                      ${isDone ? '重解' : '解鎖'}
+                    </button>
+                  </div>
+                  ${isDone ? `<p class="text-[11px] font-bold text-emerald-600">✓ 恭喜已解密成功！</p>` : ''}
+                </div>
+              `}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // --- 隊伍設定彈窗邏輯 ---
+    function openTeamSetupModal() {
+      const modal = document.getElementById('team-modal');
+      const input = document.getElementById('team-name-input');
+      const grid = document.getElementById('avatar-picker-grid');
+      
+      input.value = state.teamName || '';
+      grid.innerHTML = AVATAR_OPTIONS.map(emoji => `
+        <button type="button" onclick="selectAvatar('${emoji}')" class="avatar-opt-btn h-11 rounded-xl text-2xl flex items-center justify-center border-2 transition active:scale-90 ${state.teamAvatar === emoji ? 'border-amber-500 bg-amber-50' : 'border-slate-200 bg-slate-50'}">
+          ${emoji}
+        </button>
+      `).join('');
+
+      modal.classList.remove('hidden');
+    }
+
+    function selectAvatar(emoji) {
+      state.teamAvatar = emoji;
+      document.querySelectorAll('.avatar-opt-btn').forEach(btn => {
+        if (btn.innerText.trim() === emoji) {
+          btn.classList.add('border-amber-500', 'bg-amber-50');
+          btn.classList.remove('border-slate-200', 'bg-slate-50');
+        } else {
+          btn.classList.remove('border-amber-500', 'bg-amber-50');
+          btn.classList.add('border-slate-200', 'bg-slate-50');
+        }
+      });
+      playSound('click');
+    }
+
+    function saveTeamInfo() {
+      const input = document.getElementById('team-name-input');
+      const name = input.value.trim() || '探險先鋒小隊';
+      state.teamName = name;
+      
+      document.getElementById('display-team-name').innerText = name;
+      document.getElementById('display-team-avatar').innerText = state.teamAvatar;
+
+      document.getElementById('team-modal').classList.add('hidden');
+      saveStateToStorage();
+      showToast(`特務隊伍【${name}】準備完畢！`, state.teamAvatar);
+      playSound('success');
+    }
+
+    // --- 關主/老師自訂任務彈窗邏輯 ---
+    function openConfigModal() {
+      const modal = document.getElementById('config-modal');
+      const list = document.getElementById('config-quest-list');
+      
+      list.innerHTML = state.quests.map((q, idx) => `
+        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="font-black text-slate-700">關卡 ${idx + 1} 編輯</span>
+            <span class="text-[10px] text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded font-bold">${q.type === 'photo' ? '拍照任務' : '益智題目'}</span>
+          </div>
+          <div>
+            <label class="block text-[11px] text-slate-500 font-bold mb-0.5">標題</label>
+            <input type="text" id="cfg-title-${q.id}" value="${q.title}" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg font-bold">
+          </div>
+          <div>
+            <label class="block text-[11px] text-slate-500 font-bold mb-0.5">任務說明</label>
+            <textarea id="cfg-desc-${q.id}" rows="2" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg">${q.desc}</textarea>
+          </div>
+          <div>
+            <label class="block text-[11px] text-slate-500 font-bold mb-0.5">提示技巧</label>
+            <input type="text" id="cfg-hint-${q.id}" value="${q.hint || ''}" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg">
+          </div>
+          ${q.type === 'quiz' ? `
+            <div>
+              <label class="block text-[11px] text-slate-500 font-bold mb-0.5">正確答案 (多個用半形逗點分開)</label>
+              <input type="text" id="cfg-ans-${q.id}" value="${(q.correctAnswers || []).join(',')}" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg font-mono">
+            </div>
+          ` : ''}
+        </div>
+      `).join('');
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeConfigModal() {
+      document.getElementById('config-modal').classList.add('hidden');
+    }
+
+    function saveCustomQuests() {
+      state.quests.forEach(q => {
+        const titleEl = document.getElementById(`cfg-title-${q.id}`);
+        const descEl = document.getElementById(`cfg-desc-${q.id}`);
+        const hintEl = document.getElementById(`cfg-hint-${q.id}`);
+        if (titleEl) q.title = titleEl.value;
+        if (descEl) q.desc = descEl.value;
+        if (hintEl) q.hint = hintEl.value;
+
+        if (q.type === 'quiz') {
+          const ansEl = document.getElementById(`cfg-ans-${q.id}`);
+          if (ansEl) {
+            q.correctAnswers = ansEl.value.split(',').map(s => s.trim()).filter(Boolean);
+          }
+        }
+      });
+
+      saveStateToStorage();
+      renderQuests();
+      closeConfigModal();
+      showToast('關卡自訂內容已儲存！', '💾');
+    }
+
+    function restoreDefaultQuests() {
+      state.quests = JSON.parse(JSON.stringify(DEFAULT_QUESTS));
+      saveStateToStorage();
+      renderQuests();
+      updateProgress();
+      closeConfigModal();
+      showToast('已恢復預設五年級關卡！', '🔄');
+    }
+
+    // --- 證書彈窗邏輯 ---
+    function openCertificateModal() {
+      const modal = document.getElementById('certificate-modal');
+      const total = state.quests.length;
+      const completedCount = state.quests.filter(q => q.completed).length;
+
+      document.getElementById('cert-team-icon').innerText = state.teamAvatar;
+      document.getElementById('cert-team-name').innerText = state.teamName;
+      document.getElementById('cert-time-spent').innerText = document.getElementById('quest-stopwatch').innerText;
+      document.getElementById('cert-score-text').innerText = `${completedCount} / ${total} 完成`;
+
+      const now = new Date();
+      document.getElementById('cert-date-string').innerText = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日 戶外班聚紀念`;
+
+      // 填充照片畫廊
+      const gallery = document.getElementById('cert-gallery-grid');
+      const photoQuests = state.quests.filter(q => q.photoData);
+
+      if (photoQuests.length > 0) {
+        gallery.innerHTML = photoQuests.map(q => `
+          <div class="relative group rounded-lg overflow-hidden border border-slate-200 aspect-square bg-slate-200">
+            <img src="${q.photoData}" class="w-full h-full object-cover">
+            <div class="absolute bottom-0 inset-x-0 bg-black/60 text-white text-[9px] p-0.5 truncate text-center">
+              ${q.title.split('：')[0]}
+            </div>
+          </div>
+        `).join('');
+      } else {
+        gallery.innerHTML = `
+          <div class="col-span-3 text-center py-6 text-slate-400 text-xs font-bold">
+            尚未拍攝任何照片，快拿手機捕捉大自然的美景吧！
+          </div>
+        `;
+      }
+
+      modal.classList.remove('hidden');
+      playSound('complete-all');
+      if (window.confetti) {
+        window.confetti({ particleCount: 80, spread: 60, origin: { y: 0.5 } });
+      }
+    }
+
+    function closeCertificateModal() {
+      document.getElementById('certificate-modal').classList.add('hidden');
+    }
+
+    // --- 重置進度確認 ---
+    function promptResetProgress() {
+      const msg = '確定要清空目前進度與拍攝的照片重新挑戰嗎？';
+      // 依規範不使用原生 confirm，採用輕量互動確認
+      const banner = document.getElementById('team-badge-banner');
+      if (confirmResetMode) {
+        // 第二次點擊直接重設
+        state.startTime = Date.now();
+        state.quests.forEach(q => {
+          q.completed = false;
+          q.photoData = null;
+          q.userAnswer = '';
+        });
+        saveStateToStorage();
+        renderQuests();
+        updateProgress();
+        showToast('進度已全數重設，開始全新探險！', '🏁');
+        confirmResetMode = false;
+      } else {
+        confirmResetMode = true;
+        showToast('再按一次重置按鈕以確認清空記錄', '⚠️');
+        setTimeout(() => { confirmResetMode = false; }, 3500);
+      }
+    }
+    let confirmResetMode = false;
+
+    // --- 初始化應用程式 ---
+    window.onload = function() {
+      loadStateFromStorage();
+      
+      // 更新小隊名稱與頭像
+      document.getElementById('display-team-name').innerText = state.teamName || '探險先鋒小隊';
+      document.getElementById('display-team-avatar').innerText = state.teamAvatar || '🦁';
+
+      renderQuests();
+      updateProgress();
+      startTimer();
+
+      // 如果尚未自訂隊伍名稱，初次進入主動彈出小隊設定
+      if (!localStorage.getItem('adventure_quest_state_v1')) {
+        setTimeout(openTeamSetupModal, 600);
+      }
+    };
+  </script>
+</body>
+</html>
