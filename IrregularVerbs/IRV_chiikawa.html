@@ -1,193 +1,134 @@
 <!DOCTYPE html>
-<html lang="zh-TW" class="h-full">
+<html lang="zh-TW" class="min-h-full">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>吉伊卡哇的動詞討伐修練場 - Chiikawa Verb Quest</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ちいかわ - 英語不規則動詞分級特訓站</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Google Fonts: Zen Maru Gothic & M PLUS Rounded 1c for adorable Chiikawa typography -->
+  <!-- Google Fonts: 清晰銳利的圓體英文字型 + 繁體中文無襯線黑體 -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
     body {
-      font-family: 'Zen Maru Gothic', 'M PLUS Rounded 1c', sans-serif;
-      background-color: #FFF9F2;
-      background-image: 
-        radial-gradient(#FDE2E8 18%, transparent 18%),
-        radial-gradient(#E8F4FD 18%, transparent 18%);
-      background-size: 40px 40px;
-      background-position: 0 0, 20px 20px;
-      color: #5A4033;
+      /* 優先套用清晰繁中字型與英文字型，避免日文字體缺字導致的假粗體模糊 */
+      font-family: 'Fredoka', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Microsoft JhengHei", sans-serif;
+      background-color: #fffbf2;
+      color: #3f2e22;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    /* Chiikawa Soft 3D Bubble Button */
-    .chii-btn {
-      position: relative;
-      background-color: #FFFFFF;
-      color: #5A4033;
-      border: 2.5px solid #5A4033;
-      border-radius: 9999px;
-      box-shadow: 0 4px 0 #E2D3CA;
-      font-weight: 800;
-      transition: all 0.12s cubic-bezier(0.34, 1.56, 0.64, 1);
+    /* 吉伊卡哇主題按鈕 (清晰無毛邊) */
+    .app-btn {
+      transition: all 0.15s ease-in-out;
+      border: 1.5px solid #fbd38d;
+      background-color: #ffffff;
+      color: #744210;
     }
-    .chii-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 0 #D4C1B6;
-      background-color: #FFFDF9;
+    .app-btn:hover {
+      background-color: #fef3c7;
+      border-color: #f6ad55;
     }
-    .chii-btn:active {
-      transform: translateY(3px);
-      box-shadow: 0 1px 0 #D4C1B6;
+    .app-btn:active {
+      transform: scale(0.97);
     }
-
-    /* Active / Pink Chiikawa Highlight */
-    .chii-btn.active, .chii-btn-pink {
-      background-color: #FFB7C5;
-      color: #4A2B20;
-      border-color: #5A4033;
-      box-shadow: 0 4px 0 #D88F9F;
+    .app-btn.active {
+      background-color: #fb7185;
+      color: #ffffff;
+      border-color: #f43f5e;
+      box-shadow: 0 3px 8px rgba(251, 113, 133, 0.35);
     }
-    .chii-btn.active:hover, .chii-btn-pink:hover {
-      background-color: #FFAEC0;
-      box-shadow: 0 6px 0 #C97D8E;
+    .app-btn.active:hover {
+      background-color: #f43f5e;
     }
 
-    /* Blue / Hachiware style */
-    .chii-btn-blue {
-      background-color: #BAE6FD;
-      color: #1E3A8A;
-      border-color: #5A4033;
-      box-shadow: 0 4px 0 #8ACAE9;
+    /* 主按鈕：粉櫻吉伊款 */
+    .app-btn-primary {
+      background: #fb7185;
+      color: #ffffff;
+      border: 1.5px solid #e11d48;
+      box-shadow: 0 3px 8px rgba(244, 63, 94, 0.3);
+      transition: all 0.15s ease;
     }
-    .chii-btn-blue:hover {
-      background-color: #A9DDFB;
-      box-shadow: 0 6px 0 #7AB8D7;
+    .app-btn-primary:hover {
+      background: #f43f5e;
+      box-shadow: 0 4px 12px rgba(244, 63, 94, 0.35);
     }
-
-    /* Yellow / Usagi style */
-    .chii-btn-yellow {
-      background-color: #FEF08A;
-      color: #713F12;
-      border-color: #5A4033;
-      box-shadow: 0 4px 0 #DEC761;
-    }
-    .chii-btn-yellow:hover {
-      background-color: #FEEA6D;
-      box-shadow: 0 6px 0 #CBB24C;
+    .app-btn-primary:active {
+      transform: scale(0.97);
     }
 
-    /* Mint / Weeding Green */
-    .chii-btn-mint {
-      background-color: #BBF7D0;
-      color: #14532D;
-      border-color: #5A4033;
-      box-shadow: 0 4px 0 #8DDDA7;
+    /* 成功按鈕：小八天空藍款 */
+    .app-btn-success {
+      background: #0ea5e9;
+      color: #ffffff;
+      border: 1.5px solid #0284c7;
+      box-shadow: 0 3px 8px rgba(14, 165, 233, 0.3);
+      transition: all 0.15s ease;
     }
-    .chii-btn-mint:hover {
-      background-color: #ABF2C4;
-      box-shadow: 0 6px 0 #79C794;
+    .app-btn-success:hover {
+      background: #0284c7;
+      box-shadow: 0 4px 12px rgba(14, 165, 233, 0.35);
     }
-
-    .chii-btn:disabled {
-      background-color: #F1ECE7 !important;
-      color: #AFA29A !important;
-      border-color: #C8BCB3 !important;
-      box-shadow: 0 2px 0 #DED5CE !important;
-      cursor: not-allowed;
-      transform: none !important;
+    .app-btn-success:active {
+      transform: scale(0.97);
     }
 
-    /* Soft Cozy Card Panels */
-    .chii-panel {
-      background-color: #FFFFFF;
-      border: 3px solid #5A4033;
-      border-radius: 2rem;
-      box-shadow: 0 8px 0 rgba(90, 64, 51, 0.15);
+    /* 可愛卡片容器 */
+    .app-card {
+      background-color: #ffffff;
+      border: 1.5px solid #fed7aa;
+      border-radius: 1.25rem;
+      box-shadow: 0 4px 12px -2px rgba(254, 215, 170, 0.3);
     }
 
-    .chii-subcard {
-      background-color: #FFFDF8;
-      border: 2px solid #EBDDD3;
-      border-radius: 1.5rem;
+    @keyframes spin-normal {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
-
-    /* Cute Progress bar */
-    .chii-bar-container {
-      background-color: #F3ECE5;
-      border: 2.5px solid #5A4033;
-      border-radius: 9999px;
-      overflow: hidden;
-    }
-    .chii-bar-fill {
-      background: linear-gradient(90deg, #FFB4C4 0%, #FEE08B 50%, #A7F3D0 100%);
-      box-shadow: inset 0 -2px 0 rgba(0,0,0,0.1);
-      border-radius: 9999px;
-    }
-
-    /* Subtle wobble animation for cute emojis */
-    @keyframes cuteWobble {
-      0%, 100% { transform: rotate(0deg); }
-      25% { transform: rotate(-5deg) scale(1.05); }
-      75% { transform: rotate(5deg) scale(1.05); }
-    }
-    .animate-wobble {
-      display: inline-block;
-      animation: cuteWobble 2.5s ease-in-out infinite;
-    }
-
-    @keyframes floaty {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-4px); }
-    }
-    .animate-float {
-      animation: floaty 3s ease-in-out infinite;
+    .animate-spin-custom {
+      animation: spin-normal 1s linear infinite;
     }
   </style>
 </head>
-<body class="h-full flex flex-col select-none">
+<body class="min-h-screen flex flex-col select-none">
 
-  <!-- 頂部可愛導航 -->
-  <header class="border-b-[3px] border-[#5A4033] bg-[#FFF8EE]/95 backdrop-blur-md sticky top-0 z-40 shadow-sm">
-    <div class="max-w-6xl mx-auto px-4 h-20 flex items-center justify-between py-2">
-      
-      <!-- Logo 區塊 -->
-      <div class="flex items-center space-x-3 cursor-pointer group" onclick="playChiiSound('click'); switchTab('quiz')">
-        <div class="w-13 h-13 p-1.5 bg-[#FFE4EB] border-2 border-[#5A4033] rounded-2xl flex items-center justify-center shadow-[0_3px_0_#DDAFB9] group-hover:rotate-6 transition-transform">
-          <span class="text-3xl animate-wobble">🌸</span>
+  <!-- 頂部導航列 -->
+  <header class="border-b-2 border-amber-200 bg-white/95 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-6xl mx-auto px-3 sm:px-4 h-14 sm:h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-2.5 cursor-pointer shrink-0" onclick="playSound('click'); switchTab('quiz')">
+        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-rose-400 rounded-xl flex items-center justify-center text-white shadow-sm border border-rose-300">
+          <span class="text-lg sm:text-xl">🌸</span>
         </div>
         <div>
-          <div class="flex items-center space-x-1.5">
-            <h1 class="text-2xl sm:text-3xl font-black tracking-wide text-[#5A4033]">
-              動詞討伐修練場
-            </h1>
-            <span class="hidden sm:inline-block px-2 py-0.5 text-xs bg-[#FEF08A] border border-[#5A4033] rounded-full font-extrabold text-[#713F12]">
-              除草檢定篇 🌿
-            </span>
-          </div>
-          <p class="text-xs sm:text-sm text-[#8D7060] font-bold">小可愛們的英語不規則動詞分級特訓 (わ～い！)</p>
+          <h1 class="text-base sm:text-lg font-bold tracking-tight text-amber-950 leading-none flex items-center gap-1">
+            <span>ちいかわ</span>
+            <span class="text-[11px] bg-rose-100 text-rose-600 px-1.5 py-0.5 rounded-full border border-rose-200 font-semibold">特訓場</span>
+          </h1>
+          <p class="text-[10px] sm:text-xs text-amber-800 font-medium mt-0.5">なんとかなれーッ！不規則動詞特訓</p>
         </div>
       </div>
 
-      <!-- 右側按鈕與連線小標籤 -->
-      <div class="flex items-center space-x-3">
+      <div class="flex items-center space-x-1.5 sm:space-x-3">
         <!-- 雲端同步狀態標籤 -->
-        <div id="top-sync-status" class="hidden sm:flex items-center space-x-1.5 px-3 py-1 bg-[#FFFDF8] border-2 border-[#5A4033] rounded-full text-xs font-bold shadow-sm">
-          <span id="top-sync-icon" class="inline-block animate-spin">🍥</span>
-          <span id="top-sync-text" class="text-[#8D7060]">連線中...</span>
+        <div id="top-sync-status" class="hidden md:flex items-center space-x-1.5 px-3 py-1 bg-amber-50 border border-amber-300 text-amber-900 text-xs font-semibold rounded-full">
+          <i data-lucide="refresh-cw" class="w-3.5 h-3.5 animate-spin-custom text-amber-600"></i>
+          <span id="top-sync-text">連線中...</span>
         </div>
 
-        <nav class="flex items-center space-x-2 sm:space-x-3">
-          <button id="nav-btn-quiz" onclick="playChiiSound('click'); switchTab('quiz')" class="chii-btn active px-4 sm:px-5 py-2 text-sm sm:text-base flex items-center space-x-1.5">
+        <nav class="flex items-center space-x-1 sm:space-x-2">
+          <button id="nav-btn-quiz" onclick="playSound('click'); switchTab('quiz')" class="app-btn active px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-1">
             <span>⚔️</span>
-            <span>討伐特訓</span>
+            <span>檢定特訓</span>
           </button>
-          <button id="nav-btn-dictionary" onclick="playChiiSound('click'); switchTab('dictionary')" class="chii-btn px-4 sm:px-5 py-2 text-sm sm:text-base flex items-center space-x-1.5">
+          <button id="nav-btn-dictionary" onclick="playSound('click'); switchTab('dictionary')" class="app-btn px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-1">
             <span>📖</span>
             <span>動詞圖鑑 (<span id="dict-total-count">...</span>)</span>
           </button>
@@ -197,321 +138,300 @@
   </header>
 
   <!-- 主內容視窗 -->
-  <main class="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 flex flex-col justify-start">
+  <main class="flex-1 max-w-5xl w-full mx-auto p-3 sm:p-6 pb-12 flex flex-col">
 
     <!-- 區塊 1: 測驗設定介面 -->
-    <div id="section-setup" class="w-full max-w-2xl mx-auto space-y-6 my-auto">
+    <div id="section-setup" class="w-full max-w-2xl mx-auto space-y-4 sm:space-y-6">
       
-      <!-- 醒目的資料庫載入提示卡片 -->
-      <div id="db-loading-banner" class="p-4 bg-[#FFF6DB] border-2 border-[#E3B83F] rounded-3xl text-[#6B4E17] flex items-center justify-between shadow-[0_4px_0_#ECD18A] transition-all">
-        <div class="flex items-center space-x-3">
-          <div class="w-10 h-10 bg-[#FFDE6A] border-2 border-[#5A4033] rounded-2xl flex items-center justify-center text-xl font-bold shadow-sm">
-            <span id="db-status-emoji">🍄</span>
+      <!-- 雲端試算表連線提示卡 -->
+      <div id="db-loading-banner" class="p-3.5 sm:p-4 bg-amber-50 border border-amber-300 rounded-xl text-amber-950 flex items-center justify-between shadow-sm">
+        <div class="flex items-center space-x-2.5 sm:space-x-3">
+          <div class="w-8 h-8 rounded-lg bg-amber-200/80 text-amber-800 flex items-center justify-center shrink-0 text-base">
+            <span id="db-status-emoji">🌱</span>
           </div>
           <div>
-            <div id="db-loading-title" class="text-base sm:text-lg font-black text-[#5A4033]">正在翻閱雲端 Google 試算表筆記...</div>
-            <div id="db-loading-desc" class="text-xs sm:text-sm text-[#7D614A]">小八貓正在整理「動詞三態句」全等級題庫，馬上就能開始囉！</div>
+            <div id="db-loading-title" class="text-xs sm:text-sm font-bold text-amber-900">正在前往討伐基地同步題庫...</div>
+            <div id="db-loading-desc" class="text-[11px] sm:text-xs text-amber-700 font-medium">小八正在抄寫雲端筆記，完成即可拔草練習！</div>
           </div>
         </div>
-        <button id="btn-manual-sync" onclick="playChiiSound('pop'); syncDataFromGAS(true)" class="hidden sm:block chii-btn px-3 py-1.5 text-xs font-bold bg-white">
-          🔄 重新整理
+        <button id="btn-manual-sync" onclick="playSound('click'); syncDataFromGAS(true)" class="app-btn px-2.5 py-1 text-xs font-semibold rounded-lg bg-white shrink-0">
+          重新整理
         </button>
       </div>
 
-      <!-- 標題介紹 -->
-      <div class="text-center space-y-2">
-        <div class="inline-flex items-center space-x-1.5 bg-[#FFE4EB] border-2 border-[#5A4033] rounded-full px-4 py-1 text-xs sm:text-sm text-[#873449] font-black shadow-[0_2px_0_#F3BFCA]">
-          <span>🌟</span>
-          <span>語境情境實戰 · 像拔草一樣消滅難題</span>
-          <span>💪</span>
-        </div>
-        <h2 class="text-3xl sm:text-4xl font-black text-[#5A4033] tracking-tight">
-          討伐準備！設定特訓範圍
+      <div class="text-center space-y-1">
+        <h2 class="text-xl sm:text-2xl font-bold text-amber-950 tracking-tight flex items-center justify-center gap-2">
+          <span>🌿 拔草檢定・三態特訓設定 🌿</span>
         </h2>
-        <p class="text-sm text-[#8C7162] font-bold">吉伊卡哇、小八貓、烏薩奇陪你一起特訓動詞三態！</p>
+        <p class="text-xs sm:text-sm text-amber-800 font-medium">「フ！ハッ！なんとかなれーッ！」一起考取英語 5 級檢定吧！</p>
       </div>
 
-      <!-- 設定面板 -->
-      <div class="chii-panel p-6 sm:p-8 space-y-6">
+      <div class="app-card p-4 sm:p-7 space-y-5">
         
-        <!-- 1. 動詞深度範圍選擇 -->
-        <div class="space-y-2.5">
-          <div class="text-base sm:text-lg font-black text-[#5A4033] flex items-center space-x-2">
-            <span class="w-6 h-6 rounded-full bg-[#FFE4EB] border border-[#5A4033] text-xs flex items-center justify-center">1</span>
-            <span>選擇單字收錄範圍：</span>
-          </div>
-          <div class="grid grid-cols-2 gap-3">
-            <button type="button" onclick="playChiiSound('pop'); setScope('COMMON')" id="scope-btn-common" class="chii-btn active py-3 text-base sm:text-lg font-black flex items-center justify-center space-x-2">
-              <span id="scope-common-label">💖 核心常用動詞</span>
+        <!-- 1. 動詞單字範圍選擇 -->
+        <div class="space-y-2">
+          <label class="text-sm sm:text-base font-bold text-amber-950 flex items-center space-x-1.5">
+            <span class="w-5 h-5 bg-rose-100 text-rose-700 rounded-full flex items-center justify-center text-xs font-bold">1</span>
+            <span>選擇單字收錄範圍</span>
+          </label>
+          <div class="grid grid-cols-2 gap-2 sm:gap-3">
+            <button type="button" onclick="playSound('click'); setScope('COMMON')" id="scope-btn-common" class="app-btn active py-2.5 sm:py-3 px-2 sm:px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center">
+              <span id="scope-common-label">⭐ 核心必考</span>
             </button>
-            <button type="button" onclick="playChiiSound('pop'); setScope('ALL')" id="scope-btn-all" class="chii-btn py-3 text-base sm:text-lg font-black flex items-center justify-center space-x-2">
-              <span id="scope-all-label">🌈 完整全收錄動詞</span>
+            <button type="button" onclick="playSound('click'); setScope('ALL')" id="scope-btn-all" class="app-btn py-2.5 sm:py-3 px-2 sm:px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center">
+              <span id="scope-all-label">🏰 全收錄</span>
             </button>
           </div>
         </div>
 
         <!-- 2. 等級 1~5 聯集選擇 -->
-        <div class="space-y-2.5">
-          <div class="flex justify-between items-center text-base sm:text-lg font-black text-[#5A4033]">
-            <div class="flex items-center space-x-2">
-              <span class="w-6 h-6 rounded-full bg-[#E1F3FE] border border-[#5A4033] text-xs flex items-center justify-center">2</span>
-              <span>例句難度等級 (可多選)：</span>
-            </div>
-            <span id="selected-level-desc" class="text-xs bg-[#FFF8D6] text-[#6B501B] px-3 py-1 border-2 border-[#5A4033] rounded-full font-bold">
-              已選：Lv.1 ~ Lv.5
-            </span>
+        <div class="space-y-2">
+          <div class="flex justify-between items-center">
+            <label class="text-sm sm:text-base font-bold text-amber-950 flex items-center space-x-1.5">
+              <span class="w-5 h-5 bg-sky-100 text-sky-700 rounded-full flex items-center justify-center text-xs font-bold">2</span>
+              <span>例句檢定難度（角色階級）</span>
+            </label>
+            <span id="selected-level-desc" class="text-[11px] sm:text-xs bg-rose-50 text-rose-700 border border-rose-200 px-2 py-0.5 rounded-full font-semibold">Lv.1 ~ Lv.5</span>
           </div>
-          <div class="grid grid-cols-5 gap-2">
-            <button type="button" onclick="playChiiSound('pop'); toggleLevelFilter(1)" id="level-btn-1" class="level-toggle-btn chii-btn active py-2 sm:py-3 text-base sm:text-lg font-black flex flex-col items-center justify-center space-y-0.5">
-              <span>Lv.1</span>
-              <span class="text-sm sm:text-base font-black">基礎🌱</span>
+          <div class="grid grid-cols-5 gap-1.5 sm:gap-2">
+            <button type="button" onclick="playSound('click'); toggleLevelFilter(1)" id="level-btn-1" class="level-toggle-btn app-btn active py-2 rounded-xl flex flex-col items-center justify-center">
+              <span class="text-xs sm:text-base font-bold leading-tight">Lv.1</span>
+              <span class="text-[10px] sm:text-xs font-medium opacity-90 mt-0.5">吉伊 (基)</span>
             </button>
-            <button type="button" onclick="playChiiSound('pop'); toggleLevelFilter(2)" id="level-btn-2" class="level-toggle-btn chii-btn active py-2 sm:py-3 text-base sm:text-lg font-black flex flex-col items-center justify-center space-y-0.5">
-              <span>Lv.2</span>
-              <span class="text-sm sm:text-base font-black">初級🌿</span>
+            <button type="button" onclick="playSound('click'); toggleLevelFilter(2)" id="level-btn-2" class="level-toggle-btn app-btn active py-2 rounded-xl flex flex-col items-center justify-center">
+              <span class="text-xs sm:text-base font-bold leading-tight">Lv.2</span>
+              <span class="text-[10px] sm:text-xs font-medium opacity-90 mt-0.5">小八 (初)</span>
             </button>
-            <button type="button" onclick="playChiiSound('pop'); toggleLevelFilter(3)" id="level-btn-3" class="level-toggle-btn chii-btn active py-2 sm:py-3 text-base sm:text-lg font-black flex flex-col items-center justify-center space-y-0.5">
-              <span>Lv.3</span>
-              <span class="text-sm sm:text-base font-black">中級🌸</span>
+            <button type="button" onclick="playSound('click'); toggleLevelFilter(3)" id="level-btn-3" class="level-toggle-btn app-btn active py-2 rounded-xl flex flex-col items-center justify-center">
+              <span class="text-xs sm:text-base font-bold leading-tight">Lv.3</span>
+              <span class="text-[10px] sm:text-xs font-medium opacity-90 mt-0.5">兔兔 (中)</span>
             </button>
-            <button type="button" onclick="playChiiSound('pop'); toggleLevelFilter(4)" id="level-btn-4" class="level-toggle-btn chii-btn active py-2 sm:py-3 text-base sm:text-lg font-black flex flex-col items-center justify-center space-y-0.5">
-              <span>Lv.4</span>
-              <span class="text-sm sm:text-base font-black">中高✨</span>
+            <button type="button" onclick="playSound('click'); toggleLevelFilter(4)" id="level-btn-4" class="level-toggle-btn app-btn active py-2 rounded-xl flex flex-col items-center justify-center">
+              <span class="text-xs sm:text-base font-bold leading-tight">Lv.4</span>
+              <span class="text-[10px] sm:text-xs font-medium opacity-90 mt-0.5">飛鼠 (高)</span>
             </button>
-            <button type="button" onclick="playChiiSound('pop'); toggleLevelFilter(5)" id="level-btn-5" class="level-toggle-btn chii-btn active py-2 sm:py-3 text-base sm:text-lg font-black flex flex-col items-center justify-center space-y-0.5">
-              <span>Lv.5</span>
-              <span class="text-sm sm:text-base font-black">高階👑</span>
+            <button type="button" onclick="playSound('click'); toggleLevelFilter(5)" id="level-btn-5" class="level-toggle-btn app-btn active py-2 rounded-xl flex flex-col items-center justify-center">
+              <span class="text-xs sm:text-base font-bold leading-tight">Lv.5</span>
+              <span class="text-[10px] sm:text-xs font-medium opacity-90 mt-0.5">前輩 (極)</span>
             </button>
           </div>
-          <div class="flex justify-end space-x-3 pt-0.5 text-xs font-bold text-[#8D7060]">
-            <button type="button" onclick="playChiiSound('pop'); selectAllLevels(true)" class="hover:text-[#5A4033] underline">全選等級</button>
-            <span>•</span>
-            <button type="button" onclick="playChiiSound('pop'); selectAllLevels(false)" class="hover:text-[#5A4033] underline">清空等級</button>
+          <div class="flex justify-end space-x-3 pt-0.5 text-xs font-bold text-amber-800">
+            <button type="button" onclick="playSound('click'); selectAllLevels(true)" class="hover:text-rose-600">全選</button>
+            <span>|</span>
+            <button type="button" onclick="playSound('click'); selectAllLevels(false)" class="hover:text-rose-600">清空</button>
           </div>
         </div>
 
         <!-- 3. 動詞型態聯集多選 -->
-        <div class="space-y-2.5">
-          <div class="flex justify-between items-center text-base sm:text-lg font-black text-[#5A4033]">
-            <div class="flex items-center space-x-2">
-              <span class="w-6 h-6 rounded-full bg-[#E8F5E9] border border-[#5A4033] text-xs flex items-center justify-center">3</span>
-              <span>三態變化型態 (可多選)：</span>
-            </div>
-            <span id="selected-type-count" class="text-xs bg-[#E8F5E9] text-[#1D5E37] px-3 py-1 border-2 border-[#5A4033] rounded-full font-bold">
-              0 個動詞在庫
-            </span>
+        <div class="space-y-2">
+          <div class="flex justify-between items-center">
+            <label class="text-sm sm:text-base font-bold text-amber-950 flex items-center space-x-1.5">
+              <span class="w-5 h-5 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center text-xs font-bold">3</span>
+              <span>變化型態</span>
+            </label>
+            <span id="selected-type-count" class="text-[11px] sm:text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-semibold">0 個動詞</span>
           </div>
-          <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
-            <button type="button" onclick="playChiiSound('pop'); toggleTypeFilter('AAA')" id="type-btn-AAA" class="type-toggle-btn chii-btn active py-2 text-sm sm:text-base font-black">AAA</button>
-            <button type="button" onclick="playChiiSound('pop'); toggleTypeFilter('AAB')" id="type-btn-AAB" class="type-toggle-btn chii-btn active py-2 text-sm sm:text-base font-black">AAB</button>
-            <button type="button" onclick="playChiiSound('pop'); toggleTypeFilter('ABA')" id="type-btn-ABA" class="type-toggle-btn chii-btn active py-2 text-sm sm:text-base font-black">ABA</button>
-            <button type="button" onclick="playChiiSound('pop'); toggleTypeFilter('ABB')" id="type-btn-ABB" class="type-toggle-btn chii-btn active py-2 text-sm sm:text-base font-black">ABB</button>
-            <button type="button" onclick="playChiiSound('pop'); toggleTypeFilter('ABC')" id="type-btn-ABC" class="type-toggle-btn chii-btn active py-2 text-sm sm:text-base font-black">ABC</button>
+          <div class="grid grid-cols-5 gap-1.5 sm:gap-2">
+            <button type="button" onclick="playSound('click'); toggleTypeFilter('AAA')" id="type-btn-AAA" class="type-toggle-btn app-btn active py-2 rounded-xl text-xs sm:text-sm font-bold">AAA</button>
+            <button type="button" onclick="playSound('click'); toggleTypeFilter('AAB')" id="type-btn-AAB" class="type-toggle-btn app-btn active py-2 rounded-xl text-xs sm:text-sm font-bold">AAB</button>
+            <button type="button" onclick="playSound('click'); toggleTypeFilter('ABA')" id="type-btn-ABA" class="type-toggle-btn app-btn active py-2 rounded-xl text-xs sm:text-sm font-bold">ABA</button>
+            <button type="button" onclick="playSound('click'); toggleTypeFilter('ABB')" id="type-btn-ABB" class="type-toggle-btn app-btn active py-2 rounded-xl text-xs sm:text-sm font-bold">ABB</button>
+            <button type="button" onclick="playSound('click'); toggleTypeFilter('ABC')" id="type-btn-ABC" class="type-toggle-btn app-btn active py-2 rounded-xl text-xs sm:text-sm font-bold">ABC</button>
           </div>
-          <div class="flex justify-end space-x-3 pt-0.5 text-xs font-bold text-[#8D7060]">
-            <button type="button" onclick="playChiiSound('pop'); selectAllTypes(true)" class="hover:text-[#5A4033] underline">全選型態</button>
-            <span>•</span>
-            <button type="button" onclick="playChiiSound('pop'); selectAllTypes(false)" class="hover:text-[#5A4033] underline">清空型態</button>
+          <div class="flex justify-end space-x-3 pt-0.5 text-xs font-bold text-amber-800">
+            <button type="button" onclick="playSound('click'); selectAllTypes(true)" class="hover:text-rose-600">全選</button>
+            <span>|</span>
+            <button type="button" onclick="playSound('click'); selectAllTypes(false)" class="hover:text-rose-600">清空</button>
           </div>
         </div>
 
-        <!-- 4. 題型選擇 (固定為寬敞工整的 2x2 兩行網格) -->
-        <div class="space-y-2.5">
-          <div class="text-base sm:text-lg font-black text-[#5A4033] flex items-center space-x-2">
-            <span class="w-6 h-6 rounded-full bg-[#FFF3CD] border border-[#5A4033] text-xs flex items-center justify-center">4</span>
-            <span>測驗題型模式：</span>
-          </div>
-          <div class="grid grid-cols-2 gap-3">
-            <label class="chii-subcard p-3.5 sm:p-4 flex items-center cursor-pointer border-2 border-[#5A4033] hover:bg-[#FFF4F7] transition-all select-none">
-              <input type="radio" name="question-mode" value="MIXED" checked class="accent-[#FF88A5] w-5 h-5 shrink-0">
-              <span class="ml-3 text-base sm:text-lg font-black text-[#5A4033]">🎲 綜合討伐</span>
+        <!-- 4. 題型選擇 -->
+        <div class="space-y-2">
+          <label class="text-sm sm:text-base font-bold text-amber-950 flex items-center space-x-1.5">
+            <span class="w-5 h-5 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center text-xs font-bold">4</span>
+            <span>特訓模式</span>
+          </label>
+          <div class="grid grid-cols-2 gap-2 sm:gap-3">
+            <label class="app-btn p-3 sm:p-3.5 rounded-xl flex items-center cursor-pointer hover:border-rose-400">
+              <input type="radio" name="question-mode" value="MIXED" checked class="accent-rose-500 w-4 h-4 shrink-0">
+              <span class="ml-2 text-sm sm:text-base font-bold text-amber-950">🎲 綜合大討伐</span>
             </label>
-            <label class="chii-subcard p-3.5 sm:p-4 flex items-center cursor-pointer border-2 border-[#5A4033] hover:bg-[#FFF4F7] transition-all select-none">
-              <input type="radio" name="question-mode" value="CHOICE" class="accent-[#FF88A5] w-5 h-5 shrink-0">
-              <span class="ml-3 text-base sm:text-lg font-black text-[#5A4033]">🍡 三態單選</span>
+            <label class="app-btn p-3 sm:p-3.5 rounded-xl flex items-center cursor-pointer hover:border-rose-400">
+              <input type="radio" name="question-mode" value="CHOICE" class="accent-rose-500 w-4 h-4 shrink-0">
+              <span class="ml-2 text-sm sm:text-base font-bold text-amber-950">✨ 三態單選</span>
             </label>
-            <label class="chii-subcard p-3.5 sm:p-4 flex items-center cursor-pointer border-2 border-[#5A4033] hover:bg-[#FFF4F7] transition-all select-none">
-              <input type="radio" name="question-mode" value="ERROR" class="accent-[#FF88A5] w-5 h-5 shrink-0">
-              <span class="ml-3 text-base sm:text-lg font-black text-[#5A4033]">🔍 例句抓錯</span>
+            <label class="app-btn p-3 sm:p-3.5 rounded-xl flex items-center cursor-pointer hover:border-rose-400">
+              <input type="radio" name="question-mode" value="ERROR" class="accent-rose-500 w-4 h-4 shrink-0">
+              <span class="ml-2 text-sm sm:text-base font-bold text-amber-950">🔍 例句抓錯</span>
             </label>
-            <label class="chii-subcard p-3.5 sm:p-4 flex items-center cursor-pointer border-2 border-[#5A4033] hover:bg-[#FFF4F7] transition-all select-none">
-              <input type="radio" name="question-mode" value="CLOZE" class="accent-[#FF88A5] w-5 h-5 shrink-0">
-              <span class="ml-3 text-base sm:text-lg font-black text-[#5A4033]">✏️ 例句填空</span>
+            <label class="app-btn p-3 sm:p-3.5 rounded-xl flex items-center cursor-pointer hover:border-rose-400">
+              <input type="radio" name="question-mode" value="CLOZE" class="accent-rose-500 w-4 h-4 shrink-0">
+              <span class="ml-2 text-sm sm:text-base font-bold text-amber-950">✏️ 例句填空</span>
             </label>
           </div>
         </div>
 
         <!-- 5. 題數選擇 -->
-        <div class="space-y-2.5">
-          <div class="text-base sm:text-lg font-black text-[#5A4033] flex items-center space-x-2">
-            <span class="w-6 h-6 rounded-full bg-[#E0F2FE] border border-[#5A4033] text-xs flex items-center justify-center">5</span>
-            <span>本輪題目數量：</span>
-          </div>
-          <div class="grid grid-cols-4 gap-2.5">
-            <button type="button" onclick="playChiiSound('pop'); setCount(10)" class="count-btn active chii-btn py-2.5 text-base font-black" data-count="10">10 題</button>
-            <button type="button" onclick="playChiiSound('pop'); setCount(20)" class="count-btn chii-btn py-2.5 text-base font-black" data-count="20">20 題</button>
-            <button type="button" onclick="playChiiSound('pop'); setCount(30)" class="count-btn chii-btn py-2.5 text-base font-black" data-count="30">30 題</button>
-            <button type="button" onclick="playChiiSound('pop'); setCount(50)" class="count-btn chii-btn py-2.5 text-base font-black" data-count="50">50 題</button>
+        <div class="space-y-2">
+          <label class="text-sm sm:text-base font-bold text-amber-950 flex items-center space-x-1.5">
+            <span class="w-5 h-5 bg-purple-100 text-purple-700 rounded-full flex items-center justify-center text-xs font-bold">5</span>
+            <span>拔草數量</span>
+          </label>
+          <div class="grid grid-cols-4 gap-1.5 sm:gap-2">
+            <button type="button" onclick="playSound('click'); setCount(10)" class="count-btn active app-btn py-2 rounded-xl text-xs sm:text-sm font-bold" data-count="10">10 題</button>
+            <button type="button" onclick="playSound('click'); setCount(20)" class="count-btn app-btn py-2 rounded-xl text-xs sm:text-sm font-bold" data-count="20">20 題</button>
+            <button type="button" onclick="playSound('click'); setCount(30)" class="count-btn app-btn py-2 rounded-xl text-xs sm:text-sm font-bold" data-count="30">30 題</button>
+            <button type="button" onclick="playSound('click'); setCount(50)" class="count-btn app-btn py-2 rounded-xl text-xs sm:text-sm font-bold" data-count="50">50 題</button>
           </div>
         </div>
 
         <!-- 開始按鈕 -->
-        <div class="pt-3">
-          <button id="btn-start-quiz" onclick="playChiiSound('start'); startQuiz()" class="w-full py-4 chii-btn-yellow text-xl sm:text-2xl font-black flex items-center justify-center space-x-3 tracking-wide">
-            <span class="text-2xl">⚔️</span>
-            <span id="btn-start-text">拿起討伐棒 · 出發特訓！(呀哈！)</span>
-            <span class="text-2xl">🐰</span>
+        <div class="pt-2">
+          <button id="btn-start-quiz" onclick="playSound('levelup'); startQuiz()" class="w-full py-3.5 sm:py-4 app-btn-primary rounded-xl text-base sm:text-lg font-bold flex items-center justify-center space-x-2 tracking-wide">
+            <span>ヤハッ！開始特訓 (討伐出發！)</span>
           </button>
         </div>
       </div>
     </div>
 
     <!-- 區塊 2: 進行中測驗 -->
-    <div id="section-quiz" class="w-full max-w-3xl mx-auto hidden flex-col space-y-4">
-      
-      <!-- 頂部進度資訊卡 -->
-      <div class="bg-white p-4 border-[3px] border-[#5A4033] rounded-3xl shadow-sm space-y-3">
-        <div class="flex items-center justify-between text-base sm:text-lg font-black text-[#5A4033]">
-          <div class="flex items-center space-x-2">
-            <span id="quiz-badge-type" class="bg-[#FFE4EB] text-[#8C344E] border-2 border-[#5A4033] px-3 py-0.5 rounded-full text-xs sm:text-sm font-black">題型</span>
-            <span id="quiz-badge-level" class="bg-[#E8F5E9] text-[#1B663A] border-2 border-[#5A4033] px-2.5 py-0.5 rounded-full text-xs sm:text-sm font-black">Lv.1</span>
-            <span id="quiz-progress-text" class="text-[#5A4033] ml-1">第 1 / 10 題</span>
+    <div id="section-quiz" class="w-full max-w-3xl mx-auto hidden flex-col space-y-3 sm:space-y-4">
+      <div class="app-card p-3.5 sm:p-5 space-y-2.5">
+        <div class="flex items-center justify-between text-xs sm:text-sm font-bold">
+          <div class="flex items-center space-x-1.5 sm:space-x-2">
+            <span id="quiz-badge-type" class="bg-rose-100 text-rose-700 border border-rose-300 px-2.5 py-0.5 rounded-full text-xs font-bold">題型</span>
+            <span id="quiz-badge-level" class="bg-sky-100 text-sky-800 border border-sky-300 px-2.5 py-0.5 rounded-full text-xs font-bold">Lv.1</span>
+            <span id="quiz-progress-text" class="text-amber-900 font-bold ml-1">第 1 / 10 題</span>
           </div>
-          <div class="flex items-center space-x-4">
-            <span class="flex items-center text-[#1B663A] font-black"><span class="mr-1">⭕</span><span id="current-correct">0</span></span>
-            <span class="flex items-center text-[#D8495F] font-black"><span class="mr-1">❌</span><span id="current-wrong">0</span></span>
-            <button onclick="playChiiSound('pop'); confirmExitQuiz()" class="text-[#A28373] hover:text-[#5A4033] underline text-sm font-bold">先休息(離開)</button>
+          <div class="flex items-center space-x-3 sm:space-x-4">
+            <span class="flex items-center text-emerald-600 font-bold"><span>🌟</span><span id="current-correct" class="ml-1">0</span></span>
+            <span class="flex items-center text-rose-500 font-bold"><span>💧</span><span id="current-wrong" class="ml-1">0</span></span>
+            <button onclick="playSound('click'); confirmExitQuiz()" class="text-amber-800 hover:text-amber-950 text-xs sm:text-sm font-medium underline">回休息處</button>
           </div>
         </div>
         
-        <!-- 糖果進度條 -->
-        <div class="w-full chii-bar-container h-4">
-          <div id="quiz-progress-bar" class="chii-bar-fill h-full transition-all duration-300" style="width: 10%"></div>
+        <div class="w-full bg-amber-100 rounded-full h-2.5 overflow-hidden border border-amber-200">
+          <div id="quiz-progress-bar" class="bg-rose-400 h-full rounded-full transition-all duration-300" style="width: 10%"></div>
         </div>
       </div>
 
       <!-- 題目主卡片 -->
-      <div id="question-card" class="chii-panel p-6 sm:p-8 space-y-6">
+      <div id="question-card" class="app-card p-4 sm:p-7 space-y-5">
         <div id="question-body"></div>
 
-        <!-- 作答回饋結果 -->
-        <div id="feedback-container" class="hidden p-5 border-[3px] rounded-2xl transition-all space-y-2">
-          <div class="flex items-center space-x-2 text-xl font-black" id="feedback-title"></div>
-          <div class="text-base leading-relaxed" id="feedback-explanation"></div>
+        <div id="feedback-container" class="hidden p-3.5 sm:p-5 rounded-xl border transition-all space-y-1.5">
+          <div class="flex items-center space-x-2 text-base font-bold" id="feedback-title"></div>
+          <div class="text-xs sm:text-sm font-normal leading-relaxed" id="feedback-explanation"></div>
         </div>
 
-        <!-- 動作按鈕列 -->
-        <div class="flex justify-end pt-2" id="action-buttons">
-          <button id="btn-submit-answer" onclick="checkCurrentAnswer()" class="w-full sm:w-auto px-8 py-3.5 chii-btn-pink text-xl font-black">
-            確定送出 🐾
+        <div class="flex justify-end pt-1" id="action-buttons">
+          <button id="btn-submit-answer" onclick="checkCurrentAnswer()" class="w-full sm:w-auto px-7 sm:px-9 py-3 app-btn-primary rounded-xl text-base font-bold tracking-wide">
+            エイッ！送出答案
           </button>
-          <button id="btn-next-question" onclick="playChiiSound('pop'); nextQuestion()" class="hidden w-full sm:w-auto px-8 py-3.5 chii-btn-yellow text-xl font-black flex items-center justify-center space-x-2">
-            <span>前進下一題 (わ～い)</span>
-            <span>👉</span>
+          <button id="btn-next-question" onclick="playSound('click'); nextQuestion()" class="hidden w-full sm:w-auto px-7 sm:px-9 py-3 app-btn-success rounded-xl text-base font-bold flex items-center justify-center space-x-2 tracking-wide">
+            <span>下一題 (なんとかなれ！)</span>
+            <i data-lucide="arrow-right" class="w-4 h-4 sm:w-5 sm:h-5"></i>
           </button>
         </div>
       </div>
     </div>
 
     <!-- 區塊 3: 結算報告 -->
-    <div id="section-result" class="w-full max-w-2xl mx-auto hidden flex-col space-y-6 my-auto">
-      <div class="chii-panel p-8 text-center space-y-6">
-        
-        <div id="result-icon-wrapper" class="w-24 h-24 mx-auto flex items-center justify-center bg-[#FFF8D6] border-[3px] border-[#5A4033] rounded-full shadow-[0_5px_0_#ECD078]">
-          <span class="text-5xl animate-bounce">🏆</span>
+    <div id="section-result" class="w-full max-w-2xl mx-auto hidden flex-col space-y-4 sm:space-y-6">
+      <div class="app-card p-5 sm:p-8 text-center space-y-5">
+        <div id="result-icon-wrapper" class="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center bg-rose-100 border border-rose-300 text-3xl shadow-sm">
+          🏆
         </div>
         
-        <div class="space-y-1">
-          <h2 class="text-3xl sm:text-4xl font-black text-[#5A4033]" id="result-title">討伐大成功！特訓結算</h2>
-          <p class="text-base sm:text-lg text-[#8C7060] font-bold" id="result-subtitle">吉伊卡哇為你感到無比驕傲喔！</p>
+        <div>
+          <h2 class="text-xl sm:text-2xl font-bold text-amber-950 tracking-tight" id="result-title">特訓結束！檢定成績出爐！</h2>
+          <p class="text-xs sm:text-sm text-amber-800 font-medium mt-1" id="result-subtitle">烏薩奇正在幫你核對勞動成果！</p>
         </div>
 
-        <!-- 分數大儀表 -->
-        <div class="grid grid-cols-3 gap-3 p-4 bg-[#FFFBF0] border-2 border-[#5A4033] rounded-2xl">
-          <div class="p-2">
-            <div class="text-xs sm:text-sm text-[#8C7060] font-bold">總命中率</div>
-            <div class="text-2xl sm:text-4xl font-black text-[#E59700]" id="result-score">0%</div>
+        <div class="grid grid-cols-3 gap-2 sm:gap-3 p-3 sm:p-4 bg-amber-50 border border-amber-200 rounded-xl">
+          <div class="p-1 sm:p-2">
+            <div class="text-xs text-amber-800 font-medium">答對率</div>
+            <div class="text-xl sm:text-2xl font-bold text-rose-500 mt-0.5" id="result-score">0%</div>
           </div>
-          <div class="p-2 border-x-2 border-[#EADFCB]">
-            <div class="text-xs sm:text-sm text-[#8C7060] font-bold">討伐成功(答對)</div>
-            <div class="text-2xl sm:text-4xl font-black text-[#1B663A]" id="result-correct-count">0</div>
+          <div class="p-1 sm:p-2 border-x border-amber-200">
+            <div class="text-xs text-amber-800 font-medium">成功討伐</div>
+            <div class="text-xl sm:text-2xl font-bold text-emerald-600 mt-0.5" id="result-correct-count">0</div>
           </div>
-          <div class="p-2">
-            <div class="text-xs sm:text-sm text-[#8C7060] font-bold">哭哭了(答錯)</div>
-            <div class="text-2xl sm:text-4xl font-black text-[#D8495F]" id="result-wrong-count">0</div>
+          <div class="p-1 sm:p-2">
+            <div class="text-xs text-amber-800 font-medium">跌倒落空</div>
+            <div class="text-xl sm:text-2xl font-bold text-rose-400 mt-0.5" id="result-wrong-count">0</div>
           </div>
         </div>
 
         <div id="wrong-answers-container" class="space-y-2 text-left"></div>
 
-        <div class="flex flex-col sm:flex-row gap-3 pt-2">
-          <button id="btn-retry-wrong" onclick="playChiiSound('pop'); retryWrongQuestions()" class="hidden flex-1 py-4 chii-btn-pink text-lg sm:text-xl font-black flex items-center justify-center space-x-2">
-            <span>🩹</span>
-            <span>重新討伐錯題 (<span id="wrong-retry-count">0</span>)</span>
+        <div class="flex flex-col sm:flex-row gap-2.5 sm:gap-3 pt-2">
+          <button id="btn-retry-wrong" onclick="playSound('click'); retryWrongQuestions()" class="hidden flex-1 py-3 app-btn rounded-xl text-sm font-bold text-amber-900 bg-amber-100 border-amber-300 hover:bg-amber-200 flex items-center justify-center space-x-1.5">
+            <span>🛡️</span>
+            <span>重新挑戰弱點動詞 (<span id="wrong-retry-count">0</span>)</span>
           </button>
-          <button onclick="playChiiSound('pop'); resetToSetup()" class="flex-1 py-4 chii-btn-yellow text-lg sm:text-xl font-black flex items-center justify-center space-x-2">
+          <button onclick="playSound('click'); resetToSetup()" class="flex-1 py-3 app-btn-primary rounded-xl text-sm font-bold flex items-center justify-center space-x-1.5">
             <span>✨</span>
-            <span>再來一輪全新修練！</span>
+            <span>再來一輪拔草特訓！</span>
           </button>
         </div>
       </div>
     </div>
 
-    <!-- 區塊 4: 完整動詞速查字典 -->
-    <div id="section-dictionary" class="w-full hidden flex-col space-y-4">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <!-- 區塊 4: 完整動詞檢索圖鑑 -->
+    <div id="section-dictionary" class="w-full hidden flex-col space-y-3 sm:space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4">
         <div>
-          <h2 class="text-2xl sm:text-3xl font-black text-[#5A4033] flex items-center space-x-2">
-            <span>📖</span>
-            <span>吉伊卡哇動詞秘密圖鑑</span>
+          <h2 class="text-xl font-bold text-amber-950 tracking-tight flex items-center gap-1.5">
+            <span>📖 不規則動詞大圖鑑</span>
           </h2>
-          <p class="text-sm sm:text-base text-[#8C7060] font-bold">支援核心/全收錄切換、AAA~ABC 變化分類與 1~5 級例句檢視</p>
+          <p class="text-xs text-amber-800 font-medium">隨身複習小手冊，隨時隨地翻閱學習</p>
         </div>
         <div class="flex items-center space-x-2">
-          <input id="dict-search-input" oninput="renderDictionary()" type="text" placeholder="🔍 搜尋動詞或中文意義..." class="w-full sm:w-72 px-4 py-2.5 bg-white border-2 border-[#5A4033] rounded-full text-base font-bold text-[#5A4033] placeholder-[#B5A59C] focus:outline-none focus:ring-2 focus:ring-[#FFB7C5]">
+          <div class="relative w-full sm:w-72">
+            <i data-lucide="search" class="w-4 h-4 absolute left-3 top-3 text-amber-600"></i>
+            <input id="dict-search-input" oninput="renderDictionary()" type="text" placeholder="搜尋動詞或中文..." class="w-full pl-9 pr-3 py-2 bg-white border border-amber-300 rounded-xl text-xs sm:text-sm font-medium text-amber-950 focus:outline-none focus:border-rose-400 shadow-sm">
+          </div>
         </div>
       </div>
 
-      <!-- 圖鑑過濾控制列：範圍切換 + 型態快篩 -->
-      <div class="flex flex-wrap items-center justify-between gap-3 bg-white p-3.5 border-2 border-[#5A4033] rounded-2xl shadow-sm">
-        <!-- 範圍切換按鈕 (全部收錄 / 核心常用) -->
-        <div class="flex items-center space-x-2">
-          <span class="text-xs sm:text-sm font-black text-[#8C7060]">收錄清單：</span>
-          <button type="button" onclick="playChiiSound('pop'); setDictScope('ALL')" id="dict-scope-btn-all" class="dict-scope-btn chii-btn active px-3.5 py-1.5 text-xs sm:text-sm font-black">
-            🌈 全收錄 (<span id="dict-scope-all-count">0</span>)
+      <!-- 圖鑑過濾工具列 -->
+      <div class="app-card p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="flex items-center space-x-1.5 sm:space-x-2">
+          <span class="text-xs font-bold text-amber-800 shrink-0">範圍：</span>
+          <button type="button" onclick="playSound('click'); setDictScope('ALL')" id="dict-scope-btn-all" class="dict-scope-btn app-btn active px-2.5 py-1 rounded-lg text-xs font-bold">
+            全收錄 (<span id="dict-scope-all-count">0</span>)
           </button>
-          <button type="button" onclick="playChiiSound('pop'); setDictScope('COMMON')" id="dict-scope-btn-common" class="dict-scope-btn chii-btn px-3.5 py-1.5 text-xs sm:text-sm font-black">
-            💖 核心字 (<span id="dict-scope-common-count">0</span>)
+          <button type="button" onclick="playSound('click'); setDictScope('COMMON')" id="dict-scope-btn-common" class="dict-scope-btn app-btn px-2.5 py-1 rounded-lg text-xs font-bold">
+            ⭐ 核心 (<span id="dict-scope-common-count">0</span>)
           </button>
         </div>
 
-        <!-- AAA~ABC 型態按鈕 -->
-        <div class="flex flex-wrap items-center gap-1.5">
-          <button onclick="playChiiSound('pop'); setDictFilter('ALL')" class="dict-filter active chii-btn px-3 py-1 text-xs sm:text-sm font-black" data-dict="ALL">全部型態</button>
-          <button onclick="playChiiSound('pop'); setDictFilter('AAA')" class="dict-filter chii-btn px-3 py-1 text-xs sm:text-sm font-black" data-dict="AAA">AAA 三態同形</button>
-          <button onclick="playChiiSound('pop'); setDictFilter('AAB')" class="dict-filter chii-btn px-3 py-1 text-xs sm:text-sm font-black" data-dict="AAB">AAB 分詞變</button>
-          <button onclick="playChiiSound('pop'); setDictFilter('ABA')" class="dict-filter chii-btn px-3 py-1 text-xs sm:text-sm font-black" data-dict="ABA">ABA 首尾同</button>
-          <button onclick="playChiiSound('pop'); setDictFilter('ABB')" class="dict-filter chii-btn px-3 py-1 text-xs sm:text-sm font-black" data-dict="ABB">ABB 過去/分詞同</button>
-          <button onclick="playChiiSound('pop'); setDictFilter('ABC')" class="dict-filter chii-btn px-3 py-1 text-xs sm:text-sm font-black" data-dict="ABC">ABC 三態全異</button>
+        <div class="flex flex-wrap items-center gap-1 sm:gap-1.5">
+          <button onclick="playSound('click'); setDictFilter('ALL')" class="dict-filter active app-btn px-2 py-1 rounded-lg text-xs font-bold" data-dict="ALL">全部</button>
+          <button onclick="playSound('click'); setDictFilter('AAA')" class="dict-filter app-btn px-2 py-1 rounded-lg text-xs font-bold" data-dict="AAA">AAA</button>
+          <button onclick="playSound('click'); setDictFilter('AAB')" class="dict-filter app-btn px-2 py-1 rounded-lg text-xs font-bold" data-dict="AAB">AAB</button>
+          <button onclick="playSound('click'); setDictFilter('ABA')" class="dict-filter app-btn px-2 py-1 rounded-lg text-xs font-bold" data-dict="ABA">ABA</button>
+          <button onclick="playSound('click'); setDictFilter('ABB')" class="dict-filter app-btn px-2 py-1 rounded-lg text-xs font-bold" data-dict="ABB">ABB</button>
+          <button onclick="playSound('click'); setDictFilter('ABC')" class="dict-filter app-btn px-2 py-1 rounded-lg text-xs font-bold" data-dict="ABC">ABC</button>
         </div>
       </div>
 
-      <!-- 表格面板 -->
-      <div class="chii-panel overflow-hidden border-[3px]">
+      <!-- 表格清單 -->
+      <div class="app-card overflow-hidden">
         <div class="overflow-x-auto">
-          <table class="w-full text-left text-base text-[#5A4033]">
-            <thead class="bg-[#FFF4E4] border-b-2 border-[#5A4033] font-black">
+          <table class="w-full text-left text-xs sm:text-sm text-amber-950 whitespace-nowrap sm:whitespace-normal">
+            <thead class="bg-amber-100/70 border-b border-amber-200 text-xs font-bold text-amber-800 uppercase tracking-wider">
               <tr>
-                <th class="py-3 px-4 w-12 text-center text-xs">#</th>
-                <th class="py-3 px-4">原形 (Base)</th>
-                <th class="py-3 px-4">過去式 (Past)</th>
-                <th class="py-3 px-4">過去分詞 (P.P.)</th>
-                <th class="py-3 px-4">中文涵義</th>
-                <th class="py-3 px-4 text-center">分類</th>
-                <th class="py-3 px-4 text-center">題庫例句</th>
+                <th class="py-2.5 px-3 sm:px-4 w-10 text-center">#</th>
+                <th class="py-2.5 px-3 sm:px-4">原形 (Base)</th>
+                <th class="py-2.5 px-3 sm:px-4">過去式 (Past)</th>
+                <th class="py-2.5 px-3 sm:px-4">過去分詞 (P.P.)</th>
+                <th class="py-2.5 px-3 sm:px-4">中文涵義</th>
+                <th class="py-2.5 px-3 sm:px-4 text-center">型態</th>
               </tr>
             </thead>
-            <tbody id="dict-table-body" class="divide-y divide-[#EEDDCF] font-bold bg-white">
+            <tbody id="dict-table-body" class="divide-y divide-amber-100 font-medium">
             </tbody>
           </table>
         </div>
@@ -522,84 +442,74 @@
 
   <script>
     // ==========================================
-    // 0. 吉伊卡哇風格萌系音效系統 (Web Audio API)
+    // 0. 音效系統 (Web Audio API)
     // ==========================================
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
 
-    function playChiiSound(type) {
-      if (audioCtx.state === 'suspended') audioCtx.resume();
+    function initAudio() {
+      if (!audioCtx && AudioContextClass) {
+        audioCtx = new AudioContextClass();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playSound(type) {
+      initAudio();
+      if (!audioCtx) return;
       const now = audioCtx.currentTime;
 
-      if (type === 'click' || type === 'pop') {
-        // 水滴泡泡音效 (cute bubbly pop)
+      if (type === 'click') {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(600, now);
-        osc.frequency.exponentialRampToValueAtTime(1400, now + 0.07);
-        gain.gain.setValueAtTime(0.2, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+        osc.frequency.setValueAtTime(800, now);
+        osc.frequency.exponentialRampToValueAtTime(400, now + 0.05);
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
         osc.connect(gain);
         gain.connect(audioCtx.destination);
         osc.start(now);
-        osc.stop(now + 0.08);
+        osc.stop(now + 0.05);
       } else if (type === 'correct') {
-        // 哇咿～ 閃亮清脆鈴音 (Sparkling chime)
-        const notes = [659.25, 880, 1174.66, 1760]; // E5, A5, D6, A6
-        notes.forEach((freq, idx) => {
+        [587.33, 880, 1174.66].forEach((freq, i) => {
           const osc = audioCtx.createOscillator();
           const gain = audioCtx.createGain();
           osc.type = 'sine';
-          osc.frequency.setValueAtTime(freq, now + idx * 0.07);
-          gain.gain.setValueAtTime(0.18, now + idx * 0.07);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.07 + 0.35);
+          osc.frequency.setValueAtTime(freq, now + i * 0.08);
+          gain.gain.setValueAtTime(0.15, now + i * 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.2);
           osc.connect(gain);
           gain.connect(audioCtx.destination);
-          osc.start(now + idx * 0.07);
-          osc.stop(now + idx * 0.07 + 0.35);
+          osc.start(now + i * 0.08);
+          osc.stop(now + i * 0.08 + 0.2);
         });
       } else if (type === 'wrong') {
-        // 哭哭抖動音 (Cute wobbly sad cry)
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.type = 'triangle';
         osc.frequency.setValueAtTime(320, now);
-        osc.frequency.exponentialRampToValueAtTime(240, now + 0.12);
-        osc.frequency.exponentialRampToValueAtTime(180, now + 0.28);
-        gain.gain.setValueAtTime(0.22, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+        osc.frequency.exponentialRampToValueAtTime(200, now + 0.25);
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
         osc.connect(gain);
         gain.connect(audioCtx.destination);
         osc.start(now);
-        osc.stop(now + 0.3);
-      } else if (type === 'start') {
-        // 烏薩奇 呀哈！歡樂起跑音
-        [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+        osc.stop(now + 0.25);
+      } else if (type === 'levelup') {
+        [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
           const osc = audioCtx.createOscillator();
           const gain = audioCtx.createGain();
           osc.type = 'sine';
-          osc.frequency.setValueAtTime(freq, now + i * 0.06);
-          gain.gain.setValueAtTime(0.18, now + i * 0.06);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.06 + 0.2);
+          osc.frequency.setValueAtTime(freq, now + i * 0.07);
+          gain.gain.setValueAtTime(0.15, now + i * 0.07);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.07 + 0.3);
           osc.connect(gain);
           gain.connect(audioCtx.destination);
-          osc.start(now + i * 0.06);
-          osc.stop(now + i * 0.06 + 0.2);
-        });
-      } else if (type === 'fanfare') {
-        // 慶祝大遊行音效
-        const arpeggio = [523.25, 659.25, 783.99, 1046.50, 1318.51];
-        arpeggio.forEach((freq, i) => {
-          const osc = audioCtx.createOscillator();
-          const gain = audioCtx.createGain();
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(freq, now + i * 0.08);
-          gain.gain.setValueAtTime(0.18, now + i * 0.08);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.4);
-          osc.connect(gain);
-          gain.connect(audioCtx.destination);
-          osc.start(now + i * 0.08);
-          osc.stop(now + i * 0.08 + 0.4);
+          osc.start(now + i * 0.07);
+          osc.stop(now + i * 0.07 + 0.3);
         });
       }
     }
@@ -662,40 +572,6 @@
         ]
       },
       {
-        base: "beat", past: "beat", pp: "beaten", zh: "打敗、敲打", type: "AAB", common: true,
-        ptSentences: [
-          { level: 1, sentence: "Tom (_____) me in the video game last night.", answer: "beat" },
-          { level: 2, sentence: "The drummer (_____) the drums loudly during the school concert yesterday.", answer: "beat" },
-          { level: 3, sentence: "The heavy rain (_____) against the classroom windows all afternoon.", answer: "beat" },
-          { level: 4, sentence: "His heart (_____) violently as he walked onto the stage to address the large audience.", answer: "beat" },
-          { level: 5, sentence: "The national debate squad decisively (_____) their opponents by dismantling their core premise.", answer: "beat" }
-        ],
-        ppSentences: [
-          { level: 1, sentence: "Our team has never (_____) Class 501 in dodgeball.", answer: "beaten" },
-          { level: 2, sentence: "Have you ever (_____) your older brother in chess?", answer: "beaten" },
-          { level: 3, sentence: "The champion has not been (_____) by anyone this season.", answer: "beaten" },
-          { level: 4, sentence: "The small boat was severely (_____) by towering waves throughout the storm.", answer: "beaten" },
-          { level: 5, sentence: "Having finally (_____) his debilitating stage fright, he delivered a compelling keynote address.", answer: "beaten" }
-        ]
-      },
-      {
-        base: "abide", past: "abided", pp: "abided", zh: "遵守、忍受", type: "ABB", common: false,
-        ptSentences: [
-          { level: 1, sentence: "He (_____) by his father's words and stayed home yesterday.", answer: "abided" },
-          { level: 2, sentence: "The two boys (_____) by the game rules during the match last week.", answer: "abided" },
-          { level: 3, sentence: "Although it was difficult, she (_____) by her promise to help her classmate.", answer: "abided" },
-          { level: 4, sentence: "The company strictly (_____) by international environmental standards throughout the project.", answer: "abided" },
-          { level: 5, sentence: "Despite immense political pressure, the judge resolutely (_____) by the legal principles.", answer: "abided" }
-        ],
-        ppSentences: [
-          { level: 1, sentence: "We have always (_____) by our family rules.", answer: "abided" },
-          { level: 2, sentence: "He has (_____) by his word since he was a little boy.", answer: "abided" },
-          { level: 3, sentence: "They have faithfully (_____) by the agreement signed three years ago.", answer: "abided" },
-          { level: 4, sentence: "The laboratory has consistently (_____) by national safety guidelines for over a decade.", answer: "abided" },
-          { level: 5, sentence: "Having never (_____) by any societal norms, the rebellious artist remained an enigma.", answer: "abided" }
-        ]
-      },
-      {
         base: "cut", past: "cut", pp: "cut", zh: "切、剪", type: "AAA", common: true,
         ptSentences: [
           { level: 1, sentence: "She (_____) the paper with scissors five minutes ago.", answer: "cut" },
@@ -715,10 +591,8 @@
     ];
 
     // ==========================================
-    // 2. 雲端試算表連線狀態與載入控制
+    // 2. 雲端資料庫連線
     // ==========================================
-    let isDbLoaded = false;
-
     function setDbLoadingState(state, infoText = "") {
       const banner = document.getElementById('db-loading-banner');
       const title = document.getElementById('db-loading-title');
@@ -726,42 +600,36 @@
       const emoji = document.getElementById('db-status-emoji');
       const topBadge = document.getElementById('top-sync-status');
       const topText = document.getElementById('top-sync-text');
-      const topIcon = document.getElementById('top-sync-icon');
 
       if (state === 'loading') {
-        banner.className = "p-4 bg-[#FFF6DB] border-2 border-[#E3B83F] rounded-3xl text-[#6B4E17] flex items-center justify-between shadow-[0_4px_0_#ECD18A]";
-        title.textContent = "正在翻閱雲端 Google 試算表筆記...";
-        desc.textContent = "小八貓正在整理「動詞三態句」全等級題庫，稍等一下喔！";
-        emoji.textContent = "🐾";
+        banner.className = "p-3.5 sm:p-4 bg-amber-50 border border-amber-300 rounded-xl text-amber-950 flex items-center justify-between shadow-sm";
+        title.textContent = "正在前往討伐基地同步題庫...";
+        desc.textContent = "小八正在抄寫雲端筆記，完成即可拔草練習！";
+        emoji.textContent = "🌱";
         if (topBadge) {
-          topBadge.classList.remove('hidden');
-          topIcon.className = "inline-block animate-spin";
-          topIcon.textContent = "🍥";
-          topText.textContent = "筆記同步中...";
+          topBadge.className = "hidden md:flex items-center space-x-1.5 px-3 py-1 bg-amber-50 border border-amber-300 text-amber-900 text-xs font-semibold rounded-full";
+          topText.textContent = "抄寫筆記中...";
         }
       } else if (state === 'success') {
-        banner.className = "p-3 sm:p-4 bg-[#E8F8ED] border-2 border-[#54A06B] rounded-3xl text-[#1E5C32] flex items-center justify-between shadow-[0_4px_0_#BEDFC8]";
-        title.textContent = `🍀 雲端題庫同步完成！(共收錄 ${VERB_DATABASE.length} 個動詞)`;
-        desc.textContent = infoText || "分級例句準備齊全！可以自由選擇 Lv.1~Lv.5 展開討伐修練囉！(わ～い！)";
-        emoji.textContent = "✨";
+        banner.className = "p-3.5 sm:p-4 bg-emerald-50 border border-emerald-300 rounded-xl text-emerald-950 flex items-center justify-between shadow-sm";
+        title.textContent = `🎉 題庫同步完成！(共 ${VERB_DATABASE.length} 個動詞)`;
+        desc.textContent = infoText || "隨時可以向鎧甲前輩領取討伐任務囉！";
+        emoji.textContent = "🍄";
         if (topBadge) {
-          topBadge.classList.remove('hidden');
-          topIcon.className = "inline-block";
-          topIcon.textContent = "🌸";
-          topText.textContent = `已同步 (${VERB_DATABASE.length}字)`;
+          topBadge.className = "hidden md:flex items-center space-x-1.5 px-3 py-1 bg-emerald-50 border border-emerald-300 text-emerald-800 text-xs font-semibold rounded-full";
+          topText.textContent = `已就緒 (${VERB_DATABASE.length}字)`;
         }
       } else if (state === 'offline') {
-        banner.className = "p-3 sm:p-4 bg-[#FFEAEA] border-2 border-[#D8697A] rounded-3xl text-[#842332] flex items-center justify-between shadow-[0_4px_0_#EDB5BE]";
-        title.textContent = "🥺 網路稍微卡住了，目前啟用在地小本本題庫";
-        desc.textContent = "請確認試算表網址是否正常，也可以隨時點選重新整理再試一次！";
-        emoji.textContent = "🩹";
+        banner.className = "p-3.5 sm:p-4 bg-rose-50 border border-rose-300 rounded-xl text-rose-950 flex items-center justify-between shadow-sm";
+        title.textContent = "🌧️ 雲端連線失敗，啟用本地背包題庫";
+        desc.textContent = "別哭別哭！本地題庫依然可以好好練習～";
+        emoji.textContent = "😿";
         if (topBadge) {
-          topBadge.classList.remove('hidden');
-          topIcon.className = "inline-block";
-          topIcon.textContent = "🍃";
-          topText.textContent = "離線筆記本";
+          topBadge.className = "hidden md:flex items-center space-x-1.5 px-3 py-1 bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold rounded-full";
+          topText.textContent = "離線冒險";
         }
       }
+      lucide.createIcons();
     }
 
     async function syncDataFromGAS(isManual = false) {
@@ -812,15 +680,14 @@
             };
           });
 
-          isDbLoaded = true;
           setDbLoadingState('success');
           updateFilterCount();
           renderDictionary();
         } else {
-          throw new Error("回傳資料為空或格式不符");
+          throw new Error("回傳格式不符");
         }
       } catch (err) {
-        console.warn("GAS 背景同步失敗，使用本地備援庫:", err);
+        console.warn("GAS 連線失敗，切換至備援資料庫:", err);
         setDbLoadingState('offline');
         updateFilterCount();
         renderDictionary();
@@ -828,7 +695,7 @@
     }
 
     // ==========================================
-    // 3. 狀態管理 (特訓場 & 圖鑑)
+    // 3. 狀態管理
     // ==========================================
     let currentScope = 'COMMON';
     let selectedLevels = new Set([1, 2, 3, 4, 5]);
@@ -840,14 +707,17 @@
     let answeredCurrent = false;
     let wrongList = [];
 
-    // 圖鑑專用狀態
     let dictCurrentType = 'ALL';
     let dictCurrentScope = 'ALL';
 
     function setScope(scope) {
       currentScope = scope;
-      document.getElementById('scope-btn-common').className = scope === 'COMMON' ? 'chii-btn active py-3 text-base sm:text-lg font-black flex items-center justify-center space-x-2' : 'chii-btn py-3 text-base sm:text-lg font-black flex items-center justify-center space-x-2';
-      document.getElementById('scope-btn-all').className = scope === 'ALL' ? 'chii-btn active py-3 text-base sm:text-lg font-black flex items-center justify-center space-x-2' : 'chii-btn py-3 text-base sm:text-lg font-black flex items-center justify-center space-x-2';
+      document.getElementById('scope-btn-common').className = scope === 'COMMON' 
+        ? 'app-btn active py-2.5 sm:py-3 px-2 sm:px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center' 
+        : 'app-btn py-2.5 sm:py-3 px-2 sm:px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center';
+      document.getElementById('scope-btn-all').className = scope === 'ALL' 
+        ? 'app-btn active py-2.5 sm:py-3 px-2 sm:px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center' 
+        : 'app-btn py-2.5 sm:py-3 px-2 sm:px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center';
       updateFilterCount();
     }
 
@@ -893,14 +763,14 @@
       const sorted = Array.from(selectedLevels).sort((a, b) => a - b);
       const descEl = document.getElementById('selected-level-desc');
       if (sorted.length === 0) {
-        descEl.textContent = "尚未挑選等級喔！";
-        descEl.className = "text-xs bg-[#FFDFE4] text-[#8E283A] px-3 py-1 border-2 border-[#5A4033] rounded-full font-bold";
+        descEl.textContent = "未選擇";
+        descEl.className = "text-[11px] sm:text-xs bg-rose-50 text-rose-700 border border-rose-200 px-2 py-0.5 rounded-full font-bold";
       } else if (sorted.length === 5) {
-        descEl.textContent = "已選：Lv.1 ~ Lv.5 (全部)";
-        descEl.className = "text-xs bg-[#FFF8D6] text-[#6B501B] px-3 py-1 border-2 border-[#5A4033] rounded-full font-bold";
+        descEl.textContent = "全夥伴出動 (Lv.1~5)";
+        descEl.className = "text-[11px] sm:text-xs bg-rose-100 text-rose-800 border border-rose-200 px-2 py-0.5 rounded-full font-bold";
       } else {
-        descEl.textContent = `已選範圍：Lv.${sorted.join(', ')}`;
-        descEl.className = "text-xs bg-[#E8F5E9] text-[#1B663A] px-3 py-1 border-2 border-[#5A4033] rounded-full font-bold";
+        descEl.textContent = `已選夥伴：Lv.${sorted.join(',')}`;
+        descEl.className = "text-[11px] sm:text-xs bg-sky-100 text-sky-800 border border-sky-200 px-2 py-0.5 rounded-full font-bold";
       }
     }
 
@@ -948,9 +818,9 @@
       const dictScopeAll = document.getElementById('dict-scope-all-count');
       const dictScopeCommon = document.getElementById('dict-scope-common-count');
 
-      if (commonLabel) commonLabel.textContent = `💖 核心常用 (${commonCount}字)`;
-      if (allLabel) allLabel.textContent = `🌈 完整收錄 (${allCount}字)`;
-      if (typeCountEl) typeCountEl.textContent = `${pool.length} 個動詞在庫`;
+      if (commonLabel) commonLabel.textContent = `⭐ 核心必考 (${commonCount})`;
+      if (allLabel) allLabel.textContent = `🏰 全收錄 (${allCount})`;
+      if (typeCountEl) typeCountEl.textContent = `${pool.length} 個在庫`;
       if (dictCountEl) dictCountEl.textContent = allCount;
       if (dictScopeAll) dictScopeAll.textContent = allCount;
       if (dictScopeCommon) dictScopeCommon.textContent = commonCount;
@@ -982,8 +852,16 @@
       return sentenceList[Math.floor(Math.random() * sentenceList.length)];
     }
 
+    const LEVEL_CHARACTERS = {
+      1: "吉伊 (基礎)",
+      2: "小八 (初級)",
+      3: "兔兔 (中級)",
+      4: "飛鼠 (中高)",
+      5: "栗子前輩 (高階)"
+    };
+
     // ==========================================
-    // 4. 題型產生器
+    // 4. 題目產生邏輯
     // ==========================================
     function generateChoiceQuestion(verb) {
       const isPast = Math.random() > 0.45;
@@ -1012,11 +890,11 @@
         typeName: '三態單選',
         level: Array.from(selectedLevels)[0] || 1,
         verb: verb,
-        title: `請選出動詞 <span class="text-[#E03D67] bg-[#FFE8EE] px-2 py-0.5 rounded-lg border border-[#5A4033] font-black">${verb.base}</span>（${verb.zh}）的正確【${targetTense}】：`,
-        subText: `小八貓悄悄話：仔細回想動詞的原形與變化家族喔！`,
+        title: `選出動詞 <span class="text-rose-500 font-bold underline">${verb.base}</span>（${verb.zh}）的【${targetTense}】：`,
+        subText: `小八提示：「哇…！注意三態變化型態是 ${verb.type} 喔！」`,
         options: options,
         correctAnswer: correctAnswer,
-        explanation: `<b>${verb.base}</b> 的三態變化為：原形 <code>${verb.base}</code> / 過去式 <code>${verb.past}</code> / 過去分詞 <code>${verb.pp}</code>。中文是「${verb.zh}」的意思喔！`
+        explanation: `<b>${verb.base}</b> 的三態變化為：原形 <code>${verb.base}</code> / 過去式 <code>${verb.past}</code> / 過去分詞 <code>${verb.pp}</code>。中文是「${verb.zh}」！`
       };
     }
 
@@ -1037,7 +915,7 @@
       
       const displaySentenceHtml = rawSentence.replace(
         /\([_]+\)/g, 
-        `<span class="px-2 py-0.5 mx-1 bg-[#FFD8DE] border-2 border-[#D8495F] text-[#9A1E33] rounded-lg font-black underline decoration-wavy decoration-[#D8495F]">${incorrectForm}</span>`
+        `<span class="px-2 py-0.5 mx-1 bg-rose-100 border border-rose-400 text-rose-700 font-bold rounded-lg underline decoration-wavy decoration-rose-500">${incorrectForm}</span>`
       );
 
       return {
@@ -1045,12 +923,12 @@
         typeName: '例句抓錯',
         level: chosenLevel,
         verb: verb,
-        title: `哇！句子裡有一個怪怪的【波浪紅字】，請輸入正確動詞變化來擊退它：`,
-        subText: `根據句子上下文的情境時態，寫出正確的動詞拼法`,
+        title: `找出句子中【怪怪的動詞拼法】並修正：`,
+        subText: `吉伊：「哇…這裡好像寫錯了…（擦汗）快寫出正確的！」`,
         displaySentence: displaySentenceHtml,
         wrongWord: incorrectForm,
         correctAnswer: correctAnswer,
-        explanation: `句子裡的「<code>${incorrectForm}</code>」是錯誤形式！<br>正確完整句子：<b>${rawSentence.replace(/\([_]+\)/g, correctAnswer)}</b><br>動詞「${verb.base}（${verb.zh}）」三態為：<code>${verb.base}</code> - <code>${verb.past}</code> - <code>${verb.pp}</code>。`
+        explanation: `句中「<code>${incorrectForm}</code>」是錯誤拼法！<br>正確句子：<b>${rawSentence.replace(/\([_]+\)/g, correctAnswer)}</b><br>動詞「${verb.base}（${verb.zh}）」：<code>${verb.base}</code> - <code>${verb.past}</code> - <code>${verb.pp}</code>。`
       };
     }
 
@@ -1072,12 +950,12 @@
         typeName: '例句填空',
         level: chosenLevel,
         verb: verb,
-        title: `觀察句子線索，在框框空格中填入適當的動詞形式：`,
-        subText: `提示動詞原形：<b class="text-[#8C344E] bg-[#FFE4EB] px-2 py-0.5 rounded border border-[#5A4033]">${verb.base}</b>（${verb.zh}）· 請填入正確的過去式或過去分詞`,
+        title: `烏薩奇留下了空格！請填入正確形式：`,
+        subText: `考查動詞：<b class="text-rose-500 underline">${verb.base}</b>（${verb.zh}）· 依語境填入過去式或過去分詞`,
         clozePre: clozePre,
         clozePost: clozePost,
         correctAnswer: correctAnswer,
-        explanation: `完整句子：<b>${rawSentence.replace(/\([_]+\)/g, correctAnswer)}</b><br>動詞「${verb.base}」三態為：<code>${verb.base}</code> / <code>${verb.past}</code> / <code>${verb.pp}</code>。`
+        explanation: `完整句子：<b>${rawSentence.replace(/\([_]+\)/g, correctAnswer)}</b><br>動詞「${verb.base}」變化：<code>${verb.base}</code> / <code>${verb.past}</code> / <code>${verb.pp}</code>。`
       };
     }
 
@@ -1086,14 +964,14 @@
     // ==========================================
     function startQuiz(customVerbs = null) {
       if (selectedLevels.size === 0) {
-        showChiikawaToast("請至少挑選一個難度等級 (Lv.1 ~ Lv.5) 喔！");
+        alert("吉伊說：請至少選擇一個難度等級（夥伴）才能出發討伐喔！");
         return;
       }
 
       const pool = customVerbs || getFilteredVerbs();
 
       if (pool.length === 0) {
-        showChiikawaToast("目前條件下沒有符合的動詞～請至少勾選一種變化型態！");
+        alert("目前條件下找不到動詞！請至少勾選一種變化型態。");
         return;
       }
 
@@ -1123,22 +1001,8 @@
       document.getElementById('section-quiz').classList.remove('hidden');
       document.getElementById('section-quiz').classList.add('flex');
 
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       renderCurrentQuestion();
-    }
-
-    function showChiikawaToast(msg) {
-      let toast = document.getElementById('chii-toast');
-      if (!toast) {
-        toast = document.createElement('div');
-        toast.id = 'chii-toast';
-        toast.className = 'fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-[#5A4033] text-white px-5 py-3 rounded-full text-base font-bold shadow-xl z-50 transition-all';
-        document.body.appendChild(toast);
-      }
-      toast.textContent = `🐾 ${msg}`;
-      toast.style.opacity = '1';
-      setTimeout(() => {
-        toast.style.opacity = '0';
-      }, 2500);
     }
 
     function renderCurrentQuestion() {
@@ -1151,9 +1015,7 @@
       document.getElementById('quiz-badge-type').textContent = q.typeName;
       
       const badgeLevel = document.getElementById('quiz-badge-level');
-      if (badgeLevel) {
-        badgeLevel.textContent = `Lv.${q.level}`;
-      }
+      if (badgeLevel) badgeLevel.textContent = `Lv.${q.level} ${LEVEL_CHARACTERS[q.level] || ''}`;
 
       document.getElementById('current-correct').textContent = score;
       document.getElementById('current-wrong').textContent = wrongList.length;
@@ -1166,16 +1028,16 @@
 
       if (q.type === 'CHOICE') {
         body.innerHTML = `
-          <div class="space-y-5">
+          <div class="space-y-4">
             <div>
-              <div class="text-xl sm:text-2xl font-black leading-relaxed text-[#5A4033]">${q.title}</div>
-              <div class="text-sm sm:text-base text-[#8C7060] font-bold mt-1">${q.subText}</div>
+              <div class="text-lg sm:text-xl font-bold leading-relaxed text-amber-950">${q.title}</div>
+              <div class="text-xs sm:text-sm text-amber-800 font-medium mt-1">${q.subText}</div>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 pt-1">
               ${q.options.map((opt, i) => `
-                <button type="button" onclick="selectOption('${opt}')" class="choice-opt-btn chii-btn p-4 text-left text-lg sm:text-xl font-black flex items-center justify-between" data-val="${opt}">
+                <button type="button" onclick="selectOption('${opt}')" class="choice-opt-btn app-btn p-3 sm:p-3.5 rounded-xl text-left text-base font-bold flex items-center justify-between" data-val="${opt}">
                   <span>(${String.fromCharCode(65 + i)}) ${opt}</span>
-                  <span class="opt-indicator w-7 h-7 rounded-full border-2 border-[#5A4033] bg-[#FFF9F2] flex items-center justify-center text-sm font-black"></span>
+                  <span class="opt-indicator w-5 h-5 rounded-full border border-amber-300 flex items-center justify-center text-xs"></span>
                 </button>
               `).join('')}
             </div>
@@ -1184,30 +1046,30 @@
         `;
       } else if (q.type === 'ERROR') {
         body.innerHTML = `
-          <div class="space-y-5">
+          <div class="space-y-4">
             <div>
-              <div class="text-xl sm:text-2xl font-black text-[#5A4033]">${q.title}</div>
-              <div class="text-sm sm:text-base text-[#8C7060] font-bold mt-1">${q.subText}</div>
+              <div class="text-lg sm:text-xl font-bold text-amber-950">${q.title}</div>
+              <div class="text-xs sm:text-sm text-amber-800 font-medium mt-1">${q.subText}</div>
             </div>
-            <div class="p-5 chii-subcard text-lg sm:text-xl text-[#5A4033] leading-relaxed font-bold border-2 border-[#5A4033]">
+            <div class="p-3.5 sm:p-4 bg-amber-50/70 border border-amber-200 rounded-xl text-base sm:text-lg text-amber-950 leading-relaxed font-semibold">
               ${q.displaySentence}
             </div>
-            <div class="pt-2 space-y-2">
-              <label class="block text-base font-black text-[#5A4033]">請在下方輸入正確的動詞拼寫：</label>
-              <input type="text" id="user-text-input" autofocus placeholder="輸入正確動詞..." class="w-full sm:w-80 px-4 py-2.5 bg-white border-2 border-[#5A4033] rounded-full text-[#5A4033] font-black text-xl focus:ring-2 focus:ring-[#FFB7C5] focus:outline-none">
+            <div class="pt-1 space-y-2">
+              <label class="block text-xs sm:text-sm font-bold text-amber-900">請在下方寫出修正後的正確拼法：</label>
+              <input type="text" id="user-text-input" autofocus placeholder="輸入正確動詞..." class="w-full sm:w-80 px-3.5 py-2 bg-white border border-amber-300 rounded-xl text-amber-950 font-bold text-base focus:border-rose-400 focus:outline-none shadow-sm">
             </div>
           </div>
         `;
       } else if (q.type === 'CLOZE') {
         body.innerHTML = `
-          <div class="space-y-5">
+          <div class="space-y-4">
             <div>
-              <div class="text-xl sm:text-2xl font-black text-[#5A4033]">${q.title}</div>
-              <div class="text-sm sm:text-base text-[#8C7060] font-bold mt-1">${q.subText}</div>
+              <div class="text-lg sm:text-xl font-bold text-amber-950">${q.title}</div>
+              <div class="text-xs sm:text-sm text-amber-800 font-medium mt-1">${q.subText}</div>
             </div>
-            <div class="p-5 chii-subcard text-lg sm:text-xl text-[#5A4033] leading-loose font-bold border-2 border-[#5A4033]">
+            <div class="p-3.5 sm:p-4 bg-amber-50/70 border border-amber-200 rounded-xl text-base sm:text-lg text-amber-950 leading-loose font-semibold">
               ${q.clozePre}
-              <input type="text" id="user-text-input" autofocus placeholder="填入形式" class="inline-block mx-2 px-3 py-1 bg-white border-2 border-[#5A4033] rounded-full font-black text-[#8C344E] w-44 text-center focus:outline-none focus:ring-2 focus:ring-[#FFB7C5]">
+              <input type="text" id="user-text-input" autofocus placeholder="填入形式" class="inline-block mx-1.5 px-2 py-0.5 bg-white border-b-2 border-rose-400 font-bold text-rose-600 w-32 sm:w-40 text-center focus:outline-none">
               ${q.clozePost}
             </div>
           </div>
@@ -1216,7 +1078,6 @@
 
       const textInput = document.getElementById('user-text-input');
       if (textInput) {
-        textInput.focus();
         textInput.addEventListener('keydown', (e) => {
           if (e.key === 'Enter') {
             if (!answeredCurrent) checkCurrentAnswer();
@@ -1224,19 +1085,23 @@
           }
         });
       }
+
+      lucide.createIcons();
     }
 
     function selectOption(val) {
       if (answeredCurrent) return;
-      playChiiSound('pop');
+      playSound('click');
       document.getElementById('user-selected-val').value = val;
       document.querySelectorAll('.choice-opt-btn').forEach(btn => {
         if (btn.dataset.val === val) {
           btn.classList.add('active');
           btn.querySelector('.opt-indicator').innerHTML = '🌸';
+          btn.querySelector('.opt-indicator').className = 'opt-indicator w-5 h-5 rounded-full bg-white flex items-center justify-center text-xs font-bold shadow-sm';
         } else {
           btn.classList.remove('active');
           btn.querySelector('.opt-indicator').innerHTML = '';
+          btn.querySelector('.opt-indicator').className = 'opt-indicator w-5 h-5 rounded-full border border-amber-300 flex items-center justify-center text-xs';
         }
       });
     }
@@ -1267,21 +1132,21 @@
 
       if (isCorrect) {
         score++;
-        playChiiSound('correct');
-        feedbackBox.className = "p-4 sm:p-5 border-2 border-[#5A4033] bg-[#E8F8ED] text-[#1B663A] rounded-2xl";
-        feedbackTitle.innerHTML = `<span>🎉</span> <span>好耶！成功討伐！太棒了～(わ～い！)</span>`;
+        playSound('correct');
+        feedbackBox.className = "p-3.5 sm:p-4 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-950 shadow-sm";
+        feedbackTitle.innerHTML = `<span>🎉</span> <span class="text-emerald-800">なんとかなったーッ！（答對了！）</span>`;
       } else {
         wrongList.push({ question: q, userAns: userAns });
-        playChiiSound('wrong');
-        feedbackBox.className = "p-4 sm:p-5 border-2 border-[#5A4033] bg-[#FFEAEA] text-[#8C2939] rounded-2xl";
-        feedbackTitle.innerHTML = `<span>🥺</span> <span>哇哇…答錯了！正確解答是：<b class="underline ml-1">${q.correctAnswer}</b></span>`;
+        playSound('wrong');
+        feedbackBox.className = "p-3.5 sm:p-4 rounded-xl border border-rose-300 bg-rose-50 text-rose-950 shadow-sm";
+        feedbackTitle.innerHTML = `<span>😿</span> <span class="text-rose-700">哇啊啊…答錯了！（正解是：<b class="underline">${q.correctAnswer}</b>）</span>`;
       }
 
       feedbackExp.innerHTML = q.explanation;
+      lucide.createIcons();
 
       document.getElementById('btn-submit-answer').classList.add('hidden');
       document.getElementById('btn-next-question').classList.remove('hidden');
-      document.getElementById('btn-next-question').focus();
     }
 
     function nextQuestion() {
@@ -1305,17 +1170,17 @@
       document.getElementById('section-result').classList.add('hidden');
       document.getElementById('section-result').classList.remove('flex');
       document.getElementById('section-setup').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function confirmExitQuiz() {
-      const modalConfirm = window.confirm("確定要暫停討伐特訓並返回準備區嗎？");
-      if (modalConfirm) {
+      if (confirm("吉伊問：確定要先返回基地休息嗎？目前的進度不會保留喔！")) {
         resetToSetup();
       }
     }
 
     function showResults() {
-      playChiiSound('fanfare');
+      playSound('levelup');
       document.getElementById('section-quiz').classList.add('hidden');
       document.getElementById('section-quiz').classList.remove('flex');
       document.getElementById('section-result').classList.remove('hidden');
@@ -1329,16 +1194,16 @@
       document.getElementById('result-wrong-count').textContent = wrongList.length;
 
       const titleEl = document.getElementById('result-title');
-      const subTitleEl = document.getElementById('result-subtitle');
+      const subEl = document.getElementById('result-subtitle');
       if (rate >= 90) {
-        titleEl.textContent = "討伐大獲全勝！五級除草證書達成！🎉";
-        subTitleEl.textContent = "烏薩奇大喊：呀哈！烏拉拉！太神啦！🐰✨";
+        titleEl.textContent = "超絕厲害！檢定 1 級合格！";
+        subEl.textContent = "烏薩奇：「ウラ…ヤハッ！！」鎧甲前輩發放最高等報酬！";
       } else if (rate >= 60) {
-        titleEl.textContent = "表現非常棒！漸入佳境囉！🌸";
-        subTitleEl.textContent = "小八貓說：「只要常常練習，一定會越來越厲害的！」🐱";
+        titleEl.textContent = "なんとかなった！表現很棒！";
+        subEl.textContent = "小八貓：「太好了～我們一起喝熱湯慶祝吧！」";
       } else {
-        titleEl.textContent = "哇…這次好辛苦喔，但吉伊卡哇陪你！🥺";
-        subTitleEl.textContent = "拍拍！喝杯熱茶，點選下方按鈕重新討伐錯題吧！🍵";
+        titleEl.textContent = "別哭別哭！再練一次一定行！";
+        subEl.textContent = "吉伊卡哇：「わ…わァ…！（擦乾眼淚再次挑戰！）」";
       }
 
       const wrongContainer = document.getElementById('wrong-answers-container');
@@ -1350,27 +1215,28 @@
         document.getElementById('wrong-retry-count').textContent = wrongList.length;
 
         wrongContainer.innerHTML = `
-          <div class="text-base sm:text-lg font-black text-[#5A4033] flex items-center mb-2">
-            <span class="mr-1.5">🩹</span>
-            本次需要補習的錯題清單 (${wrongList.length} 題)：
+          <div class="text-xs sm:text-sm font-bold text-amber-950 flex items-center mb-1">
+            <span>📝</span>
+            <span class="ml-1">需要再次複習的動詞筆記 (${wrongList.length} 題)：</span>
           </div>
-          <div class="space-y-2 max-h-56 overflow-y-auto pr-1">
+          <div class="space-y-2 max-h-52 overflow-y-auto pr-1">
             ${wrongList.map(item => `
-              <div class="p-3 bg-[#FFFDF8] border-2 border-[#5A4033] rounded-2xl text-base flex justify-between items-center font-bold">
+              <div class="p-2.5 sm:p-3 bg-amber-50/80 border border-amber-200 rounded-xl text-xs sm:text-sm flex justify-between items-center font-medium">
                 <div>
-                  <span class="text-[#8C344E] font-black">${item.question.verb.base} (${item.question.verb.zh})</span>
-                  <span class="text-xs bg-[#E1F3FE] text-[#1E3A8A] px-2 py-0.5 rounded-full border border-[#5A4033] ml-1">Lv.${item.question.level}</span>
-                  <span class="text-[#8C7060] ml-2 text-sm">你的答案: <span class="text-[#D8495F] line-through">${item.userAns || "(未作答)"}</span></span>
+                  <span class="font-bold text-amber-950">${item.question.verb.base} (${item.question.verb.zh})</span>
+                  <span class="text-[10px] bg-rose-100 text-rose-700 px-1.5 py-0.5 rounded-full ml-1 font-bold">Lv.${item.question.level}</span>
+                  <div class="text-amber-700 text-xs mt-0.5">你的回答: <span class="text-rose-500 line-through">${item.userAns || "(未作答)"}</span></div>
                 </div>
-                <div class="text-[#1B663A] font-black">正解: ${item.question.correctAnswer}</div>
+                <div class="text-emerald-700 font-bold shrink-0 text-right">正解: ${item.question.correctAnswer}</div>
               </div>
             `).join('')}
           </div>
         `;
       } else {
         retryWrongBtn.classList.add('hidden');
-        wrongContainer.innerHTML = `<div class="p-4 bg-[#E8F8ED] text-[#1B663A] font-black text-center text-lg border-2 border-[#5A4033] rounded-2xl">🌟 全部題目都答對了！無任何錯題！真不愧是你！</div>`;
+        wrongContainer.innerHTML = `<div class="p-3.5 bg-emerald-100/80 border border-emerald-300 rounded-xl text-emerald-950 font-bold text-center text-xs sm:text-sm">🌸 完美通關！沒有任何錯題！拿到閃亮亮檢定證書了！</div>`;
       }
+      lucide.createIcons();
     }
 
     // ==========================================
@@ -1393,6 +1259,7 @@
         document.getElementById('nav-btn-dictionary').classList.add('active');
         renderDictionary();
       }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function setDictFilter(type) {
@@ -1422,27 +1289,22 @@
       });
 
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-[#8C7060] font-bold text-lg">沒有找到符合條件的動詞唷～(眨眼)</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-amber-700 font-medium text-xs">找不到符合的小筆記...</td></tr>`;
         return;
       }
 
       tbody.innerHTML = filtered.map((v, idx) => {
         return `
-          <tr class="hover:bg-[#FFF9F2] transition-colors">
-            <td class="py-3 px-4 text-center text-xs text-[#8C7060]">${idx + 1}</td>
-            <td class="py-3 px-4 text-[#5A4033] font-black flex items-center space-x-1.5">
+          <tr class="hover:bg-amber-50/60 transition-colors">
+            <td class="py-2 px-3 sm:px-4 text-center text-amber-600 text-xs">${idx + 1}</td>
+            <td class="py-2 px-3 sm:px-4 text-amber-950 font-bold flex items-center space-x-1.5">
               <span>${v.base}</span>
-              ${v.common ? '<span class="text-[11px] bg-[#FFE4EB] text-[#8C344E] px-2 py-0.5 rounded-full border border-[#5A4033] font-bold">核心</span>' : ''}
+              ${v.common ? '<span class="text-[10px] bg-rose-100 text-rose-600 border border-rose-300 px-1 py-0.2 rounded-full font-bold">必考</span>' : ''}
             </td>
-            <td class="py-3 px-4 text-[#1E3A8A] font-bold">${v.past}</td>
-            <td class="py-3 px-4 text-[#1B663A] font-bold">${v.pp}</td>
-            <td class="py-3 px-4 text-[#5A4033] font-bold">${v.zh}</td>
-            <td class="py-3 px-4 text-center">
-              <span class="bg-[#FFF4D4] border border-[#5A4033] text-[#713F12] px-2.5 py-0.5 text-xs rounded-full font-black">${v.type}</span>
-            </td>
-            <td class="py-3 px-4 text-center text-xs font-bold text-[#8C7060]">
-              <span class="bg-[#F0EAE1] px-2 py-0.5 rounded-full">Lv.1~Lv.5</span>
-            </td>
+            <td class="py-2 px-3 sm:px-4 text-sky-700 font-semibold">${v.past}</td>
+            <td class="py-2 px-3 sm:px-4 text-emerald-700 font-semibold">${v.pp}</td>
+            <td class="py-2 px-3 sm:px-4 text-amber-900 font-medium">${v.zh}</td>
+            <td class="py-2 px-3 sm:px-4 text-center"><span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full text-[11px] font-semibold">${v.type}</span></td>
           </tr>
         `;
       }).join('');
