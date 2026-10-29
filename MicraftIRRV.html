@@ -163,7 +163,7 @@
 
       <div class="text-center space-y-1">
         <div class="inline-block bg-[#113110] border-2 border-[#55ff55] px-4 py-0.5 text-sm sm:text-base text-[#55ff55] font-bold">
-          真實語境上下文判斷 · 無直接時態洩題
+          真實語境上下文判斷
         </div>
         <h2 class="text-3xl sm:text-4xl font-extrabold text-[#ffff55] tracking-wide no-shadow">設定特訓範圍與等級</h2>
       </div>
@@ -370,20 +370,35 @@
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 class="text-2xl sm:text-3xl font-extrabold text-[#ffff55] no-shadow">不規則動詞檢索圖鑑</h2>
-          <p class="text-base sm:text-lg text-gray-300">支援 AAA~ABC 分類快篩與例句等級檢視</p>
+          <p class="text-base sm:text-lg text-gray-300">支援全部／核心切換、AAA~ABC 分類快篩與例句等級檢視</p>
         </div>
         <div class="flex items-center space-x-2">
           <input id="dict-search-input" oninput="renderDictionary()" type="text" placeholder="🔍 搜尋動詞或中文..." class="w-full sm:w-72 px-4 py-2.5 bg-black border-2 border-gray-500 text-lg text-[#55ff55] focus:outline-none focus:border-[#55ff55]">
         </div>
       </div>
 
-      <div class="flex flex-wrap items-center gap-2">
-        <button onclick="playMcSound('click'); setDictFilter('ALL')" class="dict-filter active mc-btn px-4 py-2 text-base font-bold" data-dict="ALL">全部型態</button>
-        <button onclick="playMcSound('click'); setDictFilter('AAA')" class="dict-filter mc-btn px-4 py-2 text-base font-bold" data-dict="AAA">AAA 三態同形</button>
-        <button onclick="playMcSound('click'); setDictFilter('AAB')" class="dict-filter mc-btn px-4 py-2 text-base font-bold" data-dict="AAB">AAB 分詞變</button>
-        <button onclick="playMcSound('click'); setDictFilter('ABA')" class="dict-filter mc-btn px-4 py-2 text-base font-bold" data-dict="ABA">ABA 首尾同</button>
-        <button onclick="playMcSound('click'); setDictFilter('ABB')" class="dict-filter mc-btn px-4 py-2 text-base font-bold" data-dict="ABB">ABB 過去/分詞同</button>
-        <button onclick="playMcSound('click'); setDictFilter('ABC')" class="dict-filter mc-btn px-4 py-2 text-base font-bold" data-dict="ABC">ABC 三態全異</button>
+      <!-- 圖鑑過濾控制列：範圍切換 + 型態快篩 -->
+      <div class="flex flex-wrap items-center justify-between gap-3 bg-[#262626] p-3 border-2 border-black">
+        <!-- 範圍切換按鈕 (全部收錄 / 核心常用) -->
+        <div class="flex items-center space-x-2">
+          <span class="text-sm font-bold text-gray-300">收錄範圍：</span>
+          <button type="button" onclick="playMcSound('click'); setDictScope('ALL')" id="dict-scope-btn-all" class="dict-scope-btn mc-btn active px-3.5 py-1.5 text-base font-bold">
+            🌐 全部收錄 (<span id="dict-scope-all-count">0</span>)
+          </button>
+          <button type="button" onclick="playMcSound('click'); setDictScope('COMMON')" id="dict-scope-btn-common" class="dict-scope-btn mc-btn px-3.5 py-1.5 text-base font-bold">
+            🔥 核心常用 (<span id="dict-scope-common-count">0</span>)
+          </button>
+        </div>
+
+        <!-- AAA~ABC 型態按鈕 -->
+        <div class="flex flex-wrap items-center gap-2">
+          <button onclick="playMcSound('click'); setDictFilter('ALL')" class="dict-filter active mc-btn px-3 py-1.5 text-sm sm:text-base font-bold" data-dict="ALL">全部型態</button>
+          <button onclick="playMcSound('click'); setDictFilter('AAA')" class="dict-filter mc-btn px-3 py-1.5 text-sm sm:text-base font-bold" data-dict="AAA">AAA 三態同形</button>
+          <button onclick="playMcSound('click'); setDictFilter('AAB')" class="dict-filter mc-btn px-3 py-1.5 text-sm sm:text-base font-bold" data-dict="AAB">AAB 分詞變</button>
+          <button onclick="playMcSound('click'); setDictFilter('ABA')" class="dict-filter mc-btn px-3 py-1.5 text-sm sm:text-base font-bold" data-dict="ABA">ABA 首尾同</button>
+          <button onclick="playMcSound('click'); setDictFilter('ABB')" class="dict-filter mc-btn px-3 py-1.5 text-sm sm:text-base font-bold" data-dict="ABB">ABB 過去/分詞同</button>
+          <button onclick="playMcSound('click'); setDictFilter('ABC')" class="dict-filter mc-btn px-3 py-1.5 text-sm sm:text-base font-bold" data-dict="ABC">ABC 三態全異</button>
+        </div>
       </div>
 
       <div class="mc-panel overflow-hidden">
@@ -635,7 +650,7 @@
       setDbLoadingState('loading');
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 12000); // 12秒超時
+        const timeoutId = setTimeout(() => controller.abort(), 12000);
 
         const response = await fetch(GAS_ENDPOINT_URL, { signal: controller.signal });
         clearTimeout(timeoutId);
@@ -695,7 +710,7 @@
     }
 
     // ==========================================
-    // 3. 狀態管理 (範圍、等級聯集、型態聯集、題數)
+    // 3. 狀態管理 (特訓場 & 圖鑑)
     // ==========================================
     let currentScope = 'COMMON';
     let selectedLevels = new Set([1, 2, 3, 4, 5]);
@@ -706,13 +721,31 @@
     let score = 0;
     let answeredCurrent = false;
     let wrongList = [];
+
+    // 圖鑑專用狀態
     let dictCurrentType = 'ALL';
+    let dictCurrentScope = 'ALL'; // 'ALL' 或 'COMMON'
 
     function setScope(scope) {
       currentScope = scope;
       document.getElementById('scope-btn-common').className = scope === 'COMMON' ? 'mc-btn active py-3 text-lg sm:text-xl font-bold flex items-center justify-center space-x-2' : 'mc-btn py-3 text-lg sm:text-xl font-bold flex items-center justify-center space-x-2';
       document.getElementById('scope-btn-all').className = scope === 'ALL' ? 'mc-btn active py-3 text-lg sm:text-xl font-bold flex items-center justify-center space-x-2' : 'mc-btn py-3 text-lg sm:text-xl font-bold flex items-center justify-center space-x-2';
       updateFilterCount();
+    }
+
+    function setDictScope(scope) {
+      dictCurrentScope = scope;
+      const btnAll = document.getElementById('dict-scope-btn-all');
+      const btnCommon = document.getElementById('dict-scope-btn-common');
+
+      if (scope === 'ALL') {
+        btnAll.classList.add('active');
+        btnCommon.classList.remove('active');
+      } else {
+        btnCommon.classList.add('active');
+        btnAll.classList.remove('active');
+      }
+      renderDictionary();
     }
 
     function toggleLevelFilter(lvl) {
@@ -794,10 +827,16 @@
       const typeCountEl = document.getElementById('selected-type-count');
       const dictCountEl = document.getElementById('dict-total-count');
 
+      // 圖鑑收錄範圍按鈕數量
+      const dictScopeAll = document.getElementById('dict-scope-all-count');
+      const dictScopeCommon = document.getElementById('dict-scope-common-count');
+
       if (commonLabel) commonLabel.textContent = `🔥 核心常用 (${commonCount}字)`;
       if (allLabel) allLabel.textContent = `🌐 完整全收錄 (${allCount}字)`;
       if (typeCountEl) typeCountEl.textContent = `${pool.length} 個動詞在庫`;
       if (dictCountEl) dictCountEl.textContent = allCount;
+      if (dictScopeAll) dictScopeAll.textContent = allCount;
+      if (dictScopeCommon) dictScopeCommon.textContent = commonCount;
     }
 
     function setCount(num) {
@@ -827,9 +866,8 @@
     }
 
     // ==========================================
-    // 4. 題型產生器 (已移除洩題時態與原形提示)
+    // 4. 題型產生器
     // ==========================================
-
     function generateChoiceQuestion(verb) {
       const isPast = Math.random() > 0.45;
       const targetTense = isPast ? "過去式 (Past Tense)" : "過去分詞 (P.P.)";
@@ -891,7 +929,6 @@
         level: chosenLevel,
         verb: verb,
         title: `找出句子中【劃紅線錯誤形式】並輸入正確的動詞變化：`,
-        // 移除時態提示，僅保留考驗上下文判斷的乾淨引導
         subText: `根據句子語境與前後文時態，寫出正確的動詞拼法`,
         displaySentence: displaySentenceHtml,
         wrongWord: incorrectForm,
@@ -919,7 +956,6 @@
         level: chosenLevel,
         verb: verb,
         title: `閱讀上下文語境線索，在空格中填入正確的動詞形式：`,
-        // 移除洩題的时態說明，僅提供原形動詞
         subText: `考查動詞原形：<b class="text-[#ffff55] underline">${verb.base}</b>（${verb.zh}）· 請依句意填入適當的過去式或過去分詞`,
         clozePre: clozePre,
         clozePost: clozePost,
@@ -1237,13 +1273,15 @@
       if (!tbody) return;
 
       const filtered = VERB_DATABASE.filter(v => {
+        const matchesScope = dictCurrentScope === 'ALL' ? true : v.common;
         const matchesType = dictCurrentType === 'ALL' || v.type === dictCurrentType;
         const matchesSearch = !searchKey || 
           v.base.toLowerCase().includes(searchKey) ||
           v.past.toLowerCase().includes(searchKey) ||
           v.pp.toLowerCase().includes(searchKey) ||
           v.zh.toLowerCase().includes(searchKey);
-        return matchesType && matchesSearch;
+
+        return matchesScope && matchesType && matchesSearch;
       });
 
       if (filtered.length === 0) {
@@ -1255,7 +1293,10 @@
         return `
           <tr class="hover:bg-[#d8d8d8] transition-colors">
             <td class="py-3 px-4 text-center text-gray-600">${idx + 1}</td>
-            <td class="py-3 px-4 text-black font-extrabold">${v.base}</td>
+            <td class="py-3 px-4 text-black font-extrabold flex items-center space-x-1.5">
+              <span>${v.base}</span>
+              ${v.common ? '<span class="text-xs bg-[#b85800] text-white px-1.5 py-0.2 rounded font-bold">核心</span>' : ''}
+            </td>
             <td class="py-3 px-4 text-blue-900">${v.past}</td>
             <td class="py-3 px-4 text-emerald-900">${v.pp}</td>
             <td class="py-3 px-4 text-gray-800">${v.zh}</td>
