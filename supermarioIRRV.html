@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SUPER MARIO BROS. - 不規則動詞 World 1-1 大冒險</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Fonts: 經典紅白機像素字型 Press Start 2P + 粗黑圓體 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DotGothic16&family=Noto+Sans+TC:wght@700;900&display=swap" rel="stylesheet">
+
+  <style>
+    /* 經典任天堂 NES 核心設定 */
+    :root {
+      --mario-sky: #5c94fc;
+      --mario-red: #e52521;
+      --mario-green: #00a800;
+      --mario-dark-green: #006000;
+      --mario-pipe-light: #5ce65c;
+      --mario-pipe-body: #00a800;
+      --mario-pipe-dark: #004d00;
+      --mario-brick: #b84418;
+      --mario-brick-dark: #6b2408;
+      --mario-question: #fc9838;
+      --mario-gold: #fbd000;
+      --ground-top: #00a800;
+      --ground-brown: #c84c0c;
+      --ground-dark: #000000;
+    }
+
+    * {
+      image-rendering: pixelated;
+    }
+
+    body {
+      font-family: 'Press Start 2P', 'DotGothic16', 'Noto Sans TC', sans-serif;
+      background-color: var(--mario-sky);
+      position: relative;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    .pixel-text {
+      font-family: 'Press Start 2P', monospace;
+      letter-spacing: 1px;
+    }
+
+    .tc-bold {
+      font-family: 'DotGothic16', 'Noto Sans TC', sans-serif;
+      font-weight: 900;
+    }
+
+    /* 經典 World 1-1 裝飾背景：像素雲朵、灌木叢、浮空硬磚與問號磚 */
+    .bg-clouds {
+      position: absolute;
+      top: 50px;
+      width: 100%;
+      height: 120px;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* 經典 3 段式像素白雲（帶笑眼） */
+    .mario-cloud {
+      position: absolute;
+      background: #ffffff;
+      border: 4px solid #000;
+      border-radius: 20px;
+      height: 38px;
+      width: 90px;
+      box-shadow: inset -4px -4px 0px #bce0fc;
+    }
+    .mario-cloud::before {
+      content: '';
+      position: absolute;
+      background: #ffffff;
+      border: 4px solid #000;
+      border-bottom: none;
+      border-radius: 24px 24px 0 0;
+      width: 44px;
+      height: 32px;
+      top: -24px;
+      left: 18px;
+      box-shadow: inset -4px 2px 0px #ffffff;
+    }
+    .mario-cloud::after {
+      content: '';
+      position: absolute;
+      width: 4px;
+      height: 10px;
+      background: #000;
+      top: 14px;
+      left: 36px;
+      box-shadow: 16px 0 0 #000;
+    }
+
+    /* 經典像素磚塊紋理 (Question Block & Hard Brick) */
+    .pixel-brick {
+      background-color: var(--mario-brick);
+      border: 4px solid #000;
+      box-shadow: 
+        inset 4px 4px 0px #fc9838, 
+        inset -4px -4px 0px var(--mario-brick-dark),
+        0 6px 0 #000000;
+    }
+
+    .pixel-qblock {
+      background-color: var(--mario-question);
+      border: 4px solid #000;
+      box-shadow: 
+        inset 4px 4px 0px #fcde98, 
+        inset -4px -4px 0px #b05c10,
+        0 6px 0 #000000;
+      animation: qPulse 1.8s infinite steps(2);
+    }
+    @keyframes qPulse {
+      0%, 100% { background-color: var(--mario-question); }
+      50% { background-color: #fca844; }
+    }
+
+    /* 經典任天堂厚底立體按鈕 (NES Button) */
+    .nes-btn {
+      position: relative;
+      background-color: #fc9838;
+      color: #000;
+      border: 4px solid #000;
+      box-shadow: inset 4px 4px 0px #ffe299, inset -4px -4px 0px #a85810, 0 6px 0 #000;
+      transition: transform 0.05s, box-shadow 0.05s;
+    }
+    .nes-btn:hover {
+      background-color: #fbd000;
+      transform: translateY(-2px);
+      box-shadow: inset 4px 4px 0px #fff2a8, inset -4px -4px 0px #bd7010, 0 8px 0 #000;
+    }
+    .nes-btn:active {
+      transform: translateY(4px);
+      box-shadow: inset 4px 4px 0px #a85810, inset -4px -4px 0px #ffe299, 0 2px 0 #000;
+    }
+    .nes-btn.active, .nes-btn-red {
+      background-color: var(--mario-red);
+      color: #fff;
+      box-shadow: inset 4px 4px 0px #ff9997, inset -4px -4px 0px #820e0c, 0 6px 0 #000;
+    }
+    .nes-btn.active:hover, .nes-btn-red:hover {
+      background-color: #ff3c38;
+      box-shadow: inset 4px 4px 0px #ffc2c0, inset -4px -4px 0px #a31412, 0 8px 0 #000;
+    }
+    .nes-btn-green {
+      background-color: var(--mario-green);
+      color: #fff;
+      box-shadow: inset 4px 4px 0px #70f070, inset -4px -4px 0px #005200, 0 6px 0 #000;
+    }
+    .nes-btn-green:hover {
+      background-color: #00c900;
+      box-shadow: inset 4px 4px 0px #9ef79e, inset -4px -4px 0px #006b00, 0 8px 0 #000;
+    }
+
+    /* 經典綠色大水管面板邊框 (NES Warp Pipe Panel) */
+    .pipe-panel {
+      position: relative;
+      background-color: #fce4b8; /* 經典金幣問號箱內部金棕米色 */
+      border: 6px solid #000;
+      box-shadow: 
+        inset 6px 6px 0px #ffffff,
+        inset -6px -6px 0px #cca86b,
+        10px 10px 0px rgba(0,0,0,0.45);
+    }
+
+    /* 頂部水管法蘭邊飾 */
+    .pipe-header-bar {
+      background: linear-gradient(90deg, #005000 0%, #009900 12%, #5ce65c 22%, #00a800 35%, #006000 85%, #003300 100%);
+      border-bottom: 6px solid #000;
+    }
+
+    /* 底部經典泥土地磚 (Ground Blocks) */
+    .mario-ground-strip {
+      height: 48px;
+      background-color: var(--ground-brown);
+      border-top: 6px solid #000;
+      position: relative;
+      background-image: 
+        linear-gradient(45deg, #000 25%, transparent 25%), 
+        linear-gradient(-45deg, #000 25%, transparent 25%), 
+        linear-gradient(45deg, transparent 75%, #000 75%), 
+        linear-gradient(-45deg, transparent 75%, #000 75%);
+      background-size: 24px 24px;
+      background-position: 0 0, 0 12px, 12px -12px, -12px 0px;
+    }
+    .mario-ground-strip::before {
+      content: '';
+      position: absolute;
+      top: -12px;
+      left: 0;
+      right: 0;
+      height: 12px;
+      background-color: var(--ground-top);
+      border-top: 4px solid #70f070;
+      border-bottom: 4px solid #000;
+    }
+
+    /* 金幣旋轉動畫 */
+    @keyframes nesCoin {
+      0%, 100% { transform: scaleX(1); }
+      50% { transform: scaleX(0.18); }
+    }
+    .nes-coin-icon {
+      display: inline-block;
+      animation: nesCoin 0.85s steps(4) infinite;
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col justify-between select-none">
+
+  <!-- 經典飄浮像素雲朵背景 -->
+  <div class="bg-clouds">
+    <div class="mario-cloud" style="left: 6%; top: 15px;"></div>
+    <div class="mario-cloud" style="left: 45%; top: 40px;"></div>
+    <div class="mario-cloud" style="right: 8%; top: 20px;"></div>
+  </div>
+
+  <!-- 頂部正宗 NES 遊戲 HUD 狀態列 -->
+  <header class="bg-black text-white border-b-6 border-black px-4 py-3 sticky top-0 z-50 shadow-2xl">
+    <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-y-2 pixel-text text-xs sm:text-sm">
+      
+      <!-- MARIO 分數 -->
+      <div class="flex flex-col cursor-pointer" onclick="playMarioSound('coin'); switchTab('quiz')">
+        <span class="text-gray-300">MARIO</span>
+        <span id="hud-score" class="text-white text-sm sm:text-base tracking-widest">000000</span>
+      </div>
+
+      <!-- 金幣計數器 (Coin Counter) -->
+      <div class="flex items-center space-x-2 bg-[#222] px-3 py-1 border-2 border-white">
+        <span class="nes-coin-icon text-[#fbd000] text-base">🪙</span>
+        <span class="text-[#fbd000]">×</span>
+        <span id="hud-coins" class="text-[#fbd000] text-sm sm:text-base">00</span>
+      </div>
+
+      <!-- WORLD 關卡 -->
+      <div class="flex flex-col text-center">
+        <span class="text-gray-300">WORLD</span>
+        <span id="hud-world" class="text-white text-sm sm:text-base">1-1</span>
+      </div>
+
+      <!-- 倒數時間 TIME / 題數 -->
+      <div class="flex flex-col text-right">
+        <span class="text-gray-300">STAGE</span>
+        <span id="hud-stage-text" class="text-[#fbd000] text-sm sm:text-base">LV.ALL</span>
+      </div>
+
+      <!-- 導航切換：關卡挑戰 vs 動詞圖鑑（已放大字級與內距，清晰醒目） -->
+      <div class="flex items-center space-x-2.5 w-full sm:w-auto justify-end pt-1.5 sm:pt-0">
+        <button id="nav-btn-quiz" onclick="playMarioSound('coin'); switchTab('quiz')" class="nes-btn active px-4 py-2 text-base sm:text-lg tc-bold font-black flex items-center space-x-1.5">
+          <span class="text-lg">🔥</span>
+          <span>冒險挑戰</span>
+        </button>
+        <button id="nav-btn-dictionary" onclick="playMarioSound('coin'); switchTab('dictionary')" class="nes-btn px-4 py-2 text-base sm:text-lg tc-bold font-black flex items-center space-x-1.5 bg-white">
+          <span class="text-lg">📖</span>
+          <span>動詞圖鑑 (<span id="dict-total-count">...</span>)</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- 主遊戲視窗 -->
+  <main class="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 flex flex-col justify-start relative z-10">
+
+    <!-- 區塊 1: 關卡準備選單 (Setup Stage) -->
+    <div id="section-setup" class="w-full max-w-2xl mx-auto space-y-6 my-auto">
+      
+      <!-- 醒目的問號箱連線狀態橫幅 -->
+      <div id="db-loading-banner" class="p-4 bg-[#fbd000] border-4 border-black text-black flex items-center justify-between shadow-[6px_6px_0px_#000]">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 bg-black text-[#fbd000] border-2 border-white flex items-center justify-center text-xl font-bold">
+            <span id="db-status-emoji">❓</span>
+          </div>
+          <div>
+            <div id="db-loading-title" class="text-base sm:text-lg tc-bold text-black font-black">正在連線碧姬城堡雲端題庫...</div>
+            <div id="db-loading-desc" class="text-xs sm:text-sm tc-bold text-gray-900 font-bold">正在讀取 Google 試算表 1~5 級例句，水管通道開啟中！</div>
+          </div>
+        </div>
+        <button id="btn-manual-sync" onclick="playMarioSound('coin'); syncDataFromGAS(true)" class="hidden sm:block nes-btn px-3 py-1.5 text-xs tc-bold bg-white">
+          🔄 重新連線
+        </button>
+      </div>
+
+      <!-- 標題橫幅 (帶問號磚與硬磚裝飾) -->
+      <div class="text-center space-y-2">
+        <div class="flex items-center justify-center space-x-3">
+          <div class="pixel-brick w-9 h-9 flex items-center justify-center text-white text-xs">🧱</div>
+          <div class="pixel-qblock w-9 h-9 flex items-center justify-center text-black font-black text-base">?</div>
+          <div class="pixel-brick w-9 h-9 flex items-center justify-center text-white text-xs">🧱</div>
+        </div>
+        <h2 class="pixel-text text-2xl sm:text-3xl text-white tracking-wider drop-shadow-[4px_4px_0_#000]">
+          VERB QUEST 1-1
+        </h2>
+        <p class="tc-bold text-base sm:text-lg text-[#fbd000] font-black drop-shadow-[2px_2px_0_#000]">
+          ★ 裝備火焰花 · 踩扁英語不規則動詞怪物 ★
+        </p>
+      </div>
+
+      <!-- 綠色大水管主設定面板 -->
+      <div class="pipe-panel p-6 sm:p-8 space-y-6">
+        
+        <!-- 1. 動詞單字範圍選擇 -->
+        <div class="space-y-2">
+          <div class="tc-bold text-lg font-black text-black flex items-center space-x-2">
+            <span class="pixel-text bg-black text-[#fbd000] px-2 py-0.5 text-xs">01</span>
+            <span>選擇單字收錄範圍：</span>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <button type="button" onclick="playMarioSound('coin'); setScope('COMMON')" id="scope-btn-common" class="nes-btn active py-3 text-base sm:text-lg tc-bold flex items-center justify-center space-x-2">
+              <span id="scope-common-label">🍄 核心常用動詞</span>
+            </button>
+            <button type="button" onclick="playMarioSound('coin'); setScope('ALL')" id="scope-btn-all" class="nes-btn py-3 text-base sm:text-lg tc-bold flex items-center justify-center space-x-2 bg-white">
+              <span id="scope-all-label">🌟 完整全收錄動詞</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. 等級 1~5 聯集選擇 (大字體清楚醒目) -->
+        <div class="space-y-2">
+          <div class="flex justify-between items-center tc-bold text-lg font-black text-black">
+            <div class="flex items-center space-x-2">
+              <span class="pixel-text bg-black text-[#fbd000] px-2 py-0.5 text-xs">02</span>
+              <span>例句難度等級 (可多選)：</span>
+            </div>
+            <span id="selected-level-desc" class="pixel-text text-xs bg-black text-[#fbd000] px-2.5 py-1 border-2 border-black">
+              Lv.1-5 ALL
+            </span>
+          </div>
+          <div class="grid grid-cols-5 gap-2">
+            <button type="button" onclick="playMarioSound('coin'); toggleLevelFilter(1)" id="level-btn-1" class="level-toggle-btn nes-btn active py-2 sm:py-3 text-base sm:text-lg tc-bold flex flex-col items-center justify-center space-y-0.5">
+              <span class="pixel-text text-xs sm:text-sm">Lv.1</span>
+              <span class="text-sm sm:text-base font-black">基礎🌱</span>
+            </button>
+            <button type="button" onclick="playMarioSound('coin'); toggleLevelFilter(2)" id="level-btn-2" class="level-toggle-btn nes-btn active py-2 sm:py-3 text-base sm:text-lg tc-bold flex flex-col items-center justify-center space-y-0.5">
+              <span class="pixel-text text-xs sm:text-sm">Lv.2</span>
+              <span class="text-sm sm:text-base font-black">初級🌿</span>
+            </button>
+            <button type="button" onclick="playMarioSound('coin'); toggleLevelFilter(3)" id="level-btn-3" class="level-toggle-btn nes-btn active py-2 sm:py-3 text-base sm:text-lg tc-bold flex flex-col items-center justify-center space-y-0.5">
+              <span class="pixel-text text-xs sm:text-sm">Lv.3</span>
+              <span class="text-sm sm:text-base font-black">中級🍄</span>
+            </button>
+            <button type="button" onclick="playMarioSound('coin'); toggleLevelFilter(4)" id="level-btn-4" class="level-toggle-btn nes-btn active py-2 sm:py-3 text-base sm:text-lg tc-bold flex flex-col items-center justify-center space-y-0.5">
+              <span class="pixel-text text-xs sm:text-sm">Lv.4</span>
+              <span class="text-sm sm:text-base font-black">中高🌟</span>
+            </button>
+            <button type="button" onclick="playMarioSound('coin'); toggleLevelFilter(5)" id="level-btn-5" class="level-toggle-btn nes-btn active py-2 sm:py-3 text-base sm:text-lg tc-bold flex flex-col items-center justify-center space-y-0.5">
+              <span class="pixel-text text-xs sm:text-sm">Lv.5</span>
+              <span class="text-sm sm:text-base font-black">高階👑</span>
+            </button>
+          </div>
+          <div class="flex justify-end space-x-3 pt-0.5 text-xs tc-bold font-black text-gray-800">
+            <button type="button" onclick="playMarioSound('coin'); selectAllLevels(true)" class="hover:text-black underline">全選等級</button>
+            <span>•</span>
+            <button type="button" onclick="playMarioSound('coin'); selectAllLevels(false)" class="hover:text-black underline">清空等級</button>
+          </div>
+        </div>
+
+        <!-- 3. 動詞三態變化型態聯集多選 -->
+        <div class="space-y-2">
+          <div class="flex justify-between items-center tc-bold text-lg font-black text-black">
+            <div class="flex items-center space-x-2">
+              <span class="pixel-text bg-black text-[#fbd000] px-2 py-0.5 text-xs">03</span>
+              <span>變化型態 (可多選)：</span>
+            </div>
+            <span id="selected-type-count" class="pixel-text text-xs bg-[#00a800] text-white px-2 py-1 border-2 border-black">
+              0 VERBS
+            </span>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
+            <button type="button" onclick="playMarioSound('coin'); toggleTypeFilter('AAA')" id="type-btn-AAA" class="type-toggle-btn nes-btn active py-2 text-sm sm:text-base tc-bold font-black">AAA</button>
+            <button type="button" onclick="playMarioSound('coin'); toggleTypeFilter('AAB')" id="type-btn-AAB" class="type-toggle-btn nes-btn active py-2 text-sm sm:text-base tc-bold font-black">AAB</button>
+            <button type="button" onclick="playMarioSound('coin'); toggleTypeFilter('ABA')" id="type-btn-ABA" class="type-toggle-btn nes-btn active py-2 text-sm sm:text-base tc-bold font-black">ABA</button>
+            <button type="button" onclick="playMarioSound('coin'); toggleTypeFilter('ABB')" id="type-btn-ABB" class="type-toggle-btn nes-btn active py-2 text-sm sm:text-base tc-bold font-black">ABB</button>
+            <button type="button" onclick="playMarioSound('coin'); toggleTypeFilter('ABC')" id="type-btn-ABC" class="type-toggle-btn nes-btn active py-2 text-sm sm:text-base tc-bold font-black">ABC</button>
+          </div>
+          <div class="flex justify-end space-x-3 pt-0.5 text-xs tc-bold font-black text-gray-800">
+            <button type="button" onclick="playMarioSound('coin'); selectAllTypes(true)" class="hover:text-black underline">全選型態</button>
+            <span>•</span>
+            <button type="button" onclick="playMarioSound('coin'); selectAllTypes(false)" class="hover:text-black underline">清空型態</button>
+          </div>
+        </div>
+
+        <!-- 4. 測驗題型模式 (寬敞工整的 2x2 兩行網格，文字絕對不折行) -->
+        <div class="space-y-2">
+          <div class="tc-bold text-lg font-black text-black flex items-center space-x-2">
+            <span class="pixel-text bg-black text-[#fbd000] px-2 py-0.5 text-xs">04</span>
+            <span>測驗題型模式：</span>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <label class="bg-white p-3.5 sm:p-4 flex items-center cursor-pointer border-4 border-black shadow-[4px_4px_0_#000] hover:bg-[#fff6d6] transition-all select-none">
+              <input type="radio" name="question-mode" value="MIXED" checked class="accent-[#e52521] w-5 h-5 shrink-0">
+              <span class="ml-3 text-base sm:text-lg tc-bold font-black text-black">🎲 綜合大冒險</span>
+            </label>
+            <label class="bg-white p-3.5 sm:p-4 flex items-center cursor-pointer border-4 border-black shadow-[4px_4px_0_#000] hover:bg-[#fff6d6] transition-all select-none">
+              <input type="radio" name="question-mode" value="CHOICE" class="accent-[#e52521] w-5 h-5 shrink-0">
+              <span class="ml-3 text-base sm:text-lg tc-bold font-black text-black">❓ 三態問號磚</span>
+            </label>
+            <label class="bg-white p-3.5 sm:p-4 flex items-center cursor-pointer border-4 border-black shadow-[4px_4px_0_#000] hover:bg-[#fff6d6] transition-all select-none">
+              <input type="radio" name="question-mode" value="ERROR" class="accent-[#e52521] w-5 h-5 shrink-0">
+              <span class="ml-3 text-base sm:text-lg tc-bold font-black text-black">🐢 踩碎庫巴錯字</span>
+            </label>
+            <label class="bg-white p-3.5 sm:p-4 flex items-center cursor-pointer border-4 border-black shadow-[4px_4px_0_#000] hover:bg-[#fff6d6] transition-all select-none">
+              <input type="radio" name="question-mode" value="CLOZE" class="accent-[#e52521] w-5 h-5 shrink-0">
+              <span class="ml-3 text-base sm:text-lg tc-bold font-black text-black">🧱 水管例句填空</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- 5. 題數選擇 -->
+        <div class="space-y-2">
+          <div class="tc-bold text-lg font-black text-black flex items-center space-x-2">
+            <span class="pixel-text bg-black text-[#fbd000] px-2 py-0.5 text-xs">05</span>
+            <span>關卡長度：</span>
+          </div>
+          <div class="grid grid-cols-4 gap-2.5">
+            <button type="button" onclick="playMarioSound('coin'); setCount(10)" class="count-btn active nes-btn py-2.5 text-base tc-bold font-black" data-count="10">10 題</button>
+            <button type="button" onclick="playMarioSound('coin'); setCount(20)" class="count-btn nes-btn py-2.5 text-base tc-bold font-black bg-white" data-count="20">20 題</button>
+            <button type="button" onclick="playMarioSound('coin'); setCount(30)" class="count-btn nes-btn py-2.5 text-base tc-bold font-black bg-white" data-count="30">30 題</button>
+            <button type="button" onclick="playMarioSound('coin'); setCount(50)" class="count-btn nes-btn py-2.5 text-base tc-bold font-black bg-white" data-count="50">50 題</button>
+          </div>
+        </div>
+
+        <!-- 開始闖關按鈕 -->
+        <div class="pt-2">
+          <button id="btn-start-quiz" onclick="playMarioSound('pipe'); startQuiz()" class="w-full py-4 nes-btn-red text-xl sm:text-2xl tc-bold font-black flex items-center justify-center space-x-3 tracking-wide">
+            <span class="text-2xl">🔥</span>
+            <span id="btn-start-text">PRESS START · 進入水管出發！</span>
+            <span class="text-2xl">🍄</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 區塊 2: 進行中測驗 (Quiz Arena) -->
+    <div id="section-quiz" class="w-full max-w-3xl mx-auto hidden flex-col space-y-4">
+      
+      <!-- 戰鬥頂部 HUD -->
+      <div class="bg-black text-white p-3.5 border-4 border-black shadow-[6px_6px_0px_rgba(0,0,0,0.6)] space-y-2.5">
+        <div class="flex items-center justify-between text-xs sm:text-sm pixel-text">
+          <div class="flex items-center space-x-2 sm:space-x-3">
+            <span id="quiz-badge-type" class="bg-[#e52521] border border-white px-2 py-0.5 text-xs text-white">題型</span>
+            <span id="quiz-badge-level" class="bg-[#00a800] border border-white px-2 py-0.5 text-xs text-white">Lv.1</span>
+            <span id="quiz-progress-text" class="text-[#fbd000]">STAGE 1/10</span>
+          </div>
+          <div class="flex items-center space-x-4">
+            <span class="flex items-center text-[#fbd000] font-black"><span class="mr-1 nes-coin-icon">🪙</span><span id="current-correct">0</span></span>
+            <span class="flex items-center text-[#e52521] font-black"><span class="mr-1">🐢</span><span id="current-wrong">0</span></span>
+            <button onclick="playMarioSound('coin'); confirmExitQuiz()" class="text-gray-400 hover:text-white underline text-xs">EXIT</button>
+          </div>
+        </div>
+        
+        <!-- 金幣能量進度條 -->
+        <div class="w-full bg-[#333] border-2 border-white h-4 p-0.5">
+          <div id="quiz-progress-bar" class="bg-gradient-to-r from-[#fc9838] to-[#fbd000] h-full transition-all duration-300" style="width: 10%"></div>
+        </div>
+      </div>
+
+      <!-- 題目主水管卡片 -->
+      <div id="question-card" class="pipe-panel p-6 sm:p-8 space-y-6">
+        <div id="question-body"></div>
+
+        <!-- 作答回饋結果 -->
+        <div id="feedback-container" class="hidden p-5 border-4 border-black transition-all space-y-2">
+          <div class="flex items-center space-x-2 text-xl tc-bold font-black" id="feedback-title"></div>
+          <div class="text-base leading-relaxed tc-bold font-bold" id="feedback-explanation"></div>
+        </div>
+
+        <!-- 動作按鈕列 -->
+        <div class="flex justify-end pt-2" id="action-buttons">
+          <button id="btn-submit-answer" onclick="checkCurrentAnswer()" class="w-full sm:w-auto px-8 py-3.5 nes-btn-red text-xl tc-bold font-black">
+            確定送出 (FIRE!)
+          </button>
+          <button id="btn-next-question" onclick="playMarioSound('coin'); nextQuestion()" class="hidden w-full sm:w-auto px-8 py-3.5 nes-btn-green text-xl tc-bold font-black flex items-center justify-center space-x-2">
+            <span>下一關 (NEXT)</span>
+            <span>👉</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 區塊 3: 結算報告 (Stage Clear Screen) -->
+    <div id="section-result" class="w-full max-w-2xl mx-auto hidden flex-col space-y-6 my-auto">
+      <div class="pipe-panel p-8 text-center space-y-6">
+        
+        <div id="result-icon-wrapper" class="w-24 h-24 mx-auto flex items-center justify-center bg-[#fbd000] border-4 border-black shadow-[4px_4px_0_#000]">
+          <span class="text-5xl">🚩</span>
+        </div>
+        
+        <div class="space-y-1">
+          <h2 class="pixel-text text-2xl sm:text-3xl text-black" id="result-title">STAGE CLEAR!</h2>
+          <p class="tc-bold text-base sm:text-lg text-gray-900 font-bold" id="result-subtitle">碧姬公主感謝你的勇氣與智慧！</p>
+        </div>
+
+        <!-- 結算計分板 -->
+        <div class="grid grid-cols-3 gap-3 p-4 bg-black border-4 border-black text-white">
+          <div class="p-2">
+            <div class="pixel-text text-xs text-gray-400">SCORE %</div>
+            <div class="pixel-text text-xl sm:text-3xl text-[#fbd000] mt-1" id="result-score">0%</div>
+          </div>
+          <div class="p-2 border-x-2 border-gray-700">
+            <div class="pixel-text text-xs text-gray-400">COINS 🪙</div>
+            <div class="pixel-text text-xl sm:text-3xl text-[#00a800] mt-1" id="result-correct-count">0</div>
+          </div>
+          <div class="p-2">
+            <div class="pixel-text text-xs text-gray-400">BUMP 🐢</div>
+            <div class="pixel-text text-xl sm:text-3xl text-[#e52521] mt-1" id="result-wrong-count">0</div>
+          </div>
+        </div>
+
+        <div id="wrong-answers-container" class="space-y-2 text-left"></div>
+
+        <div class="flex flex-col sm:flex-row gap-3 pt-2">
+          <button id="btn-retry-wrong" onclick="playMarioSound('coin'); retryWrongQuestions()" class="hidden flex-1 py-4 nes-btn bg-white text-lg sm:text-xl tc-bold font-black flex items-center justify-center space-x-2">
+            <span>🍄</span>
+            <span>重新挑戰錯題 (<span id="wrong-retry-count">0</span>)</span>
+          </button>
+          <button onclick="playMarioSound('coin'); resetToSetup()" class="flex-1 py-4 nes-btn-green text-lg sm:text-xl tc-bold font-black flex items-center justify-center space-x-2">
+            <span>⭐</span>
+            <span>進入下一輪大冒險！</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 區塊 4: 完整動詞速查圖鑑 (Verb Dex) -->
+    <div id="section-dictionary" class="w-full hidden flex-col space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="pixel-text text-xl sm:text-2xl text-white drop-shadow-[3px_3px_0_#000] flex items-center space-x-2">
+            <span>📖</span>
+            <span>VERB DEX 城堡圖鑑</span>
+          </h2>
+          <p class="tc-bold text-sm sm:text-base font-bold text-[#fbd000] drop-shadow-[1px_1px_0_#000]">
+            收錄全部與核心動詞、AAA~ABC 變化規律與 1~5 級例句庫
+          </p>
+        </div>
+        <div class="flex items-center space-x-2">
+          <input id="dict-search-input" oninput="renderDictionary()" type="text" placeholder="🔍 搜尋動詞或中文意義..." class="w-full sm:w-72 px-4 py-2 bg-black border-4 border-white text-white tc-bold font-bold text-base placeholder-gray-400 focus:outline-none focus:border-[#fbd000]">
+        </div>
+      </div>
+
+      <!-- 圖鑑過濾控制列：範圍切換 + 型態快篩 -->
+      <div class="flex flex-wrap items-center justify-between gap-3 bg-black p-3.5 border-4 border-black text-white shadow-xl">
+        <!-- 範圍切換按鈕 (全部收錄 / 核心常用) -->
+        <div class="flex items-center space-x-2">
+          <span class="pixel-text text-xs text-gray-300">SCOPE:</span>
+          <button type="button" onclick="playMarioSound('coin'); setDictScope('ALL')" id="dict-scope-btn-all" class="dict-scope-btn nes-btn active px-3.5 py-1.5 text-xs tc-bold font-black">
+            🌐 全收錄 (<span id="dict-scope-all-count">0</span>)
+          </button>
+          <button type="button" onclick="playMarioSound('coin'); setDictScope('COMMON')" id="dict-scope-btn-common" class="dict-scope-btn nes-btn bg-white px-3.5 py-1.5 text-xs tc-bold font-black">
+            🍄 核心字 (<span id="dict-scope-common-count">0</span>)
+          </button>
+        </div>
+
+        <!-- AAA~ABC 型態按鈕 -->
+        <div class="flex flex-wrap items-center gap-1.5">
+          <button onclick="playMarioSound('coin'); setDictFilter('ALL')" class="dict-filter active nes-btn px-3 py-1 text-xs tc-bold font-black" data-dict="ALL">全部</button>
+          <button onclick="playMarioSound('coin'); setDictFilter('AAA')" class="dict-filter nes-btn bg-white px-3 py-1 text-xs tc-bold font-black" data-dict="AAA">AAA 同形</button>
+          <button onclick="playMarioSound('coin'); setDictFilter('AAB')" class="dict-filter nes-btn bg-white px-3 py-1 text-xs tc-bold font-black" data-dict="AAB">AAB 分詞變</button>
+          <button onclick="playMarioSound('coin'); setDictFilter('ABA')" class="dict-filter nes-btn bg-white px-3 py-1 text-xs tc-bold font-black" data-dict="ABA">ABA 首尾同</button>
+          <button onclick="playMarioSound('coin'); setDictFilter('ABB')" class="dict-filter nes-btn bg-white px-3 py-1 text-xs tc-bold font-black" data-dict="ABB">ABB 過去/分詞同</button>
+          <button onclick="playMarioSound('coin'); setDictFilter('ABC')" class="dict-filter nes-btn bg-white px-3 py-1 text-xs tc-bold font-black" data-dict="ABC">ABC 全異</button>
+        </div>
+      </div>
+
+      <!-- 表格面板 -->
+      <div class="pipe-panel overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-base tc-bold text-black">
+            <thead class="bg-[#fbd000] border-b-4 border-black font-black">
+              <tr>
+                <th class="py-3 px-4 w-12 text-center text-xs pixel-text">#</th>
+                <th class="py-3 px-4">原形 (Base)</th>
+                <th class="py-3 px-4">過去式 (Past)</th>
+                <th class="py-3 px-4">過去分詞 (P.P.)</th>
+                <th class="py-3 px-4">中文涵義</th>
+                <th class="py-3 px-4 text-center">分類</th>
+                <th class="py-3 px-4 text-center">題庫例句</th>
+              </tr>
+            </thead>
+            <tbody id="dict-table-body" class="divide-y-2 divide-gray-300 font-bold bg-white">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- 底部經典超級瑪利歐草皮與泥土地磚 -->
+  <footer class="w-full mt-auto relative z-20">
+    <div class="mario-ground-strip"></div>
+  </footer>
+
+  <script>
+    // ==========================================
+    // 0. 正宗任天堂 2A03 晶片 8-bit 合成音效 (Web Audio API)
+    // ==========================================
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playMarioSound(type) {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const now = audioCtx.currentTime;
+
+      if (type === 'coin') {
+        // 經典頂問號磚金幣聲 (B5 987.77Hz -> 快速跳到 E6 1318.51Hz 方波)
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(987.77, now);
+        osc.frequency.setValueAtTime(1318.51, now + 0.075);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.4);
+      } else if (type === '1up' || type === 'correct') {
+        // 經典綠色蘑菇 1-UP 加命音階 (E5, G5, E6, C6, D6, G6)
+        const notes = [659.25, 783.99, 1318.51, 1046.50, 1174.66, 1567.98];
+        notes.forEach((freq, i) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(freq, now + i * 0.08);
+          gain.gain.setValueAtTime(0.2, now + i * 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.16);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now + i * 0.08);
+          osc.stop(now + i * 0.08 + 0.16);
+        });
+      } else if (type === 'bump' || type === 'wrong') {
+        // 頂硬磚 / 失誤碰撞咚聲
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(180, now);
+        osc.frequency.exponentialRampToValueAtTime(50, now + 0.2);
+        gain.gain.setValueAtTime(0.35, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.2);
+      } else if (type === 'pipe') {
+        // 經典水管鑽入音 (Pipe Down: 快速下降頻率)
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(300, now);
+        osc.frequency.exponentialRampToValueAtTime(80, now + 0.22);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.25);
+      } else if (type === 'fanfare') {
+        // 旗桿過關大遊行音樂 (Stage Clear Fanfare)
+        const notes = [
+          { f: 523.25, t: 0.12 },
+          { f: 659.25, t: 0.12 },
+          { f: 783.99, t: 0.12 },
+          { f: 1046.50, t: 0.22 },
+          { f: 880.00, t: 0.16 },
+          { f: 1046.50, t: 0.45 }
+        ];
+        let offset = 0;
+        notes.forEach(n => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(n.f, now + offset);
+          gain.gain.setValueAtTime(0.22, now + offset);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + offset + n.t);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now + offset);
+          osc.stop(now + offset + n.t);
+          offset += n.t + 0.03;
+        });
+      }
+    }
+
+    // ==========================================
+    // 1. 本地備援題庫資料
+    // ==========================================
+    const GAS_ENDPOINT_URL = "https://script.google.com/macros/s/AKfycbwdRf5bUnTQuShcpT9F1sLWJp8HTkfJfO3_3JKGf-PypJ2SoJUwIQkK3GPnw96vJbH2MQ/exec";
+
+    let VERB_DATABASE = [
+      {
+        base: "be", past: "was", pp: "been", zh: "是、在", type: "ABC", common: true,
+        ptSentences: [
+          { level: 1, sentence: "Kevin (_____) absent from school yesterday because of a cold.", answer: "was" },
+          { level: 2, sentence: "All the students (_____) very excited about the field trip last Friday.", answer: "were" },
+          { level: 3, sentence: "The weather (_____) surprisingly chilly during our mountain hike last weekend.", answer: "was" },
+          { level: 4, sentence: "Both of his parents (_____) extraordinarily proud when he received the scholarship.", answer: "were" },
+          { level: 5, sentence: "The economic indicators from that fiscal quarter (_____) indicative of a broader crisis.", answer: "were" }
+        ],
+        ppSentences: [
+          { level: 1, sentence: "She has (_____) to Japan with her family twice.", answer: "been" },
+          { level: 2, sentence: "How long have you (_____) a student at this school?", answer: "been" },
+          { level: 3, sentence: "He has (_____) my best friend since our elementary school days.", answer: "been" },
+          { level: 4, sentence: "There have (_____) remarkable improvements in public health across the country this year.", answer: "been" },
+          { level: 5, sentence: "Theoretical physics has (_____) fundamentally reshaped by recent discoveries.", answer: "been" }
+        ]
+      },
+      {
+        base: "become", past: "became", pp: "become", zh: "成為", type: "ABA", common: true,
+        ptSentences: [
+          { level: 1, sentence: "He (_____) very happy when he got the birthday gift.", answer: "became" },
+          { level: 2, sentence: "The classroom (_____) quiet as soon as the teacher walked in.", answer: "became" },
+          { level: 3, sentence: "The quiet countryside town (_____) a popular tourist spot last year.", answer: "became" },
+          { level: 4, sentence: "After years of rigorous clinical training, she finally (_____) a qualified surgeon.", answer: "became" },
+          { level: 5, sentence: "What initially seemed like a minor discrepancy soon (_____) a catastrophic system failure.", answer: "became" }
+        ],
+        ppSentences: [
+          { level: 1, sentence: "The little puppy has (_____) very big and strong.", answer: "become" },
+          { level: 2, sentence: "English has (_____) my favorite subject this semester.", answer: "become" },
+          { level: 3, sentence: "She has (_____) much more confident since joining the drama club.", answer: "become" },
+          { level: 4, sentence: "Smartphones have (_____) an indispensable tool in modern daily communication.", answer: "become" },
+          { level: 5, sentence: "Biodiversity loss has (_____) an existential crisis requiring urgent global cooperation.", answer: "become" }
+        ]
+      },
+      {
+        base: "begin", past: "began", pp: "begun", zh: "開始", type: "ABC", common: true,
+        ptSentences: [
+          { level: 1, sentence: "The movie (_____) ten minutes ago.", answer: "began" },
+          { level: 2, sentence: "She (_____) learning the piano when she was seven years old.", answer: "began" },
+          { level: 3, sentence: "The heavy rain (_____) just when we stepped out of the metro station yesterday.", answer: "began" },
+          { level: 4, sentence: "As soon as the proctor gave the signal, candidates (_____) writing their compositions.", answer: "began" },
+          { level: 5, sentence: "The diplomatic summit (_____) under tense circumstances due to escalating border disputes.", answer: "began" }
+        ],
+        ppSentences: [
+          { level: 1, sentence: "The English test has already (_____).", answer: "begun" },
+          { level: 2, sentence: "Have you (_____) reading the new novel yet?", answer: "begun" },
+          { level: 3, sentence: "The flowers in the park have (_____) to bloom under the warm spring sun.", answer: "begun" },
+          { level: 4, sentence: "Scientists have recently (_____) a comprehensive investigation into marine pollution.", answer: "begun" },
+          { level: 5, sentence: "Negotiations have tentatively (_____) between the conflicting parties following the ceasefire.", answer: "begun" }
+        ]
+      },
+      {
+        base: "beat", past: "beat", pp: "beaten", zh: "打敗、敲打", type: "AAB", common: true,
+        ptSentences: [
+          { level: 1, sentence: "Tom (_____) me in the video game last night.", answer: "beat" },
+          { level: 2, sentence: "The drummer (_____) the drums loudly during the school concert yesterday.", answer: "beat" },
+          { level: 3, sentence: "The heavy rain (_____) against the classroom windows all afternoon.", answer: "beat" },
+          { level: 4, sentence: "His heart (_____) violently as he walked onto the stage to address the large audience.", answer: "beat" },
+          { level: 5, sentence: "The national debate squad decisively (_____) their opponents by dismantling their core premise.", answer: "beat" }
+        ],
+        ppSentences: [
+          { level: 1, sentence: "Our team has never (_____) Class 501 in dodgeball.", answer: "beaten" },
+          { level: 2, sentence: "Have you ever (_____) your older brother in chess?", answer: "beaten" },
+          { level: 3, sentence: "The champion has not been (_____) by anyone this season.", answer: "beaten" },
+          { level: 4, sentence: "The small boat was severely (_____) by towering waves throughout the storm.", answer: "beaten" },
+          { level: 5, sentence: "Having finally (_____) his debilitating stage fright, he delivered a compelling keynote address.", answer: "beaten" }
+        ]
+      },
+      {
+        base: "abide", past: "abided", pp: "abided", zh: "遵守、忍受", type: "ABB", common: false,
+        ptSentences: [
+          { level: 1, sentence: "He (_____) by his father's words and stayed home yesterday.", answer: "abided" },
+          { level: 2, sentence: "The two boys (_____) by the game rules during the match last week.", answer: "abided" },
+          { level: 3, sentence: "Although it was difficult, she (_____) by her promise to help her classmate.", answer: "abided" },
+          { level: 4, sentence: "The company strictly (_____) by international environmental standards throughout the project.", answer: "abided" },
+          { level: 5, sentence: "Despite immense political pressure, the judge resolutely (_____) by the legal principles.", answer: "abided" }
+        ],
+        ppSentences: [
+          { level: 1, sentence: "We have always (_____) by our family rules.", answer: "abided" },
+          { level: 2, sentence: "He has (_____) by his word since he was a little boy.", answer: "abided" },
+          { level: 3, sentence: "They have faithfully (_____) by the agreement signed three years ago.", answer: "abided" },
+          { level: 4, sentence: "The laboratory has consistently (_____) by national safety guidelines for over a decade.", answer: "abided" },
+          { level: 5, sentence: "Having never (_____) by any societal norms, the rebellious artist remained an enigma.", answer: "abided" }
+        ]
+      },
+      {
+        base: "cut", past: "cut", pp: "cut", zh: "切、剪", type: "AAA", common: true,
+        ptSentences: [
+          { level: 1, sentence: "She (_____) the paper with scissors five minutes ago.", answer: "cut" },
+          { level: 2, sentence: "Dad (_____) the sweet watermelon for dessert after dinner.", answer: "cut" },
+          { level: 3, sentence: "The chef (_____) the fresh beef into thin slices carefully.", answer: "cut" },
+          { level: 4, sentence: "The sudden budget reduction (_____) our department's resources significantly.", answer: "cut" },
+          { level: 5, sentence: "The administration decisively (_____) tariffs to mitigate inflationary pressures.", answer: "cut" }
+        ],
+        ppSentences: [
+          { level: 1, sentence: "The birthday cake has already been (_____).", answer: "cut" },
+          { level: 2, sentence: "Have you (_____) your finger with that sharp knife?", answer: "cut" },
+          { level: 3, sentence: "The grass in the soccer field has been (_____) neatly.", answer: "cut" },
+          { level: 4, sentence: "Funding for public transportation has been drastically (_____) this quarter.", answer: "cut" },
+          { level: 5, sentence: "Having been completely (_____) off from external communication, the outpost faced severe isolation.", answer: "cut" }
+        ]
+      }
+    ];
+
+    // ==========================================
+    // 2. 雲端試算表連線狀態與載入控制
+    // ==========================================
+    let isDbLoaded = false;
+
+    function setDbLoadingState(state, infoText = "") {
+      const banner = document.getElementById('db-loading-banner');
+      const title = document.getElementById('db-loading-title');
+      const desc = document.getElementById('db-loading-desc');
+      const emoji = document.getElementById('db-status-emoji');
+
+      if (state === 'loading') {
+        banner.className = "p-4 bg-[#fbd000] border-4 border-black text-black flex items-center justify-between shadow-[6px_6px_0px_#000]";
+        title.textContent = "正在連線碧姬城堡雲端題庫...";
+        desc.textContent = "正在同步 Google 試算表 1~5 級例句，水管通道開啟中！";
+        emoji.textContent = "❓";
+      } else if (state === 'success') {
+        banner.className = "p-3 sm:p-4 bg-[#00a800] border-4 border-black text-white flex items-center justify-between shadow-[6px_6px_0px_#000]";
+        title.textContent = `⭐ 雲端題庫連線成功！(共收錄 ${VERB_DATABASE.length} 個動詞)`;
+        desc.textContent = infoText || "分級例句已就緒！選定關卡條件後即可跳入水管開始！";
+        emoji.textContent = "⭐";
+      } else if (state === 'offline') {
+        banner.className = "p-3 sm:p-4 bg-[#e52521] border-4 border-black text-white flex items-center justify-between shadow-[6px_6px_0px_#000]";
+        title.textContent = "⚠️ 網路受庫巴干擾，已啟用本地備援庫";
+        desc.textContent = "如需最新試算表資料，請確認試算表權限後點選重新連線。";
+        emoji.textContent = "🐢";
+      }
+    }
+
+    async function syncDataFromGAS(isManual = false) {
+      setDbLoadingState('loading');
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 12000);
+
+        const response = await fetch(GAS_ENDPOINT_URL, { signal: controller.signal });
+        clearTimeout(timeoutId);
+
+        const result = await response.json();
+
+        if (result.status === 'success' && Array.isArray(result.data) && result.data.length > 0) {
+          VERB_DATABASE = result.data.map(item => {
+            const ptList = [];
+            const ppList = [];
+
+            for (let lvl = 1; lvl <= 5; lvl++) {
+              const ptSentence = item[`pt${lvl}`] || item[`PT例句${lvl}`] || (item.ptSentences && item.ptSentences[lvl - 1]?.sentence);
+              const ppSentence = item[`pp${lvl}`] || item[`PP例句${lvl}`] || (item.ppSentences && item.ppSentences[lvl - 1]?.sentence);
+              
+              if (ptSentence) {
+                ptList.push({
+                  level: lvl,
+                  sentence: ptSentence,
+                  answer: item.past || item.PT
+                });
+              }
+              if (ppSentence) {
+                ppList.push({
+                  level: lvl,
+                  sentence: ppSentence,
+                  answer: item.pp || item.PP
+                });
+              }
+            }
+
+            return {
+              base: item.base || item['原型'],
+              past: item.past || item.PT,
+              pp: item.pp || item.PP,
+              zh: item.zh || item['中文'],
+              type: item.type || item['類型'],
+              common: item.common !== undefined ? item.common : (item['核心／全收錄'] === '核心'),
+              ptSentences: ptList.length > 0 ? ptList : (item.ptSentences || []),
+              ppSentences: ppList.length > 0 ? ppList : (item.ppSentences || [])
+            };
+          });
+
+          isDbLoaded = true;
+          setDbLoadingState('success');
+          updateFilterCount();
+          renderDictionary();
+        } else {
+          throw new Error("回傳格式不符");
+        }
+      } catch (err) {
+        console.warn("GAS 連線失敗，切換至備援資料庫:", err);
+        setDbLoadingState('offline');
+        updateFilterCount();
+        renderDictionary();
+      }
+    }
+
+    // ==========================================
+    // 3. 狀態管理
+    // ==========================================
+    let currentScope = 'COMMON';
+    let selectedLevels = new Set([1, 2, 3, 4, 5]);
+    let selectedTypes = new Set(['AAA', 'AAB', 'ABA', 'ABB', 'ABC']);
+    let selectedCount = 10;
+    let quizQuestions = [];
+    let currentIndex = 0;
+    let score = 0;
+    let answeredCurrent = false;
+    let wrongList = [];
+
+    // 圖鑑專用狀態
+    let dictCurrentType = 'ALL';
+    let dictCurrentScope = 'ALL';
+
+    function setScope(scope) {
+      currentScope = scope;
+      document.getElementById('scope-btn-common').className = scope === 'COMMON' ? 'nes-btn active py-3 text-base sm:text-lg tc-bold flex items-center justify-center space-x-2' : 'nes-btn py-3 text-base sm:text-lg tc-bold flex items-center justify-center space-x-2 bg-white';
+      document.getElementById('scope-btn-all').className = scope === 'ALL' ? 'nes-btn active py-3 text-base sm:text-lg tc-bold flex items-center justify-center space-x-2' : 'nes-btn py-3 text-base sm:text-lg tc-bold flex items-center justify-center space-x-2 bg-white';
+      updateFilterCount();
+    }
+
+    function setDictScope(scope) {
+      dictCurrentScope = scope;
+      const btnAll = document.getElementById('dict-scope-btn-all');
+      const btnCommon = document.getElementById('dict-scope-btn-common');
+
+      if (scope === 'ALL') {
+        btnAll.classList.add('active');
+        btnAll.classList.remove('bg-white');
+        btnCommon.classList.remove('active');
+        btnCommon.classList.add('bg-white');
+      } else {
+        btnCommon.classList.add('active');
+        btnCommon.classList.remove('bg-white');
+        btnAll.classList.remove('active');
+        btnAll.classList.add('bg-white');
+      }
+      renderDictionary();
+    }
+
+    function toggleLevelFilter(lvl) {
+      if (selectedLevels.has(lvl)) {
+        selectedLevels.delete(lvl);
+        document.getElementById(`level-btn-${lvl}`).classList.remove('active');
+      } else {
+        selectedLevels.add(lvl);
+        document.getElementById(`level-btn-${lvl}`).classList.add('active');
+      }
+      updateLevelBadge();
+    }
+
+    function selectAllLevels(isSelectAll) {
+      const all = [1, 2, 3, 4, 5];
+      if (isSelectAll) {
+        selectedLevels = new Set(all);
+        all.forEach(l => document.getElementById(`level-btn-${l}`).classList.add('active'));
+      } else {
+        selectedLevels.clear();
+        all.forEach(l => document.getElementById(`level-btn-${l}`).classList.remove('active'));
+      }
+      updateLevelBadge();
+    }
+
+    function updateLevelBadge() {
+      const sorted = Array.from(selectedLevels).sort((a, b) => a - b);
+      const descEl = document.getElementById('selected-level-desc');
+      if (sorted.length === 0) {
+        descEl.textContent = "未選等級";
+        descEl.className = "pixel-text text-xs bg-[#e52521] text-white px-2.5 py-1 border-2 border-black";
+      } else if (sorted.length === 5) {
+        descEl.textContent = "Lv.1-5 ALL";
+        descEl.className = "pixel-text text-xs bg-black text-[#fbd000] px-2.5 py-1 border-2 border-black";
+      } else {
+        descEl.textContent = `Lv.${sorted.join(',')}`;
+        descEl.className = "pixel-text text-xs bg-[#00a800] text-white px-2.5 py-1 border-2 border-black";
+      }
+    }
+
+    function toggleTypeFilter(type) {
+      if (selectedTypes.has(type)) {
+        selectedTypes.delete(type);
+        document.getElementById(`type-btn-${type}`).classList.remove('active');
+      } else {
+        selectedTypes.add(type);
+        document.getElementById(`type-btn-${type}`).classList.add('active');
+      }
+      updateFilterCount();
+    }
+
+    function selectAllTypes(isSelectAll) {
+      const all = ['AAA', 'AAB', 'ABA', 'ABB', 'ABC'];
+      if (isSelectAll) {
+        selectedTypes = new Set(all);
+        all.forEach(t => document.getElementById(`type-btn-${t}`).classList.add('active'));
+      } else {
+        selectedTypes.clear();
+        all.forEach(t => document.getElementById(`type-btn-${t}`).classList.remove('active'));
+      }
+      updateFilterCount();
+    }
+
+    function getFilteredVerbs() {
+      return VERB_DATABASE.filter(v => {
+        const scopeMatch = currentScope === 'ALL' ? true : v.common;
+        const typeMatch = selectedTypes.has(v.type);
+        return scopeMatch && typeMatch;
+      });
+    }
+
+    function updateFilterCount() {
+      const pool = getFilteredVerbs();
+      const commonCount = VERB_DATABASE.filter(v => v.common).length;
+      const allCount = VERB_DATABASE.length;
+
+      const commonLabel = document.getElementById('scope-common-label');
+      const allLabel = document.getElementById('scope-all-label');
+      const typeCountEl = document.getElementById('selected-type-count');
+      const dictCountEl = document.getElementById('dict-total-count');
+
+      const dictScopeAll = document.getElementById('dict-scope-all-count');
+      const dictScopeCommon = document.getElementById('dict-scope-common-count');
+
+      if (commonLabel) commonLabel.textContent = `🍄 核心常用 (${commonCount}字)`;
+      if (allLabel) allLabel.textContent = `🌟 完整收錄 (${allCount}字)`;
+      if (typeCountEl) typeCountEl.textContent = `${pool.length} VERBS`;
+      if (dictCountEl) dictCountEl.textContent = allCount;
+      if (dictScopeAll) dictScopeAll.textContent = allCount;
+      if (dictScopeCommon) dictScopeCommon.textContent = commonCount;
+    }
+
+    function setCount(num) {
+      selectedCount = num;
+      document.querySelectorAll('.count-btn').forEach(btn => {
+        if (parseInt(btn.dataset.count) === num) {
+          btn.classList.add('active');
+          btn.classList.remove('bg-white');
+        } else {
+          btn.classList.remove('active');
+          btn.classList.add('bg-white');
+        }
+      });
+    }
+
+    function shuffleArray(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function pickSentenceByLevel(sentenceList) {
+      if (!sentenceList || sentenceList.length === 0) return null;
+      const matched = sentenceList.filter(s => selectedLevels.has(s.level));
+      if (matched.length > 0) {
+        return matched[Math.floor(Math.random() * matched.length)];
+      }
+      return sentenceList[Math.floor(Math.random() * sentenceList.length)];
+    }
+
+    // ==========================================
+    // 4. 題型產生器
+    // ==========================================
+    function generateChoiceQuestion(verb) {
+      const isPast = Math.random() > 0.45;
+      const targetTense = isPast ? "過去式 (Past Tense)" : "過去分詞 (P.P.)";
+      const correctAnswer = isPast ? verb.past : verb.pp;
+
+      const distractors = new Set();
+      if (verb.base + "ed" !== correctAnswer) distractors.add(verb.base + "ed");
+      if (verb.base !== correctAnswer) distractors.add(verb.base);
+      if (verb.past !== verb.pp) {
+        const alt = isPast ? verb.pp : verb.past;
+        if (alt !== correctAnswer) distractors.add(alt);
+      }
+
+      const others = shuffleArray(VERB_DATABASE.filter(v => v.base !== verb.base));
+      for (const o of others) {
+        if (distractors.size >= 3) break;
+        const cand = isPast ? o.past : o.pp;
+        if (cand && cand !== correctAnswer) distractors.add(cand);
+      }
+
+      const options = shuffleArray([correctAnswer, ...Array.from(distractors).slice(0, 3)]);
+
+      return {
+        type: 'CHOICE',
+        typeName: '三態問號磚',
+        level: Array.from(selectedLevels)[0] || 1,
+        verb: verb,
+        title: `頂出正確問號磚！選出 <span class="bg-[#e52521] text-white px-2 py-0.5 border-2 border-black font-black">${verb.base}</span>（${verb.zh}）的正確【${targetTense}】：`,
+        subText: `提示：注意動詞三態變化規律，小心路霸栗寶寶！`,
+        options: options,
+        correctAnswer: correctAnswer,
+        explanation: `<b>${verb.base}</b> 的三態變化為：原形 <code>${verb.base}</code> / 過去式 <code>${verb.past}</code> / 過去分詞 <code>${verb.pp}</code>。中文涵義為「${verb.zh}」。`
+      };
+    }
+
+    function generateErrorQuestion(verb) {
+      const isPast = Math.random() > 0.5;
+      const sentenceList = (isPast ? verb.ptSentences : verb.ppSentences) || [];
+
+      const sampleObj = pickSentenceByLevel(sentenceList);
+      const chosenLevel = sampleObj ? sampleObj.level : 1;
+      const correctAnswer = sampleObj ? sampleObj.answer : (isPast ? verb.past : verb.pp);
+
+      let incorrectForm = verb.base + "ed";
+      if (incorrectForm.toLowerCase() === correctAnswer.toLowerCase()) {
+        incorrectForm = verb.base + "ing";
+      }
+
+      let rawSentence = sampleObj ? sampleObj.sentence : "The student (_____) the assignment.";
+      
+      const displaySentenceHtml = rawSentence.replace(
+        /\([_]+\)/g, 
+        `<span class="px-2 py-0.5 mx-1 bg-[#e52521] text-white border-2 border-black font-black underline decoration-wavy decoration-yellow-300">${incorrectForm}</span>`
+      );
+
+      return {
+        type: 'ERROR',
+        typeName: '踩碎錯字',
+        level: chosenLevel,
+        verb: verb,
+        title: `句子中混進了庫巴的【假冒動詞】！請輸入正確的動詞變化踩扁它：`,
+        subText: `依據句子時態與上下文線索，填寫正確的動詞拼寫`,
+        displaySentence: displaySentenceHtml,
+        wrongWord: incorrectForm,
+        correctAnswer: correctAnswer,
+        explanation: `句子中的「<code>${incorrectForm}</code>」是錯誤拼法！<br>正確完整句子：<b>${rawSentence.replace(/\([_]+\)/g, correctAnswer)}</b><br>動詞「${verb.base}（${verb.zh}）」三態為：<code>${verb.base}</code> - <code>${verb.past}</code> - <code>${verb.pp}</code>。`
+      };
+    }
+
+    function generateClozeQuestion(verb) {
+      const isPast = Math.random() > 0.5;
+      const sentenceList = (isPast ? verb.ptSentences : verb.ppSentences) || [];
+
+      const sampleObj = pickSentenceByLevel(sentenceList);
+      const chosenLevel = sampleObj ? sampleObj.level : 1;
+      const correctAnswer = sampleObj ? sampleObj.answer : (isPast ? verb.past : verb.pp);
+      let rawSentence = sampleObj ? sampleObj.sentence : "They (_____) very quickly.";
+
+      const parts = rawSentence.split(/\([_]+\)/);
+      const clozePre = parts[0] || "";
+      const clozePost = parts.slice(1).join("") || "";
+
+      return {
+        type: 'CLOZE',
+        typeName: '水管填空',
+        level: chosenLevel,
+        verb: verb,
+        title: `觀察上下文線索，在水管空格填入正確的動詞形式：`,
+        subText: `考查動詞原形：<b class="bg-black text-[#fbd000] px-2 py-0.5 border border-black">${verb.base}</b>（${verb.zh}）· 請填入合適的過去式或過去分詞`,
+        clozePre: clozePre,
+        clozePost: clozePost,
+        correctAnswer: correctAnswer,
+        explanation: `完整句子：<b>${rawSentence.replace(/\([_]+\)/g, correctAnswer)}</b><br>動詞「${verb.base}」三態為：<code>${verb.base}</code> / <code>${verb.past}</code> / <code>${verb.pp}</code>。`
+      };
+    }
+
+    // ==========================================
+    // 5. 測驗控制流程
+    // ==========================================
+    function startQuiz(customVerbs = null) {
+      if (selectedLevels.size === 0) {
+        showMarioToast("請至少挑選一個關卡等級 (Lv.1 ~ Lv.5)！");
+        return;
+      }
+
+      const pool = customVerbs || getFilteredVerbs();
+
+      if (pool.length === 0) {
+        showMarioToast("目前勾選條件下沒有任何動詞！請至少保留一種變化型態！");
+        return;
+      }
+
+      const mode = document.querySelector('input[name="question-mode"]:checked').value;
+      const targetNum = Math.min(customVerbs ? customVerbs.length : selectedCount, pool.length);
+      const chosenVerbs = shuffleArray(pool).slice(0, targetNum);
+
+      quizQuestions = chosenVerbs.map(verb => {
+        let questionType = mode;
+        if (mode === 'MIXED') {
+          const types = ['CHOICE', 'ERROR', 'CLOZE'];
+          questionType = types[Math.floor(Math.random() * types.length)];
+        }
+        if (questionType === 'CHOICE') return generateChoiceQuestion(verb);
+        if (questionType === 'ERROR') return generateErrorQuestion(verb);
+        return generateClozeQuestion(verb);
+      });
+
+      currentIndex = 0;
+      score = 0;
+      wrongList = [];
+      answeredCurrent = false;
+
+      document.getElementById('section-setup').classList.add('hidden');
+      document.getElementById('section-result').classList.add('hidden');
+      document.getElementById('section-result').classList.remove('flex');
+      document.getElementById('section-quiz').classList.remove('hidden');
+      document.getElementById('section-quiz').classList.add('flex');
+
+      updateHudDisplay();
+      renderCurrentQuestion();
+    }
+
+    function updateHudDisplay() {
+      const hudScore = document.getElementById('hud-score');
+      const hudCoins = document.getElementById('hud-coins');
+      if (hudScore) hudScore.textContent = String(score * 100).padStart(6, '0');
+      if (hudCoins) hudCoins.textContent = String(score).padStart(2, '0');
+    }
+
+    function showMarioToast(msg) {
+      let toast = document.getElementById('mario-toast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'mario-toast';
+        toast.className = 'fixed bottom-16 left-1/2 transform -translate-x-1/2 bg-black text-[#fbd000] border-4 border-white px-5 py-3 text-base tc-bold font-black shadow-2xl z-50 transition-all';
+        document.body.appendChild(toast);
+      }
+      toast.textContent = `🍄 ${msg}`;
+      toast.style.opacity = '1';
+      setTimeout(() => {
+        toast.style.opacity = '0';
+      }, 2500);
+    }
+
+    function renderCurrentQuestion() {
+      answeredCurrent = false;
+      const q = quizQuestions[currentIndex];
+      const total = quizQuestions.length;
+
+      document.getElementById('quiz-progress-text').textContent = `STAGE ${currentIndex + 1}/${total}`;
+      document.getElementById('quiz-progress-bar').style.width = `${((currentIndex + 1) / total) * 100}%`;
+      document.getElementById('quiz-badge-type').textContent = q.typeName;
+      
+      const badgeLevel = document.getElementById('quiz-badge-level');
+      if (badgeLevel) {
+        badgeLevel.textContent = `Lv.${q.level}`;
+      }
+
+      document.getElementById('current-correct').textContent = score;
+      document.getElementById('current-wrong').textContent = wrongList.length;
+
+      document.getElementById('btn-submit-answer').classList.remove('hidden');
+      document.getElementById('btn-next-question').classList.add('hidden');
+      document.getElementById('feedback-container').classList.add('hidden');
+
+      const body = document.getElementById('question-body');
+
+      if (q.type === 'CHOICE') {
+        body.innerHTML = `
+          <div class="space-y-5">
+            <div>
+              <div class="text-xl sm:text-2xl tc-bold font-black leading-relaxed text-black">${q.title}</div>
+              <div class="text-sm sm:text-base text-gray-700 tc-bold font-bold mt-1">${q.subText}</div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+              ${q.options.map((opt, i) => `
+                <button type="button" onclick="selectOption('${opt}')" class="choice-opt-btn nes-btn bg-white p-4 text-left text-lg sm:text-xl tc-bold font-black flex items-center justify-between" data-val="${opt}">
+                  <span>(${String.fromCharCode(65 + i)}) ${opt}</span>
+                  <span class="opt-indicator w-8 h-8 border-2 border-black bg-white flex items-center justify-center text-sm font-black"></span>
+                </button>
+              `).join('')}
+            </div>
+            <input type="hidden" id="user-selected-val" value="">
+          </div>
+        `;
+      } else if (q.type === 'ERROR') {
+        body.innerHTML = `
+          <div class="space-y-5">
+            <div>
+              <div class="text-xl sm:text-2xl tc-bold font-black text-black">${q.title}</div>
+              <div class="text-sm sm:text-base text-gray-700 tc-bold font-bold mt-1">${q.subText}</div>
+            </div>
+            <div class="p-5 bg-white border-4 border-black text-lg sm:text-xl text-black leading-relaxed tc-bold font-bold shadow-[4px_4px_0_#000]">
+              ${q.displaySentence}
+            </div>
+            <div class="pt-2 space-y-2">
+              <label class="block text-base tc-bold font-black text-black">請在下方輸入修正後的動詞拼法：</label>
+              <input type="text" id="user-text-input" autofocus placeholder="輸入正確動詞..." class="w-full sm:w-80 px-4 py-2.5 bg-black border-4 border-black text-[#fbd000] tc-bold font-black text-xl focus:border-[#00a800] focus:outline-none">
+            </div>
+          </div>
+        `;
+      } else if (q.type === 'CLOZE') {
+        body.innerHTML = `
+          <div class="space-y-5">
+            <div>
+              <div class="text-xl sm:text-2xl tc-bold font-black text-black">${q.title}</div>
+              <div class="text-sm sm:text-base text-gray-700 tc-bold font-bold mt-1">${q.subText}</div>
+            </div>
+            <div class="p-5 bg-white border-4 border-black text-lg sm:text-xl text-black leading-loose tc-bold font-bold shadow-[4px_4px_0_#000]">
+              ${q.clozePre}
+              <input type="text" id="user-text-input" autofocus placeholder="填入形式" class="inline-block mx-2 px-3 py-1 bg-black border-2 border-[#00a800] tc-bold font-black text-[#fbd000] w-44 text-center focus:outline-none">
+              ${q.clozePost}
+            </div>
+          </div>
+        `;
+      }
+
+      const textInput = document.getElementById('user-text-input');
+      if (textInput) {
+        textInput.focus();
+        textInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            if (!answeredCurrent) checkCurrentAnswer();
+            else nextQuestion();
+          }
+        });
+      }
+    }
+
+    function selectOption(val) {
+      if (answeredCurrent) return;
+      playMarioSound('coin');
+      document.getElementById('user-selected-val').value = val;
+      document.querySelectorAll('.choice-opt-btn').forEach(btn => {
+        if (btn.dataset.val === val) {
+          btn.classList.add('active');
+          btn.classList.remove('bg-white');
+          btn.querySelector('.opt-indicator').innerHTML = '🍄';
+        } else {
+          btn.classList.remove('active');
+          btn.classList.add('bg-white');
+          btn.querySelector('.opt-indicator').innerHTML = '';
+        }
+      });
+    }
+
+    function checkCurrentAnswer() {
+      if (answeredCurrent) return;
+
+      const q = quizQuestions[currentIndex];
+      let userAns = "";
+
+      if (q.type === 'CHOICE') {
+        userAns = document.getElementById('user-selected-val').value.trim();
+        if (!userAns) return;
+      } else {
+        const inp = document.getElementById('user-text-input');
+        userAns = inp ? inp.value.trim().toLowerCase() : "";
+        if (!userAns) return;
+      }
+
+      answeredCurrent = true;
+      const isCorrect = userAns.toLowerCase() === q.correctAnswer.toLowerCase();
+
+      const feedbackBox = document.getElementById('feedback-container');
+      const feedbackTitle = document.getElementById('feedback-title');
+      const feedbackExp = document.getElementById('feedback-explanation');
+
+      feedbackBox.classList.remove('hidden');
+
+      if (isCorrect) {
+        score++;
+        updateHudDisplay();
+        playMarioSound('correct');
+        feedbackBox.className = "p-4 sm:p-5 border-4 border-black bg-[#00a800] text-white";
+        feedbackTitle.innerHTML = `<span>⭐</span> <span>1-UP! 擊倒敵人！太神啦！</span>`;
+      } else {
+        wrongList.push({ question: q, userAns: userAns });
+        playMarioSound('bump');
+        feedbackBox.className = "p-4 sm:p-5 border-4 border-black bg-[#e52521] text-white";
+        feedbackTitle.innerHTML = `<span>🐢</span> <span>MAMMA MIA! 踩空失誤了！正解為：<b class="underline ml-1">${q.correctAnswer}</b></span>`;
+      }
+
+      feedbackExp.innerHTML = q.explanation;
+
+      document.getElementById('btn-submit-answer').classList.add('hidden');
+      document.getElementById('btn-next-question').classList.remove('hidden');
+      document.getElementById('btn-next-question').focus();
+    }
+
+    function nextQuestion() {
+      if (currentIndex < quizQuestions.length - 1) {
+        currentIndex++;
+        renderCurrentQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function retryWrongQuestions() {
+      if (!wrongList || wrongList.length === 0) return;
+      const wrongVerbs = wrongList.map(item => item.question.verb);
+      startQuiz(wrongVerbs);
+    }
+
+    function resetToSetup() {
+      document.getElementById('section-quiz').classList.add('hidden');
+      document.getElementById('section-quiz').classList.remove('flex');
+      document.getElementById('section-result').classList.add('hidden');
+      document.getElementById('section-result').classList.remove('flex');
+      document.getElementById('section-setup').classList.remove('hidden');
+      score = 0;
+      updateHudDisplay();
+    }
+
+    function confirmExitQuiz() {
+      if (confirm("確定要中止目前關卡並跳出水管返回主選單嗎？")) {
+        resetToSetup();
+      }
+    }
+
+    function showResults() {
+      playMarioSound('fanfare');
+      document.getElementById('section-quiz').classList.add('hidden');
+      document.getElementById('section-quiz').classList.remove('flex');
+      document.getElementById('section-result').classList.remove('hidden');
+      document.getElementById('section-result').classList.add('flex');
+
+      const total = quizQuestions.length;
+      const rate = Math.round((score / total) * 100);
+
+      document.getElementById('result-score').textContent = `${rate}%`;
+      document.getElementById('result-correct-count').textContent = score;
+      document.getElementById('result-wrong-count').textContent = wrongList.length;
+
+      const titleEl = document.getElementById('result-title');
+      const subTitleEl = document.getElementById('result-subtitle');
+      if (rate >= 90) {
+        titleEl.textContent = "CONGRATULATIONS!";
+        subTitleEl.textContent = "救出碧姬公主！你是名副其實的不規則動詞大師！👑";
+      } else if (rate >= 60) {
+        titleEl.textContent = "STAGE CLEAR! 順利過關！";
+        subTitleEl.textContent = "繼續保持，馬上就能徹底通關稱霸 8-4！🔥";
+      } else {
+        titleEl.textContent = "GAME OVER... 重新投幣！";
+        subTitleEl.textContent = "別氣餒！點擊下方按鈕重新特訓錯題，必定反敗為勝！🪙";
+      }
+
+      const wrongContainer = document.getElementById('wrong-answers-container');
+      const retryWrongBtn = document.getElementById('btn-retry-wrong');
+
+      if (wrongList.length > 0) {
+        retryWrongBtn.classList.remove('hidden');
+        retryWrongBtn.classList.add('flex');
+        document.getElementById('wrong-retry-count').textContent = wrongList.length;
+
+        wrongContainer.innerHTML = `
+          <div class="text-base sm:text-lg tc-bold font-black text-black flex items-center mb-2">
+            <span class="mr-1.5">🐢</span>
+            失誤庫巴障礙清單 (${wrongList.length} 題)：
+          </div>
+          <div class="space-y-2 max-h-56 overflow-y-auto pr-1">
+            ${wrongList.map(item => `
+              <div class="p-3 bg-white border-4 border-black text-base flex justify-between items-center tc-bold font-bold shadow-[2px_2px_0_#000]">
+                <div>
+                  <span class="text-[#e52521] font-black">${item.question.verb.base} (${item.question.verb.zh})</span>
+                  <span class="text-xs bg-[#00a800] text-white px-2 py-0.5 border border-black ml-1">Lv.${item.question.level}</span>
+                  <span class="text-gray-600 ml-2 text-sm">你的答案: <span class="text-[#e52521] line-through">${item.userAns || "(未作答)"}</span></span>
+                </div>
+                <div class="text-[#00a800] font-black">正解: ${item.question.correctAnswer}</div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } else {
+        retryWrongBtn.classList.add('hidden');
+        wrongContainer.innerHTML = `<div class="p-4 bg-[#00a800] text-white tc-bold font-black text-center text-lg border-4 border-black">⭐ PERFECT! 全數命中！無任何錯題！真不愧是瑪利歐！</div>`;
+      }
+    }
+
+    // ==========================================
+    // 6. 圖鑑展示與頁籤切換
+    // ==========================================
+    function switchTab(tab) {
+      if (tab === 'quiz') {
+        document.getElementById('section-dictionary').classList.add('hidden');
+        document.getElementById('section-dictionary').classList.remove('flex');
+        document.getElementById('section-setup').classList.remove('hidden');
+        document.getElementById('nav-btn-quiz').classList.add('active');
+        document.getElementById('nav-btn-dictionary').classList.remove('active');
+      } else if (tab === 'dictionary') {
+        document.getElementById('section-setup').classList.add('hidden');
+        document.getElementById('section-quiz').classList.add('hidden');
+        document.getElementById('section-result').classList.add('hidden');
+        document.getElementById('section-dictionary').classList.remove('hidden');
+        document.getElementById('section-dictionary').classList.add('flex');
+        document.getElementById('nav-btn-quiz').classList.remove('active');
+        document.getElementById('nav-btn-dictionary').classList.add('active');
+        renderDictionary();
+      }
+    }
+
+    function setDictFilter(type) {
+      dictCurrentType = type;
+      document.querySelectorAll('.dict-filter').forEach(btn => {
+        if (btn.dataset.dict === type) {
+          btn.classList.add('active');
+          btn.classList.remove('bg-white');
+        } else {
+          btn.classList.remove('active');
+          btn.classList.add('bg-white');
+        }
+      });
+      renderDictionary();
+    }
+
+    function renderDictionary() {
+      const searchKey = (document.getElementById('dict-search-input')?.value || "").toLowerCase().trim();
+      const tbody = document.getElementById('dict-table-body');
+      if (!tbody) return;
+
+      const filtered = VERB_DATABASE.filter(v => {
+        const matchesScope = dictCurrentScope === 'ALL' ? true : v.common;
+        const matchesType = dictCurrentType === 'ALL' || v.type === dictCurrentType;
+        const matchesSearch = !searchKey || 
+          v.base.toLowerCase().includes(searchKey) ||
+          v.past.toLowerCase().includes(searchKey) ||
+          v.pp.toLowerCase().includes(searchKey) ||
+          v.zh.toLowerCase().includes(searchKey);
+
+        return matchesScope && matchesType && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-gray-600 tc-bold font-bold text-lg">沒有找到符合條件的動詞</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map((v, idx) => {
+        return `
+          <tr class="hover:bg-[#fff6d6] transition-colors">
+            <td class="py-3 px-4 text-center text-xs pixel-text text-gray-500">${idx + 1}</td>
+            <td class="py-3 px-4 text-black font-black flex items-center space-x-1.5">
+              <span>${v.base}</span>
+              ${v.common ? '<span class="text-[11px] bg-[#e52521] text-white px-2 py-0.5 border border-black font-bold">核心</span>' : ''}
+            </td>
+            <td class="py-3 px-4 text-[#00a800] font-black">${v.past}</td>
+            <td class="py-3 px-4 text-[#b84418] font-black">${v.pp}</td>
+            <td class="py-3 px-4 text-black font-bold">${v.zh}</td>
+            <td class="py-3 px-4 text-center">
+              <span class="pixel-text bg-black text-[#fbd000] border border-black px-2 py-0.5 text-xs font-black">${v.type}</span>
+            </td>
+            <td class="py-3 px-4 text-center text-xs font-bold text-gray-700">
+              <span class="bg-gray-200 px-2 py-0.5 border border-black">Lv.1~Lv.5</span>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // 頁面初始化
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      updateFilterCount();
+      updateLevelBadge();
+      syncDataFromGAS();
+    });
+  </script>
+</body>
+</html>
