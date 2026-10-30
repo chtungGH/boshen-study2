@@ -65,7 +65,6 @@
       border-color: #059669;
       background: linear-gradient(180deg, rgba(6,78,59,0.25) 0%, var(--surface) 100%);
     }
-    /* 放棄狀態卡片 */
     .mission-card.skipped {
       border-color: #475569;
       background: rgba(30, 41, 59, 0.4);
@@ -225,7 +224,7 @@
     </div>
   </div>
 
-  <!-- 提前結業領證按鈕區 (新功能) -->
+  <!-- 提前結業領證按鈕區 -->
   <div style="max-width: 500px; margin: 0 auto; padding: 0 16px 12px 16px;">
     <button class="btn btn-outline-gold" onclick="openCertModal()" style="padding: 14px;">
       🏁 時間差不多了？以現有成績申請結業證書！
@@ -239,7 +238,7 @@
     </button>
   </div>
 
-  <!-- 註冊彈窗 -->
+  <!-- 註冊彈窗 (10 組小隊 ＆ 10 款指定 Emoji) -->
   <div class="modal-overlay" id="reg-modal" style="display: none;">
     <div class="modal-box">
       <div class="modal-title">🎖️ 特務小隊出發認證</div>
@@ -269,15 +268,15 @@
         <label class="form-label">挑選小隊代表隊徽</label>
         <div class="badge-picker" id="badge-picker">
           <div class="badge-opt selected">🦅</div>
-          <div class="badge-opt">🦁</div>
-          <div class="badge-opt">🐺</div>
-          <div class="badge-opt">⚡</div>
-          <div class="badge-opt">🚀</div>
-          <div class="badge-opt">🦖</div>
-          <div class="badge-opt">🦈</div>
-          <div class="badge-opt">🔥</div>
           <div class="badge-opt">🐯</div>
-          <div class="badge-opt">👑</div>
+          <div class="badge-opt">🐰</div>
+          <div class="badge-opt">🐱</div>
+          <div class="badge-opt">🐶</div>
+          <div class="badge-opt">🕷️</div>
+          <div class="badge-opt">🪰</div>
+          <div class="badge-opt">🦋</div>
+          <div class="badge-opt">🐞</div>
+          <div class="badge-opt">🪳</div>
         </div>
       </div>
 
@@ -298,7 +297,7 @@
     </div>
   </div>
 
-  <!-- 榮譽結業證書彈窗 (動態適配完成題數) -->
+  <!-- 榮譽結業證書彈窗 -->
   <div class="modal-overlay" id="cert-modal" style="display: none;">
     <div class="modal-box">
       <div class="cert-card" id="cert-area">
@@ -306,7 +305,6 @@
         <h2 style="color: var(--accent); margin: 8px 0; font-size: 1.3rem;" id="cert-title-text">特務榮譽結業證書</h2>
         <div style="font-size: 1.15rem; font-weight: bold; color: #fff;" id="cert-team-title">音速狂狼隊</div>
         
-        <!-- 動態鼓勵評語 -->
         <p style="font-size: 0.85rem; color: #cbd5e1; margin: 6px 0 10px 0; line-height: 1.4;" id="cert-cheer-text">
           在 512 戶外特務大作戰中全力以赴，展現了無與倫比的勇氣與團隊默契！
         </p>
@@ -349,7 +347,7 @@
     let currentTeam = { id: "", name: "", badge: "🚩" };
     let activeMissions = [];
     let completedMissionIds = new Set();
-    let skippedMissionIds = new Set(); // 新增：放棄的任務 ID 集合
+    let skippedMissionIds = new Set();
     let missionPhotos = {};
     let matchedCoopTeams = {};
     let currentScore = 0;
@@ -490,7 +488,7 @@
       document.getElementById("disp-score").innerText = currentScore;
     }
 
-    // ==================== 3. 題目渲染與放棄邏輯 ====================
+    // ==================== 3. 題目渲染與雙按鈕設計 ====================
     async function fetchMissions() {
       if (GAS_API_URL === "YOUR_GAS_WEB_APP_URL_HERE") {
         activeMissions = FALLBACK_MISSIONS;
@@ -530,13 +528,16 @@
                 <div style="color: #34d399; font-weight: 800; font-size: 0.95rem;">✓ 本解謎任務已圓滿通關 (+${m.score}分)</div>
               </div>`;
           } else {
+            // 需求 1：已通關的拍照題與跨組題，恢復成「重新拍照」與「重新選圖」雙按鈕並列
             actionHtml = `
               <div class="completed-proof-box">
                 <div style="color: #34d399; font-weight: 800; font-size: 0.95rem;">✓ 本任務已圓滿通關 (+${m.score}分)</div>
                 ${savedThumb ? `<img src="${savedThumb}" class="completed-thumb" id="thumb-${m.id}" alt="存證照片">` : ''}
                 
                 <div style="margin-top: 10px;">
-                  <input type="file" id="file-retake-${m.id}" accept="image/*" capture="environment" style="display: none;" onchange="handleFilePicked('${m.id}', true)">
+                  <input type="file" id="file-retake-cam-${m.id}" accept="image/*" capture="environment" style="display: none;" onchange="handleFilePicked('${m.id}', true, 'cam')">
+                  <input type="file" id="file-retake-lib-${m.id}" accept="image/*" style="display: none;" onchange="handleFilePicked('${m.id}', true, 'lib')">
+                  
                   <div class="preview-container" id="prev-wrap-retake-${m.id}">
                     <img id="prev-img-retake-${m.id}">
                     <div class="btn-group">
@@ -545,14 +546,14 @@
                     </div>
                   </div>
 
-                  <button class="btn btn-secondary" id="btn-retake-trigger-${m.id}" onclick="document.getElementById('file-retake-${m.id}').click()">
-                    🔄 重新拍攝照片
-                  </button>
+                  <div id="retake-btn-row-${m.id}" class="btn-split-row">
+                    <button class="btn btn-secondary" onclick="document.getElementById('file-retake-cam-${m.id}').click()">📸 重新拍照</button>
+                    <button class="btn btn-secondary" onclick="document.getElementById('file-retake-lib-${m.id}').click()">🖼️ 重新選圖</button>
+                  </div>
                 </div>
               </div>`;
           }
         } else if (isSkipped) {
-          // 放棄狀態展示
           actionHtml = `
             <div class="skipped-box">
               <div style="color: #94a3b8; font-weight: 700;">🏳️ 此任務已暫時戰略放棄</div>
@@ -561,7 +562,6 @@
               </button>
             </div>`;
         } else {
-          // 未完成正常操作介面
           if (m.type === "CODE") {
             actionHtml = `
               <div class="action-box">
@@ -572,8 +572,8 @@
           } else if (m.type === "PHOTO") {
             actionHtml = `
               <div class="action-box">
-                <input type="file" id="file-cam-${m.id}" accept="image/*" capture="environment" style="display: none;" onchange="handleFilePicked('${m.id}')">
-                <input type="file" id="file-lib-${m.id}" accept="image/*" style="display: none;" onchange="handleFilePicked('${m.id}')">
+                <input type="file" id="file-cam-${m.id}" accept="image/*" capture="environment" style="display: none;" onchange="handleFilePicked('${m.id}', false, 'cam')">
+                <input type="file" id="file-lib-${m.id}" accept="image/*" style="display: none;" onchange="handleFilePicked('${m.id}', false, 'lib')">
                 
                 <div class="preview-container" id="prev-wrap-${m.id}">
                   <img id="prev-img-${m.id}">
@@ -610,8 +610,8 @@
                   </div>
                 `}
 
-                <input type="file" id="file-cam-${m.id}" accept="image/*" capture="environment" style="display: none;" onchange="handleFilePicked('${m.id}')">
-                <input type="file" id="file-lib-${m.id}" accept="image/*" style="display: none;" onchange="handleFilePicked('${m.id}')">
+                <input type="file" id="file-cam-${m.id}" accept="image/*" capture="environment" style="display: none;" onchange="handleFilePicked('${m.id}', false, 'cam')">
+                <input type="file" id="file-lib-${m.id}" accept="image/*" style="display: none;" onchange="handleFilePicked('${m.id}', false, 'lib')">
                 
                 <div class="preview-container" id="prev-wrap-${m.id}">
                   <img id="prev-img-${m.id}">
@@ -632,7 +632,6 @@
           }
         }
 
-        // 放棄小按鈕 (僅未完成狀態下提供)
         const skipBtnHtml = (!isDone && !isSkipped) 
           ? `<button class="skip-btn-text" onclick="skipMission('${m.id}', '${m.title}')">🏳️ 放棄此題</button>` 
           : '';
@@ -662,7 +661,7 @@
       }
     }
 
-    // ==================== 放棄與恢復任務邏輯 ====================
+    // ==================== 放棄與恢復任務 ====================
     function skipMission(mId, mTitle) {
       if (confirm(`確定要戰略放棄「${mTitle}」嗎？\n（放棄後隨時可以點選『恢復挑戰』重新挑戰）`)) {
         skippedMissionIds.add(mId);
@@ -773,15 +772,17 @@
       completeMission(mId, score, `COOP_WITH:${matchedAlly.id}(${matchedAlly.name})`, photo);
     }
 
-    // ==================== 5. 照片操作與常規解謎 ====================
-    function handleFilePicked(mId, isRetake = false) {
+    // ==================== 5. 照片操作與重拍 ====================
+    function handleFilePicked(mId, isRetake = false, source = 'cam') {
       let file = null;
       if (isRetake) {
-        file = document.getElementById(`file-retake-${mId}`).files[0];
+        const camEl = document.getElementById(`file-retake-cam-${mId}`);
+        const libEl = document.getElementById(`file-retake-lib-${mId}`);
+        file = (source === 'cam' ? camEl.files[0] : libEl.files[0]) || camEl.files[0] || libEl.files[0];
       } else {
-        const camFile = document.getElementById(`file-cam-${mId}`) ? document.getElementById(`file-cam-${mId}`).files[0] : null;
-        const libFile = document.getElementById(`file-lib-${mId}`) ? document.getElementById(`file-lib-${mId}`).files[0] : null;
-        file = camFile || libFile;
+        const camEl = document.getElementById(`file-cam-${mId}`);
+        const libEl = document.getElementById(`file-lib-${mId}`);
+        file = (source === 'cam' ? camEl.files[0] : libEl.files[0]) || camEl.files[0] || libEl.files[0];
       }
       if (!file) return;
 
@@ -793,7 +794,7 @@
           const prevImg = document.getElementById(`prev-img-retake-${mId}`);
           prevImg.src = base64Thumb;
           prevWrap.style.display = "block";
-          document.getElementById(`btn-retake-trigger-${mId}`).style.display = "none";
+          document.getElementById(`retake-btn-row-${mId}`).style.display = "none";
         } else {
           const prevWrap = document.getElementById(`prev-wrap-${mId}`);
           const prevImg = document.getElementById(`prev-img-${mId}`);
@@ -806,9 +807,10 @@
     }
 
     function cancelRetake(mId) {
-      document.getElementById(`file-retake-${mId}`).value = "";
+      document.getElementById(`file-retake-cam-${mId}`).value = "";
+      document.getElementById(`file-retake-lib-${mId}`).value = "";
       document.getElementById(`prev-wrap-retake-${mId}`).style.display = "none";
-      document.getElementById(`btn-retake-trigger-${mId}`).style.display = "block";
+      document.getElementById(`retake-btn-row-${mId}`).style.display = "grid";
     }
 
     function confirmPhotoRetake(mId) {
@@ -872,7 +874,7 @@
       const wasAllDoneBefore = (completedMissionIds.size === activeMissions.length);
 
       completedMissionIds.add(mId);
-      skippedMissionIds.delete(mId); // 若曾放棄過，通關後移除放棄標記
+      skippedMissionIds.delete(mId);
       currentScore += score;
       if (photoBase64) missionPhotos[mId] = photoBase64;
 
@@ -911,7 +913,6 @@
       }, 2500);
     }
 
-    // 動態根據完成題數產生溫暖評價
     function openCertModal() {
       const totalCount = activeMissions.length;
       const doneCount = completedMissionIds.size;
