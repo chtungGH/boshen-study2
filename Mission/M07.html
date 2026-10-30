@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>512 特務大作戰 - 任務終端機</title>
   
-  <!-- 輕量 QR Code 產生庫與相機掃描庫 -->
+  <!-- 引入 QR Code 產生庫與相機掃描庫 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
@@ -31,15 +31,24 @@
       background: rgba(30, 41, 59, 0.95);
       backdrop-filter: blur(10px);
       border-bottom: 2px solid var(--surface-light);
-      padding: 12px 16px;
+      padding: 10px 14px;
       display: flex; justify-content: space-between; align-items: center;
     }
-    .team-badge-wrap { display: flex; align-items: center; gap: 10px; }
-    .team-avatar { font-size: 2rem; background: var(--surface-light); border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; }
-    .team-title { font-size: 1.05rem; font-weight: 800; color: #fff; }
+    .team-badge-wrap { display: flex; align-items: center; gap: 8px; }
+    .team-avatar { font-size: 1.8rem; background: var(--surface-light); border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; }
+    .team-title { font-size: 1rem; font-weight: 800; color: #fff; }
     .team-meta { font-size: 0.75rem; color: var(--text-muted); }
-    .score-box { background: linear-gradient(135deg, #f59e0b, #d97706); padding: 6px 14px; border-radius: 999px; text-align: right; }
-    .score-val { font-size: 1.15rem; font-weight: 900; color: #fff; }
+    
+    /* 頂部常駐出示 QR 鈕 */
+    .top-qr-btn {
+      background: #0284c7; color: #fff; border: none; border-radius: 8px;
+      padding: 6px 10px; font-size: 0.75rem; font-weight: 800; cursor: pointer;
+      display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
+    }
+    .top-qr-btn:active { background: #0369a1; }
+
+    .score-box { background: linear-gradient(135deg, #f59e0b, #d97706); padding: 5px 12px; border-radius: 999px; text-align: right; }
+    .score-val { font-size: 1.1rem; font-weight: 900; color: #fff; }
 
     /* 狀態與耗時條 */
     .radar-bar {
@@ -154,8 +163,15 @@
     .badge-opt { font-size: 1.7rem; padding: 8px; border-radius: 8px; background: #0f172a; border: 1px solid var(--surface-light); text-align: center; cursor: pointer; }
     .badge-opt.selected { border-color: var(--primary); background: rgba(16, 185, 129, 0.2); }
 
-    /* QR Code 展示與相機掃描容器 */
-    #qrcode-display { display: flex; justify-content: center; background: #fff; padding: 16px; border-radius: 12px; margin: 16px auto; width: 220px; height: 220px; }
+    /* QR Code 展示容器 */
+    #qrcode-display {
+      display: flex; justify-content: center; align-items: center;
+      background: #fff; padding: 16px; border-radius: 12px; margin: 16px auto;
+      width: 220px; height: 220px; min-height: 220px;
+    }
+    #qrcode-display img, #qrcode-display canvas {
+      display: block; margin: 0 auto; max-width: 100%; max-height: 100%;
+    }
     #qr-reader-box { width: 100%; border-radius: 12px; overflow: hidden; margin-bottom: 12px; display: none; background: #000; }
 
     .coop-matched-box {
@@ -189,18 +205,22 @@
 
   <canvas id="confetti-canvas"></canvas>
 
-  <!-- 頂部資訊列 -->
+  <!-- 頂部資訊列 (常駐出示 QR 鈕) -->
   <header>
     <div class="team-badge-wrap">
-      <div class="team-avatar" id="disp-badge">🚩</div>
+      <div class="team-avatar" id="disp-badge">🦅</div>
       <div>
         <div class="team-title" id="disp-team-name">連線準備中</div>
         <div class="team-meta" id="disp-team-id">ID: ----</div>
       </div>
     </div>
-    <div class="score-box">
-      <div style="font-size: 0.65rem; color: rgba(255,255,255,0.8);">目前總分</div>
-      <div class="score-val" id="disp-score">0</div>
+    
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <button class="top-qr-btn" onclick="showMyQrCode()">📱 出示QR</button>
+      <div class="score-box">
+        <div style="font-size: 0.65rem; color: rgba(255,255,255,0.8);">目前總分</div>
+        <div class="score-val" id="disp-score">0</div>
+      </div>
     </div>
   </header>
 
@@ -286,13 +306,16 @@
     </div>
   </div>
 
-  <!-- QR Code 彈窗 -->
+  <!-- QR Code 彈窗 (保證 100% 正常開啟) -->
   <div class="modal-overlay" id="qr-modal" style="display: none;">
     <div class="modal-box">
       <div class="modal-title">📡 本小隊特務連線碼</div>
       <p style="font-size: 0.85rem; color: var(--text-muted);">請將此螢幕出示給另一組特務掃描</p>
+      
+      <!-- QR Code 畫布 -->
       <div id="qrcode-display"></div>
-      <div id="qr-team-summary" style="font-weight: 800; font-size: 1.1rem; color: #fff; margin-bottom: 12px;"></div>
+      
+      <div id="qr-team-summary" style="font-weight: 800; font-size: 1.15rem; color: #fff; margin-bottom: 14px;"></div>
       <button class="btn btn-secondary" onclick="closeQrModal()">關閉返回</button>
     </div>
   </div>
@@ -344,7 +367,7 @@
       { id: "M09", category: "跨組合作", title: "雙隊合體：八星連珠", desc: "找到另一組小隊！出示或掃描彼此的特務 QR Code 完成碰頭連線，並拍下兩隊8人合體證明照！", score: 200, type: "COOP", passcode: "" }
     ];
 
-    let currentTeam = { id: "", name: "", badge: "🚩" };
+    let currentTeam = { id: "", name: "", badge: "🦅" };
     let activeMissions = [];
     let completedMissionIds = new Set();
     let skippedMissionIds = new Set();
@@ -357,7 +380,6 @@
     let wakeLock = null;
     let awayStartTime = null;
     let html5QrScanner = null;
-    let qrcodeObj = null;
 
     // ==================== 2. 初始化 ====================
     window.addEventListener("DOMContentLoaded", async () => {
@@ -488,7 +510,7 @@
       document.getElementById("disp-score").innerText = currentScore;
     }
 
-    // ==================== 3. 題目渲染與雙按鈕設計 ====================
+    // ==================== 3. 題目渲染 ====================
     async function fetchMissions() {
       if (GAS_API_URL === "YOUR_GAS_WEB_APP_URL_HERE") {
         activeMissions = FALLBACK_MISSIONS;
@@ -528,7 +550,6 @@
                 <div style="color: #34d399; font-weight: 800; font-size: 0.95rem;">✓ 本解謎任務已圓滿通關 (+${m.score}分)</div>
               </div>`;
           } else {
-            // 需求 1：已通關的拍照題與跨組題，恢復成「重新拍照」與「重新選圖」雙按鈕並列
             actionHtml = `
               <div class="completed-proof-box">
                 <div style="color: #34d399; font-weight: 800; font-size: 0.95rem;">✓ 本任務已圓滿通關 (+${m.score}分)</div>
@@ -676,21 +697,49 @@
       renderMissions();
     }
 
-    // ==================== 4. QR Code 生成與掃描 ====================
+    // ==================== 4. QR Code 生成與掃描 (修復重點) ====================
     function showMyQrCode() {
-      const qrData = `AGENT_AUTH:${currentTeam.id}|${currentTeam.name}|${currentTeam.badge}`;
+      // 1. 如果尚未成軍，先阻擋提示
+      if (!currentTeam.id) {
+        alert("請先完成小隊出發認證！");
+        return;
+      }
+
+      // 2. 先打開彈窗，確保容器在 DOM 中具備實體寬高
+      const modal = document.getElementById("qr-modal");
+      modal.style.display = "flex";
+
       const dispEl = document.getElementById("qrcode-display");
-      dispEl.innerHTML = "";
-      qrcodeObj = new QRCode(dispEl, {
-        text: qrData,
-        width: 188,
-        height: 188,
-        colorDark : "#0f172a",
-        colorLight : "#ffffff",
-        correctLevel : QRCode.CorrectLevel.M
-      });
+      dispEl.innerHTML = ""; // 清空舊內容
+
       document.getElementById("qr-team-summary").innerText = `${currentTeam.name} (${currentTeam.id}) ${currentTeam.badge}`;
-      document.getElementById("qr-modal").style.display = "flex";
+
+      const qrText = `AGENT_AUTH:${currentTeam.id}|${currentTeam.name}|${currentTeam.badge}`;
+
+      // 3. 嘗試使用 QRCodeJS 生成，若外部 CDN 卡住則自動降級到 QR 雲端圖源 (100% 保證秀出)
+      try {
+        if (typeof QRCode !== "undefined") {
+          new QRCode(dispEl, {
+            text: qrText,
+            width: 188,
+            height: 188,
+            colorDark: "#0f172a",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.M
+          });
+        } else {
+          fallbackRenderQr(dispEl, qrText);
+        }
+      } catch (err) {
+        console.warn("QRCodeJS 生成異常，切換至備用圖源:", err);
+        fallbackRenderQr(dispEl, qrText);
+      }
+    }
+
+    // 保底 QR Code 圖片生成器 (極速備案)
+    function fallbackRenderQr(container, text) {
+      const encoded = encodeURIComponent(text);
+      container.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=188x188&data=${encoded}" alt="特務QR" style="width:188px;height:188px;border-radius:8px;">`;
     }
 
     function closeQrModal() {
@@ -740,7 +789,7 @@
       const parts = decodedText.replace("AGENT_AUTH:", "").split("|");
       const allyId = parts[0];
       const allyName = parts[1];
-      const allyBadge = parts[2] || "🚩";
+      const allyBadge = parts[2] || "🦅";
 
       if (allyId === currentTeam.id) {
         alert("❌ 無法與自己小隊結盟！請尋找其他特務小隊！");
