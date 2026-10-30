@@ -39,16 +39,33 @@
     .team-title { font-size: 1rem; font-weight: 800; color: #fff; }
     .team-meta { font-size: 0.75rem; color: var(--text-muted); }
     
-    /* 頂部常駐出示 QR 鈕 */
+    /* 頂部常駐出示 QR 鈕與單行積分膠囊 */
     .top-qr-btn {
       background: #0284c7; color: #fff; border: none; border-radius: 8px;
       padding: 6px 10px; font-size: 0.75rem; font-weight: 800; cursor: pointer;
       display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
+      white-space: nowrap;
     }
     .top-qr-btn:active { background: #0369a1; }
 
-    .score-box { background: linear-gradient(135deg, #f59e0b, #d97706); padding: 5px 12px; border-radius: 999px; text-align: right; }
-    .score-val { font-size: 1.1rem; font-weight: 900; color: #fff; }
+    .score-box {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+      box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+    }
+    .score-val {
+      font-size: 0.85rem;
+      font-weight: 900;
+      color: #fff;
+    }
 
     /* 狀態與耗時條 */
     .radar-bar {
@@ -205,7 +222,7 @@
 
   <canvas id="confetti-canvas"></canvas>
 
-  <!-- 頂部資訊列 (完整保留常駐出示 QR 鈕) -->
+  <!-- 頂部資訊列 (常駐出示 QR 與單行積分膠囊) -->
   <header>
     <div class="team-badge-wrap">
       <div class="team-avatar" id="disp-badge">🦅</div>
@@ -218,8 +235,8 @@
     <div style="display: flex; align-items: center; gap: 8px;">
       <button class="top-qr-btn" onclick="showMyQrCode()">📱 出示QR</button>
       <div class="score-box">
-        <div style="font-size: 0.65rem; color: rgba(255,255,255,0.8);">目前總分</div>
-        <div class="score-val" id="disp-score">0</div>
+        <span>🏆 積分:</span>
+        <span class="score-val" id="disp-score">0</span>
       </div>
     </div>
   </header>
@@ -604,7 +621,7 @@
                   <img id="prev-img-${m.id}">
                   <div class="btn-group">
                     <button class="btn btn-secondary" onclick="resetPicker('${m.id}')">🔄 重新選擇</button>
-                    <button class="btn btn-primary" id="btn-confirm-${m.id}" onclick="confirmPhotoUpload('${m.id}', ${m.score})">🚀 確認無誤，送出！</button>
+                    <button class="btn btn-primary" id="btn-confirm-${m.id}" onclick="confirmPhotoUpload('${m.id}', ${m.score})">🚀 確認送出！</button>
                   </div>
                 </div>
 
@@ -649,8 +666,8 @@
                 </div>
 
                 <div id="picker-btn-row-${m.id}" class="btn-split-row" style="margin-bottom: 8px;">
-                  <button class="btn btn-secondary" onclick="document.getElementById('file-cam-${m.id}').click()">📸 拍所有成員合照</button>
-                  <button class="btn btn-secondary" onclick="document.getElementById('file-lib-${m.id}').click()">🖼️ 選所有成員合照</button>
+                  <button class="btn btn-secondary" onclick="document.getElementById('file-cam-${m.id}').click()">📸 拍成員合照</button>
+                  <button class="btn btn-secondary" onclick="document.getElementById('file-lib-${m.id}').click()">🖼️ 選成員合照</button>
                 </div>
 
                 <button class="btn btn-primary" onclick="submitCoopMission('${m.id}', ${m.score})">
