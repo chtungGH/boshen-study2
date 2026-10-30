@@ -451,7 +451,7 @@
     }
 
     async function checkTakenTeams() {
-      if (!GAS_API_URL || GAS_API_URL === "YOUR_GAS_WEB_APP_URL_HERE") return;
+      if (!GAS_API_URL || GAS_API_URL === "https://script.google.com/macros/s/AKfycbx-Fbw-uYiMSv9t17C-K49JPQts8fMFRVr2N2pFRFRO5OtrVQMMa9SNoQzu3KhHEwl93A/exec") return;
       try {
         const res = await fetch(`${GAS_API_URL}?action=GET_DASHBOARD`);
         const data = await res.json();
@@ -512,7 +512,7 @@
 
     // ==================== 3. 題目渲染 ====================
     async function fetchMissions() {
-      if (GAS_API_URL === "YOUR_GAS_WEB_APP_URL_HERE") {
+      if (GAS_API_URL === "https://script.google.com/macros/s/AKfycbx-Fbw-uYiMSv9t17C-K49JPQts8fMFRVr2N2pFRFRO5OtrVQMMa9SNoQzu3KhHEwl93A/exec") {
         activeMissions = FALLBACK_MISSIONS;
       } else {
         try {
@@ -1147,7 +1147,7 @@
     }
 
     function postApi(payload) {
-      if (!GAS_API_URL || GAS_API_URL === "YOUR_GAS_WEB_APP_URL_HERE") return;
+      if (!GAS_API_URL || GAS_API_URL === "https://script.google.com/macros/s/AKfycbx-Fbw-uYiMSv9t17C-K49JPQts8fMFRVr2N2pFRFRO5OtrVQMMa9SNoQzu3KhHEwl93A/exec") return;
       fetch(GAS_API_URL, {
         method: "POST",
         mode: "no-cors",
