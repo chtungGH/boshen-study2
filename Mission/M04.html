@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>512 特務大作戰 - 任務終端機</title>
+  <style>
+    :root {
+      --primary: #10b981;
+      --primary-dark: #059669;
+      --accent: #f59e0b;
+      --danger: #ef4444;
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --surface-light: #334155;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: var(--bg); color: var(--text); padding-bottom: 70px; min-height: 100vh; overflow-x: hidden; }
+
+    /* 頂部導航 */
+    header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(30, 41, 59, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 2px solid var(--surface-light);
+      padding: 12px 16px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .team-badge-wrap { display: flex; align-items: center; gap: 10px; }
+    .team-avatar { font-size: 2rem; background: var(--surface-light); border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; }
+    .team-title { font-size: 1.05rem; font-weight: 800; color: #fff; }
+    .team-meta { font-size: 0.75rem; color: var(--text-muted); }
+    .score-box { background: linear-gradient(135deg, #f59e0b, #d97706); padding: 6px 14px; border-radius: 999px; text-align: right; }
+    .score-val { font-size: 1.15rem; font-weight: 900; color: #fff; }
+
+    /* 狀態與耗時條 */
+    .radar-bar {
+      background: #022c22; border-bottom: 1px solid #065f46;
+      padding: 8px 16px; font-size: 0.78rem; color: #6ee7b7;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .timer-badge { font-weight: 800; color: #fef08a; letter-spacing: 0.5px; }
+
+    .container { max-width: 500px; margin: 0 auto; padding: 16px; }
+
+    /* 任務卡片 */
+    .mission-card {
+      background: var(--surface);
+      border: 1px solid var(--surface-light);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .mission-card.completed {
+      border-color: #059669;
+      background: linear-gradient(180deg, rgba(6,78,59,0.25) 0%, var(--surface) 100%);
+    }
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+    .category-tag { font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: 6px; background: var(--surface-light); color: #38bdf8; }
+    .score-tag { font-size: 0.85rem; font-weight: 800; color: var(--accent); background: rgba(245, 158, 11, 0.1); padding: 4px 8px; border-radius: 6px; }
+    .mission-title { font-size: 1.15rem; font-weight: 800; margin-bottom: 6px; color: #fff; }
+    .mission-desc { font-size: 0.9rem; color: #cbd5e1; line-height: 1.45; margin-bottom: 14px; }
+
+    /* 通關存證區塊 */
+    .completed-proof-box {
+      margin-top: 12px; border-radius: 12px; background: rgba(0,0,0,0.3);
+      padding: 12px; border: 1px dashed #059669; text-align: center;
+    }
+    .completed-thumb { width: 100%; max-height: 200px; object-fit: cover; border-radius: 8px; margin-top: 8px; }
+
+    /* 互動操作區 */
+    .action-box { background: rgba(0,0,0,0.25); border-radius: 12px; padding: 14px; margin-top: 10px; }
+    .btn {
+      display: block; width: 100%; padding: 12px; border-radius: 10px;
+      border: none; font-size: 0.95rem; font-weight: 700; cursor: pointer;
+      text-align: center; transition: all 0.2s;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:active { background: var(--primary-dark); }
+    .btn-secondary { background: var(--surface-light); color: #fff; }
+    .btn-gold { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4); }
+    .btn-danger-outline { background: transparent; border: 1px dashed #ef4444; color: #ef4444; font-size: 0.8rem; padding: 8px; margin-top: 24px; }
+    .btn-split-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px; }
+
+    /* 暗號輸入框與錯誤回饋 */
+    .input-code {
+      width: 100%; padding: 12px; border-radius: 8px; border: 2px solid var(--surface-light);
+      background: #0f172a; color: #fff; font-size: 1.15rem; text-align: center;
+      margin-bottom: 8px; letter-spacing: 2px;
+    }
+    .input-code.error {
+      border-color: var(--danger) !important;
+      animation: shake 0.3s ease-in-out;
+    }
+    .error-msg-banner {
+      background: rgba(239, 68, 68, 0.2); border: 1px solid var(--danger);
+      color: #fca5a5; padding: 8px 12px; border-radius: 8px; font-size: 0.85rem;
+      font-weight: bold; margin-bottom: 10px; text-align: center; display: none;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+
+    /* 拍照預覽容器 */
+    .preview-container { margin-bottom: 12px; text-align: center; display: none; }
+    .preview-container img { width: 100%; max-height: 200px; object-fit: cover; border-radius: 10px; border: 2px solid var(--accent); }
+    .btn-group { display: flex; gap: 8px; margin-top: 8px; }
+
+    /* 模態彈窗 */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.88); backdrop-filter: blur(8px);
+      z-index: 999; display: flex; align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-box {
+      background: var(--surface); border: 1px solid var(--surface-light);
+      width: 100%; max-width: 420px; border-radius: 20px; padding: 24px;
+      max-height: 90vh; overflow-y: auto;
+    }
+    .modal-title { font-size: 1.4rem; font-weight: 900; margin-bottom: 16px; text-align: center; color: var(--accent); }
+    .form-group { margin-bottom: 14px; }
+    .form-label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px; font-weight: 600; }
+    .form-select, .form-input {
+      width: 100%; padding: 12px; border-radius: 8px; background: #0f172a;
+      border: 1px solid var(--surface-light); color: #fff; font-size: 1rem;
+    }
+    .badge-picker { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 6px; }
+    .badge-opt { font-size: 1.8rem; padding: 8px; border-radius: 8px; background: #0f172a; border: 1px solid var(--surface-light); text-align: center; cursor: pointer; }
+    .badge-opt.selected { border-color: var(--primary); background: rgba(16, 185, 129, 0.2); }
+
+    /* 證書樣式 */
+    .cert-card {
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      border: 3px solid var(--accent); border-radius: 16px; padding: 20px; text-align: center; margin-bottom: 16px;
+    }
+    .cert-photo-wrap {
+      width: 100%; height: 180px; border-radius: 10px; background: #000;
+      overflow: hidden; margin: 12px 0; border: 2px dashed #94a3b8;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .cert-photo-wrap img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* 全通關彩帶煙火畫布 (需求 3) */
+    #confetti-canvas {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      pointer-events: none; z-index: 1000; display: none;
+    }
+
+    /* 頂部全通關導引橫幅 (需求 3) */
+    #all-done-banner {
+      display: none; padding: 14px 16px; background: linear-gradient(90deg, #064e3b, #0f766e);
+      border-bottom: 3px solid #34d399; text-align: center; position: sticky; top: 68px; z-index: 90;
+      animation: bounce 1.5s infinite;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 全螢幕彩帶煙火 Canvas -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- 頂部資訊列 -->
+  <header>
+    <div class="team-badge-wrap">
+      <div class="team-avatar" id="disp-badge">🚩</div>
+      <div>
+        <div class="team-title" id="disp-team-name">連線準備中</div>
+        <div class="team-meta" id="disp-team-id">ID: ----</div>
+      </div>
+    </div>
+    <div class="score-box">
+      <div style="font-size: 0.65rem; color: rgba(255,255,255,0.8);">目前總分</div>
+      <div class="score-val" id="disp-score">0</div>
+    </div>
+  </header>
+
+  <!-- 狀態條 -->
+  <div class="radar-bar">
+    <div class="timer-badge" id="disp-timer">⏱️ 任務耗時: 00:00:00</div>
+    <div id="disp-progress">進度: 0/0</div>
+  </div>
+
+  <!-- 需求 3：全通關後的引導按鈕 -->
+  <div id="all-done-banner">
+    <button class="btn btn-gold" onclick="openCertModal()" style="font-size: 1.05rem; padding: 14px;">
+      🎖️ 恭喜全通關！點此領取與列印榮譽勳章證書 🎖️
+    </button>
+  </div>
+
+  <!-- 任務清單容器 -->
+  <div class="container" id="mission-list">
+    <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+      📡 正在從總部載入任務...
+    </div>
+  </div>
+
+  <!-- 測試用重來入口 -->
+  <div style="max-width: 500px; margin: 0 auto; padding: 0 16px 20px 16px; text-align: center;">
+    <button class="btn btn-danger-outline" onclick="resetLocalProgress()">
+      ⚠️ 測試專用：重置本機所有任務進度並重新開始
+    </button>
+  </div>
+
+  <!-- 註冊彈窗 -->
+  <div class="modal-overlay" id="reg-modal" style="display: none;">
+    <div class="modal-box">
+      <div class="modal-title">🎖️ 特務小隊出發認證</div>
+      
+      <div class="form-group">
+        <label class="form-label">選擇所屬小隊</label>
+        <select class="form-select" id="reg-team-id">
+          <option value="T01">第 1 組 (T01)</option>
+          <option value="T02">第 2 組 (T02)</option>
+          <option value="T03">第 3 組 (T03)</option>
+          <option value="T04">第 4 組 (T04)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">小隊自訂名稱</label>
+        <input type="text" class="form-input" id="reg-team-name" placeholder="例如：音速獵鷹隊" maxlength="8">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">挑選小隊代表隊徽</label>
+        <div class="badge-picker" id="badge-picker">
+          <div class="badge-opt selected">🦅</div>
+          <div class="badge-opt">🦁</div>
+          <div class="badge-opt">🐺</div>
+          <div class="badge-opt">⚡</div>
+          <div class="badge-opt">🚀</div>
+          <div class="badge-opt">🦖</div>
+          <div class="badge-opt">🦈</div>
+          <div class="badge-opt">🔥</div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="submitRegistration()" style="margin-top: 14px;">
+        🚀 確認隊名，連線出發！
+      </button>
+    </div>
+  </div>
+
+  <!-- 結業證書彈窗 -->
+  <div class="modal-overlay" id="cert-modal" style="display: none;">
+    <div class="modal-box">
+      <div class="cert-card" id="cert-area">
+        <div style="font-size: 2.5rem;" id="cert-badge">🏆</div>
+        <h2 style="color: var(--accent); margin: 8px 0;">特務榮譽勳章結業證書</h2>
+        <div style="font-size: 1.15rem; font-weight: bold; color: #fff;" id="cert-team-title">音速獵鷹隊</div>
+        <p style="font-size: 0.85rem; color: #94a3b8; margin-top: 4px;">於 512 戶外特務大作戰完成所有考驗</p>
+        
+        <div class="cert-photo-wrap">
+          <span style="color: #64748b; font-size: 0.85rem;" id="cert-photo-placeholder">點擊下方拍照新增結業合影</span>
+          <img id="cert-img" style="display: none;">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; margin-top: 12px; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 8px;">
+          <div><div style="font-size:0.7rem; color:#94a3b8;">最終總積分</div><div style="font-size:1.1rem; font-weight:900; color:var(--accent);" id="cert-score">0</div></div>
+          <div><div style="font-size:0.7rem; color:#94a3b8;">解鎖任務</div><div style="font-size:1.1rem; font-weight:900; color:#34d399;" id="cert-tasks">0</div></div>
+          <div><div style="font-size:0.7rem; color:#94a3b8;">總耗時</div><div style="font-size:0.95rem; font-weight:900; color:#fef08a;" id="cert-duration">--:--</div></div>
+        </div>
+      </div>
+
+      <input type="file" id="cert-photo-input" accept="image/*" capture="environment" style="display: none;" onchange="handleCertPhoto(event)">
+      <button class="btn btn-primary" onclick="document.getElementById('cert-photo-input').click()">📸 拍張小隊結業大合照</button>
+      <button class="btn btn-secondary" onclick="window.print()" style="margin-top: 8px;">🖨️ 列印 / 截圖保存此證書</button>
+      <button class="btn btn-secondary" onclick="document.getElementById('cert-modal').style.display='none'" style="margin-top: 8px;">返回任務面板</button>
+    </div>
+  </div>
+
+  <script>
+    // ==================== 1. 核心參數與備用題庫 ====================
+    const GAS_API_URL = "YOUR_GAS_WEB_APP_URL_HERE";
+
+    const FALLBACK_MISSIONS = [
+      { id: "M01", category: "現場解謎", title: "公園時光之碑", desc: "找到園區最具代表性的紀事石碑或平面圖，輸入上面記載的建立年份四碼密碼！", score: 100, type: "CODE", passcode: "1998" },
+      { id: "M02", category: "現場解謎", title: "階梯密碼算術師", desc: "前往中央大涼亭，數出【主要階梯數】加上【涼亭柱子數】的總和數字輸入解鎖！", score: 100, type: "CODE", passcode: "24" },
+      { id: "M03", category: "搞怪錯位", title: "巨人的下午茶", desc: "近大遠小！一名隊員在近處張大嘴，另一名隊員在遠處，拍一張掉進嘴裡的搞笑瞬間！", score: 150, type: "PHOTO", passcode: "" },
+      { id: "M04", category: "搞怪錯位", title: "單手捏爆建築物", desc: "隊長在前景伸出兩指，精準借位捏住遠處的涼亭頂部，隊員全體做出崇拜表情！", score: 150, type: "PHOTO", passcode: "" },
+      { id: "M05", category: "動態抓拍", title: "地心引力消失瞬間", desc: "全隊隊員同時原地跳起，攝影官抓拍一張全員雙腳同時離地懸空的瞬間！", score: 150, type: "PHOTO", passcode: "" },
+      { id: "M06", category: "生態獵人", title: "大自然天然色票", desc: "在地上撿拾落葉排成【綠 ➔ 黃 ➔ 紅 ➔ 褐】由淺到深的漸層色階並俯拍特寫！", score: 100, type: "PHOTO", passcode: "" },
+      { id: "M07", category: "環境守護", title: "綠色特務的使命", desc: "全隊合力在活動範圍內撿起3個非自然垃圾，拍下全員投入垃圾桶的瞬間！", score: 100, type: "PHOTO", passcode: "" },
+      { id: "M08", category: "家長互動", title: "神秘接頭人密電", desc: "找到在野餐區戴帽子的家長關主，說出暗號【今天的麻雀穿雨鞋嗎？】獲得通關碼！", score: 150, type: "CODE", passcode: "777" },
+      { id: "M09", category: "跨組合作", title: "雙隊合體：八星連珠", desc: "與另一隊共8人在草皮上四肢相扣拼出巨大的幾何星形，輸入對方小隊碼並拍下8人合照！", score: 200, type: "COOP", passcode: "888" }
+    ];
+
+    let currentTeam = { id: "", name: "", badge: "🚩" };
+    let activeMissions = [];
+    let completedMissionIds = new Set();
+    let missionPhotos = {};
+    let currentScore = 0;
+    let tempPhotos = {};
+    let startTime = null;
+    let timerInterval = null;
+    let wakeLock = null;
+    let awayStartTime = null;
+
+    // ==================== 2. 初始化 ====================
+    window.addEventListener("DOMContentLoaded", async () => {
+      loadLocalProfile();
+      setupBadgePicker();
+      setupWakeLock();
+      setupVisibilityMonitor();
+
+      if (!currentTeam.id) {
+        await checkTakenTeams();
+        document.getElementById("reg-modal").style.display = "flex";
+      } else {
+        updateTeamHeader();
+        startTimer();
+        fetchMissions();
+      }
+
+      setInterval(() => {
+        if (currentTeam.id) sendHeartbeat("active");
+      }, 15000);
+    });
+
+    function loadLocalProfile() {
+      const saved = localStorage.getItem("team_profile");
+      if (saved) currentTeam = JSON.parse(saved);
+
+      const savedDone = localStorage.getItem("completed_missions");
+      if (savedDone) completedMissionIds = new Set(JSON.parse(savedDone));
+
+      const savedScore = localStorage.getItem("current_score");
+      if (savedScore) currentScore = Number(savedScore);
+
+      const savedPhotos = localStorage.getItem("mission_photos");
+      if (savedPhotos) missionPhotos = JSON.parse(savedPhotos);
+
+      const savedStart = localStorage.getItem("start_time");
+      if (savedStart) startTime = Number(savedStart);
+
+      const savedCertImg = localStorage.getItem("cert_img");
+      if (savedCertImg) {
+        const cImg = document.getElementById("cert-img");
+        cImg.src = savedCertImg;
+        cImg.style.display = "block";
+        document.getElementById("cert-photo-placeholder").style.display = "none";
+      }
+    }
+
+    function startTimer() {
+      if (!startTime) {
+        startTime = new Date().getTime();
+        localStorage.setItem("start_time", startTime);
+      }
+
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        const now = new Date().getTime();
+        const diffSec = Math.floor((now - startTime) / 1000);
+        const hrs = String(Math.floor(diffSec / 3600)).padStart(2, '0');
+        const mins = String(Math.floor((diffSec % 3600) / 60)).padStart(2, '0');
+        const secs = String(diffSec % 60).padStart(2, '0');
+        document.getElementById("disp-timer").innerText = `⏱️ 任務耗時: ${hrs}:${mins}:${secs}`;
+      }, 1000);
+    }
+
+    async function checkTakenTeams() {
+      if (!GAS_API_URL || GAS_API_URL === "YOUR_GAS_WEB_APP_URL_HERE") return;
+      try {
+        const res = await fetch(`${GAS_API_URL}?action=GET_DASHBOARD`);
+        const data = await res.json();
+        if (data && data.teams) {
+          const selectEl = document.getElementById("reg-team-id");
+          data.teams.forEach(t => {
+            if (t.status !== "Offline") {
+              const opt = selectEl.querySelector(`option[value="${t.teamId}"]`);
+              if (opt) {
+                opt.disabled = true;
+                opt.innerText += " (已被選取)";
+              }
+            }
+          });
+        }
+      } catch (e) {}
+    }
+
+    function setupBadgePicker() {
+      const opts = document.querySelectorAll(".badge-opt");
+      opts.forEach(el => {
+        el.addEventListener("click", () => {
+          opts.forEach(o => o.classList.remove("selected"));
+          el.classList.add("selected");
+        });
+      });
+    }
+
+    function submitRegistration() {
+      const teamId = document.getElementById("reg-team-id").value;
+      const teamName = document.getElementById("reg-team-name").value.trim() || `${teamId}小隊`;
+      const selectedBadgeEl = document.querySelector(".badge-opt.selected");
+      const badge = selectedBadgeEl ? selectedBadgeEl.innerText : "🦅";
+
+      currentTeam = { id: teamId, name: teamName, badge: badge };
+      localStorage.setItem("team_profile", JSON.stringify(currentTeam));
+
+      document.getElementById("reg-modal").style.display = "none";
+      updateTeamHeader();
+      startTimer();
+
+      postApi({
+        action: "REGISTER_TEAM",
+        teamId: currentTeam.id,
+        teamName: currentTeam.name,
+        badge: currentTeam.badge
+      });
+
+      fetchMissions();
+    }
+
+    function updateTeamHeader() {
+      document.getElementById("disp-team-name").innerText = currentTeam.name;
+      document.getElementById("disp-team-id").innerText = `小隊: ${currentTeam.id}`;
+      document.getElementById("disp-badge").innerText = currentTeam.badge;
+      document.getElementById("disp-score").innerText = currentScore;
+    }
+
+    // ==================== 3. 題目渲染 ====================
+    async function fetchMissions() {
+      if (GAS_API_URL === "YOUR_GAS_WEB_APP_URL_HERE") {
+        activeMissions = FALLBACK_MISSIONS;
+      } else {
+        try {
+          const res = await fetch(`${GAS_API_URL}?action=GET_MISSIONS`);
+          const data = await res.json();
+          activeMissions = (data && data.missions && data.missions.length > 0) ? data.missions : FALLBACK_MISSIONS;
+        } catch (e) {
+          activeMissions = FALLBACK_MISSIONS;
+        }
+      }
+      renderMissions();
+    }
+
+    function renderMissions() {
+      const listEl = document.getElementById("mission-list");
+      listEl.innerHTML = "";
+
+      let doneCount = 0;
+      activeMissions.forEach((m, idx) => {
+        const isDone = completedMissionIds.has(m.id);
+        if (isDone) doneCount++;
+
+        const card = document.createElement("div");
+        card.className = `mission-card ${isDone ? "completed" : ""}`;
+        card.id = `card-${m.id}`;
+
+        let actionHtml = "";
+        const savedThumb = missionPhotos[m.id];
+
+        if (isDone) {
+          // 需求 2：若純解謎題 (CODE)，通關後只顯示文字，不出現任何重新拍照/選圖介面
+          if (m.type === "CODE") {
+            actionHtml = `
+              <div class="completed-proof-box">
+                <div style="color: #34d399; font-weight: 800; font-size: 0.95rem;">✓ 本解謎任務已圓滿通關 (+${m.score}分)</div>
+              </div>`;
+          } else {
+            // 拍照題型或跨組題型：需求 1：重新拍照直接啟動相機，不再回選單
+            actionHtml = `
+              <div class="completed-proof-box">
+                <div style="color: #34d399; font-weight: 800; font-size: 0.95rem;">✓ 本任務已圓滿通關 (+${m.score}分)</div>
+                ${savedThumb ? `<img src="${savedThumb}" class="completed-thumb" id="thumb-${m.id}" alt="存證照片">` : ''}
+                
+                <div style="margin-top: 10px;">
+                  <!-- 重新拍照直接啟動後置相機 -->
+                  <input type="file" id="file-retake-${m.id}" accept="image/*" capture="environment" style="display: none;" onchange="handleFilePicked('${m.id}', true)">
+                  
+                  <div class="preview-container" id="prev-wrap-retake-${m.id}">
+                    <img id="prev-img-retake-${m.id}">
+                    <div class="btn-group">
+                      <button class="btn btn-secondary" onclick="cancelRetake('${m.id}')">取消</button>
+                      <button class="btn btn-primary" onclick="confirmPhotoRetake('${m.id}')">🚀 確認覆蓋更換</button>
+                    </div>
+                  </div>
+
+                  <button class="btn btn-secondary" id="btn-retake-trigger-${m.id}" onclick="document.getElementById('file-retake-${m.id}').click()">
+                    🔄 重新拍攝照片
+                  </button>
+                </div>
+              </div>`;
+          }
+        } else {
+          if (m.type === "CODE") {
+            actionHtml = `
+              <div class="action-box">
+                <div class="error-msg-banner" id="err-${m.id}">❌ 暗號不正確，再仔細確認一次現場線索！</div>
+                <input type="text" class="input-code" id="input-${m.id}" placeholder="請輸入現場解鎖密碼">
+                <button class="btn btn-primary" onclick="verifyCode('${m.id}', '${m.passcode}', ${m.score})">🔓 驗證暗號</button>
+              </div>`;
+          } else if (m.type === "PHOTO") {
+            actionHtml = `
+              <div class="action-box">
+                <input type="file" id="file-cam-${m.id}" accept="image/*" capture="environment" style="display: none;" onchange="handleFilePicked('${m.id}')">
+                <input type="file" id="file-lib-${m.id}" accept="image/*" style="display: none;" onchange="handleFilePicked('${m.id}')">
+                
+                <div class="preview-container" id="prev-wrap-${m.id}">
+                  <img id="prev-img-${m.id}">
+                  <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="resetPicker('${m.id}')">🔄 重新選擇</button>
+                    <button class="btn btn-primary" id="btn-confirm-${m.id}" onclick="confirmPhotoUpload('${m.id}', ${m.score})">🚀 確認無誤，送出！</button>
+                  </div>
+                </div>
+
+                <div id="picker-btn-row-${m.id}" class="btn-split-row">
+                  <button class="btn btn-primary" onclick="document.getElementById('file-cam-${m.id}').click()">📸 現場拍照</button>
+                  <button class="btn btn-secondary" onclick="document.getElementById('file-lib-${m.id}').click()">🖼️ 相簿選圖</button>
+                </div>
+              </div>`;
+          } else if (m.type === "COOP") {
+            actionHtml = `
+              <div class="action-box">
+                <div class="error-msg-banner" id="err-${m.id}">❌ 結盟碼錯誤！請詢問對方小隊專屬驗證碼。</div>
+                <input type="text" class="input-code" id="input-${m.id}" placeholder="輸入對方小隊專屬碼">
+                
+                <input type="file" id="file-cam-${m.id}" accept="image/*" capture="environment" style="display: none;" onchange="handleFilePicked('${m.id}')">
+                <input type="file" id="file-lib-${m.id}" accept="image/*" style="display: none;" onchange="handleFilePicked('${m.id}')">
+                
+                <div class="preview-container" id="prev-wrap-${m.id}">
+                  <img id="prev-img-${m.id}">
+                  <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="resetPicker('${m.id}')">🔄 重新選擇</button>
+                  </div>
+                </div>
+
+                <div id="picker-btn-row-${m.id}" class="btn-split-row" style="margin-bottom: 8px;">
+                  <button class="btn btn-secondary" onclick="document.getElementById('file-cam-${m.id}').click()">📸 拍8人合照</button>
+                  <button class="btn btn-secondary" onclick="document.getElementById('file-lib-${m.id}').click()">🖼️ 選8人合照</button>
+                </div>
+
+                <button class="btn btn-primary" onclick="verifyCoop('${m.id}', '${m.passcode}', ${m.score})">
+                  🤝 提交結盟驗證與合影
+                </button>
+              </div>`;
+          }
+        }
+
+        card.innerHTML = `
+          <div class="card-top">
+            <span class="category-tag">${m.category}</span>
+            <span class="score-tag">+${m.score} 分</span>
+          </div>
+          <div class="mission-title">${idx + 1}. ${m.title}</div>
+          <div class="mission-desc">${m.desc}</div>
+          ${actionHtml}
+        `;
+        listEl.appendChild(card);
+      });
+
+      document.getElementById("disp-progress").innerText = `進度: ${doneCount}/${activeMissions.length}`;
+
+      const allDoneBanner = document.getElementById("all-done-banner");
+      if (doneCount > 0 && doneCount === activeMissions.length) {
+        allDoneBanner.style.display = "block";
+      } else {
+        allDoneBanner.style.display = "none";
+      }
+    }
+
+    // ==================== 4. 照片操作與直接重拍 ====================
+    // 需求 1：選取照片或拍照後處理
+    function handleFilePicked(mId, isRetake = false) {
+      let file = null;
+      if (isRetake) {
+        file = document.getElementById(`file-retake-${mId}`).files[0];
+      } else {
+        const camFile = document.getElementById(`file-cam-${mId}`) ? document.getElementById(`file-cam-${mId}`).files[0] : null;
+        const libFile = document.getElementById(`file-lib-${mId}`) ? document.getElementById(`file-lib-${mId}`).files[0] : null;
+        file = camFile || libFile;
+      }
+      if (!file) return;
+
+      compressImage(file, 600).then(base64Thumb => {
+        tempPhotos[mId] = base64Thumb;
+
+        if (isRetake) {
+          const prevWrap = document.getElementById(`prev-wrap-retake-${mId}`);
+          const prevImg = document.getElementById(`prev-img-retake-${mId}`);
+          prevImg.src = base64Thumb;
+          prevWrap.style.display = "block";
+          document.getElementById(`btn-retake-trigger-${mId}`).style.display = "none";
+        } else {
+          const prevWrap = document.getElementById(`prev-wrap-${mId}`);
+          const prevImg = document.getElementById(`prev-img-${mId}`);
+          prevImg.src = base64Thumb;
+          prevWrap.style.display = "block";
+          const pickerRow = document.getElementById(`picker-btn-row-${mId}`);
+          if (pickerRow) pickerRow.style.display = "none";
+        }
+      });
+    }
+
+    function cancelRetake(mId) {
+      document.getElementById(`file-retake-${mId}`).value = "";
+      document.getElementById(`prev-wrap-retake-${mId}`).style.display = "none";
+      document.getElementById(`btn-retake-trigger-${mId}`).style.display = "block";
+    }
+
+    function confirmPhotoRetake(mId) {
+      const base64 = tempPhotos[mId];
+      if (!base64) return;
+
+      missionPhotos[mId] = base64;
+      localStorage.setItem("mission_photos", JSON.stringify(missionPhotos));
+
+      const thumb = document.getElementById(`thumb-${mId}`);
+      if (thumb) thumb.src = base64;
+
+      cancelRetake(mId);
+
+      postApi({
+        action: "SUBMIT_MISSION",
+        teamId: currentTeam.id,
+        badge: currentTeam.badge,
+        missionId: mId,
+        answerText: "PHOTO_RETAKE_UPDATE",
+        photoBase64: base64,
+        deviceInfo: navigator.userAgent.substring(0, 50)
+      });
+    }
+
+    function resetPicker(mId) {
+      if (document.getElementById(`file-cam-${mId}`)) document.getElementById(`file-cam-${mId}`).value = "";
+      if (document.getElementById(`file-lib-${mId}`)) document.getElementById(`file-lib-${mId}`).value = "";
+      document.getElementById(`prev-wrap-${mId}`).style.display = "none";
+      const pickerRow = document.getElementById(`picker-btn-row-${mId}`);
+      if (pickerRow) pickerRow.style.display = "grid";
+    }
+
+    function confirmPhotoUpload(mId, score) {
+      const base64 = tempPhotos[mId];
+      if (!base64) return;
+      const confirmBtn = document.getElementById(`btn-confirm-${mId}`);
+      confirmBtn.innerText = "⏳ 上傳存證中...";
+      confirmBtn.disabled = true;
+
+      completeMission(mId, score, "PHOTO_UPLOAD", base64);
+    }
+
+    function verifyCode(mId, correctPasscode, score) {
+      const inputEl = document.getElementById(`input-${mId}`);
+      const errBanner = document.getElementById(`err-${mId}`);
+      const val = inputEl.value.trim();
+
+      if (val.toLowerCase() === String(correctPasscode).toLowerCase() || correctPasscode === "") {
+        errBanner.style.display = "none";
+        completeMission(mId, score, val, "");
+      } else {
+        inputEl.classList.add("error");
+        errBanner.style.display = "block";
+        setTimeout(() => inputEl.classList.remove("error"), 400);
+      }
+    }
+
+    function verifyCoop(mId, correctPasscode, score) {
+      const inputEl = document.getElementById(`input-${mId}`);
+      const errBanner = document.getElementById(`err-${mId}`);
+      const val = inputEl.value.trim();
+      const photo = tempPhotos[mId];
+
+      if (val.toLowerCase() !== String(correctPasscode).toLowerCase()) {
+        inputEl.classList.add("error");
+        errBanner.style.display = "block";
+        setTimeout(() => inputEl.classList.remove("error"), 400);
+        return;
+      }
+
+      if (!photo) {
+        alert("請務必使用【拍8人合照】或【選8人合照】附上證明！");
+        return;
+      }
+
+      completeMission(mId, score, `COOP_${val}`, photo);
+    }
+
+    function completeMission(mId, score, ansText, photoBase64) {
+      const wasAllDoneBefore = (completedMissionIds.size === activeMissions.length);
+
+      completedMissionIds.add(mId);
+      currentScore += score;
+      if (photoBase64) missionPhotos[mId] = photoBase64;
+
+      localStorage.setItem("completed_missions", JSON.stringify(Array.from(completedMissionIds)));
+      localStorage.setItem("current_score", currentScore);
+      localStorage.setItem("mission_photos", JSON.stringify(missionPhotos));
+
+      updateTeamHeader();
+      renderMissions();
+
+      postApi({
+        action: "SUBMIT_MISSION",
+        teamId: currentTeam.id,
+        badge: currentTeam.badge,
+        missionId: mId,
+        answerText: ansText,
+        photoBase64: photoBase64,
+        deviceInfo: navigator.userAgent.substring(0, 50)
+      });
+
+      // 需求 3：當最後一題通關時，放煙火特效與引導橫幅
+      if (!wasAllDoneBefore && completedMissionIds.size === activeMissions.length && activeMissions.length > 0) {
+        triggerGrandFinale();
+      }
+    }
+
+    // ==================== 5. 需求 3：煙火紙花特效與引導 ====================
+    function triggerGrandFinale() {
+      // 1. 啟動全螢幕煙火紙花
+      startConfetti();
+
+      // 2. 滾動至頂部並閃爍全通關橫幅
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      const banner = document.getElementById("all-done-banner");
+      banner.style.display = "block";
+
+      // 3. 2.5 秒後自動彈出榮譽結業證書
+      setTimeout(() => {
+        openCertModal();
+      }, 2500);
+    }
+
+    function openCertModal() {
+      document.getElementById("cert-modal").style.display = "flex";
+      document.getElementById("cert-badge").innerText = currentTeam.badge;
+      document.getElementById("cert-team-title").innerText = `${currentTeam.name} (${currentTeam.id})`;
+      document.getElementById("cert-score").innerText = currentScore;
+      document.getElementById("cert-tasks").innerText = activeMissions.length;
+
+      if (startTime) {
+        const diffSec = Math.floor((new Date().getTime() - startTime) / 1000);
+        const mins = String(Math.floor(diffSec / 60)).padStart(2, '0');
+        const secs = String(diffSec % 60).padStart(2, '0');
+        document.getElementById("cert-duration").innerText = `${mins}分${secs}秒`;
+      }
+    }
+
+    // 輕量煙火紙花引擎 (原生 Canvas，不依賴外部庫)
+    function startConfetti() {
+      const canvas = document.getElementById("confetti-canvas");
+      const ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      canvas.style.display = "block";
+
+      const particles = [];
+      const colors = ["#f59e0b", "#10b981", "#3b82f6", "#ef4444", "#ec4899", "#8b5cf6"];
+
+      for (let i = 0; i < 120; i++) {
+        particles.push({
+          x: canvas.width / 2,
+          y: canvas.height / 2,
+          r: Math.random() * 6 + 3,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          vx: (Math.random() - 0.5) * 16,
+          vy: (Math.random() - 0.5) * 16 - 3,
+          gravity: 0.25,
+          alpha: 1,
+          decay: Math.random() * 0.015 + 0.008
+        });
+      }
+
+      function render() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let alive = false;
+        particles.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += p.gravity;
+          p.alpha -= p.decay;
+
+          if (p.alpha > 0) {
+            alive = true;
+            ctx.save();
+            ctx.globalAlpha = p.alpha;
+            ctx.fillStyle = p.color;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+          }
+        });
+
+        if (alive) {
+          requestAnimationFrame(render);
+        } else {
+          canvas.style.display = "none";
+        }
+      }
+      render();
+    }
+
+    function handleCertPhoto(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      compressImage(file, 800).then(b64 => {
+        document.getElementById("cert-photo-placeholder").style.display = "none";
+        const cImg = document.getElementById("cert-img");
+        cImg.src = b64;
+        cImg.style.display = "block";
+        localStorage.setItem("cert_img", b64);
+      });
+    }
+
+    function compressImage(file, maxWidth) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement("canvas");
+            const scale = maxWidth / img.width;
+            canvas.width = (scale < 1) ? maxWidth : img.width;
+            canvas.height = (scale < 1) ? (img.height * scale) : img.height;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            resolve(canvas.toDataURL("image/jpeg", 0.75));
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // ==================== 6. 重置本機進度 ====================
+    function resetLocalProgress() {
+      if (confirm("⚠️ 確定要重置本機小隊的所有進度嗎？（這將清空手機端分數、照片並重新註冊小隊，但不會刪除雲端試算表紀錄）")) {
+        localStorage.clear();
+        location.reload();
+      }
+    }
+
+    // ==================== 7. 監控與防休眠 ====================
+    async function setupWakeLock() {
+      try {
+        if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen');
+      } catch (err) {}
+    }
+
+    function setupVisibilityMonitor() {
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+          awayStartTime = new Date().getTime();
+          sendHeartbeat("away");
+        } else {
+          let awaySec = 0;
+          if (awayStartTime) {
+            awaySec = Math.round((new Date().getTime() - awayStartTime) / 1000);
+            awayStartTime = null;
+          }
+          setupWakeLock();
+          sendHeartbeat("resume", awaySec);
+        }
+      });
+    }
+
+    function sendHeartbeat(state, awaySec = 0) {
+      postApi({
+        action: "HEARTBEAT",
+        teamId: currentTeam.id,
+        state: state,
+        awayDurationSec: awaySec
+      });
+    }
+
+    function postApi(payload) {
+      if (!GAS_API_URL || GAS_API_URL === "YOUR_GAS_WEB_APP_URL_HERE") return;
+      fetch(GAS_API_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+    }
+  </script>
+</body>
+</html>
