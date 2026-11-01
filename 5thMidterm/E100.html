@@ -3,509 +3,380 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>國小五年級英文期中評量數位試卷</title>
-  <!-- Tailwind CSS CDN -->
+  <title>國小五年級英語期中評量（100題挑戰）</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts: Inter & Comic Neue for kid-friendly readability -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: 'Inter', 'Noto Sans TC', sans-serif;
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+    body { 
+      font-family: 'Noto Sans TC', sans-serif; 
+      font-size: 1.125rem; /* 基本字體加大 */
     }
-    input[type="radio"]:checked + label {
-      border-color: #3b82f6;
-      background-color: #eff6ff;
-    }
+    .correct-choice { background-color: #dcfce7 !important; border-color: #16a34a !important; color: #15803d !important; font-weight: 700 !important; }
+    .wrong-choice { background-color: #fee2e2 !important; border-color: #dc2626 !important; color: #b91c1c !important; }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased min-h-screen pb-16">
-
-  <!-- 頂部資訊列與導航 -->
-  <header class="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200 shadow-sm">
-    <div class="max-w-5xl mx-auto px-4 py-3 sm:px-6 flex flex-wrap items-center justify-between gap-3">
-      <div class="flex items-center gap-3">
-        <span class="p-2 bg-indigo-600 text-white rounded-xl shadow-sm text-xl font-bold">🏫</span>
+<body class="bg-slate-100 text-slate-800 min-h-screen py-10 px-4 sm:px-6">
+  <div class="max-w-4xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-200">
+    
+    <!-- 頁頭資訊 -->
+    <header class="bg-blue-600 text-white p-8 sm:p-10">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
         <div>
-          <h1 class="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">國小五年級英文 期中能力評量 (100題)</h1>
-          <p class="text-xs sm:text-sm text-slate-500 font-medium">範圍：Review (單字/發音/序數) + Unit 1 & Unit 2</p>
+          <span class="bg-blue-800 text-blue-200 text-sm font-bold px-4 py-1.5 rounded-full uppercase tracking-wider">Midterm Exam</span>
+          <h1 class="text-3xl sm:text-4xl font-black mt-3 tracking-wide">國小五年級 英語期中能力評量</h1>
+          <p class="text-blue-100 text-base sm:text-lg mt-2">範圍：Review（地點、過去式、發音、序數）與 Unit 1~2 精選 100 題</p>
+        </div>
+        <div class="bg-blue-500/40 px-6 py-4 rounded-2xl border border-blue-400 text-center min-w-[140px] shadow-inner">
+          <div class="text-sm text-blue-100 font-medium">總題數</div>
+          <div class="text-3xl sm:text-4xl font-black mt-1">100 題</div>
         </div>
       </div>
-      <!-- 快速進度與分數面板 -->
-      <div id="topScoreBadge" class="hidden items-center gap-3 bg-indigo-50 border border-indigo-200 px-4 py-2 rounded-2xl">
-        <span class="text-xs font-semibold text-indigo-700 uppercase tracking-wider">總得分</span>
-        <span id="badgeScore" class="text-2xl font-black text-indigo-600">0</span>
-        <span class="text-xs text-indigo-500">/ 100分</span>
+
+      <!-- 學生資訊填寫區 -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-8 pt-8 border-t border-blue-400/50">
+        <div>
+          <label class="block text-sm font-semibold text-blue-100 mb-2">班級</label>
+          <input type="text" placeholder="例如：五年二班" class="w-full px-4 py-3 rounded-xl bg-white/10 text-white text-lg placeholder-blue-300 border border-blue-300 focus:outline-none focus:ring-2 focus:ring-white">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-blue-100 mb-2">座號</label>
+          <input type="text" placeholder="例如：12" class="w-full px-4 py-3 rounded-xl bg-white/10 text-white text-lg placeholder-blue-300 border border-blue-300 focus:outline-none focus:ring-2 focus:ring-white">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-blue-100 mb-2">姓名</label>
+          <input type="text" placeholder="學生姓名" class="w-full px-4 py-3 rounded-xl bg-white/10 text-white text-lg placeholder-blue-300 border border-blue-300 focus:outline-none focus:ring-2 focus:ring-white">
+        </div>
+      </div>
+    </header>
+
+    <!-- 成績結算看版 (輸入密碼正確後展示) -->
+    <div id="scoreBoard" class="hidden bg-slate-50 border-b border-slate-200 p-8 transition-all duration-500">
+      <div class="max-w-lg mx-auto bg-white rounded-2xl shadow-lg border border-slate-200 p-8 text-center">
+        <h2 class="text-2xl font-bold text-slate-700">測驗成績結算</h2>
+        <div class="flex items-center justify-center gap-3 my-5">
+          <span id="finalScore" class="text-6xl font-black text-blue-600">0</span>
+          <span class="text-slate-400 text-2xl font-bold">/ 100 分</span>
+        </div>
+        <div class="grid grid-cols-2 gap-4 text-base sm:text-lg font-bold pt-4 border-t border-slate-100">
+          <div class="text-emerald-700 bg-emerald-50 py-3 rounded-xl border border-emerald-200">答對：<span id="correctCount" class="text-2xl">0</span> 題</div>
+          <div class="text-rose-700 bg-rose-50 py-3 rounded-xl border border-rose-200">需訂正：<span id="wrongCount" class="text-2xl">0</span> 題</div>
+        </div>
+        <p class="text-sm sm:text-base text-slate-500 mt-4">★ 答案與考點解析已自動在下方展開，請逐題訂正檢視！</p>
       </div>
     </div>
-  </header>
 
-  <main class="max-w-5xl mx-auto px-4 sm:px-6 mt-6 space-y-6">
+    <!-- 試卷主容器 -->
+    <main class="p-6 sm:p-10 space-y-12" id="quizContainer">
+      <!-- 由 JavaScript 動態生成 100 題 -->
+    </main>
 
-    <!-- 學生個人資料填寫卡片 -->
-    <section class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200/80">
-      <h2 class="text-base font-bold text-slate-800 flex items-center gap-2 mb-4">
-        <span class="w-2.5 h-2.5 bg-blue-600 rounded-full inline-block"></span>
-        學生資訊 (Student Information)
-      </h2>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div>
-          <label for="studentClass" class="block text-xs font-semibold text-slate-600 mb-1.5">班級 (Class)</label>
-          <input type="text" id="studentClass" placeholder="例如：五年三班" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
-        </div>
-        <div>
-          <label for="studentNo" class="block text-xs font-semibold text-slate-600 mb-1.5">座號 (Number)</label>
-          <input type="text" id="studentNo" placeholder="例如：12" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
-        </div>
-        <div>
-          <label for="studentName" class="block text-xs font-semibold text-slate-600 mb-1.5">姓名 (Name)</label>
-          <input type="text" id="studentName" placeholder="例如：陳小明" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
-        </div>
+    <!-- 底部操作列 -->
+    <footer class="bg-slate-50 p-6 sm:p-8 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-6">
+      <div class="text-base text-slate-600 flex items-center gap-2">
+        <svg class="w-6 h-6 text-amber-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+        <span>交卷後需輸入指導密碼方可對答案</span>
       </div>
-    </section>
-
-    <!-- 成績結果提示卡 (預設隱藏) -->
-    <section id="resultCard" class="hidden bg-gradient-to-br from-indigo-900 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden transition-all duration-300">
-      <div class="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-6">
-        <div>
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/30 text-indigo-200 text-xs font-semibold mb-2">
-            評量完成 🎉
-          </div>
-          <h3 id="resultGreetings" class="text-2xl sm:text-3xl font-black">測驗成績結算</h3>
-          <p id="resultSummary" class="text-slate-300 text-sm mt-1">恭喜你完成 100 題完整測驗！請檢視下方紅綠錯題分析。</p>
-        </div>
-        <div class="flex items-center gap-6 bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/10">
-          <div class="text-center px-2">
-            <span class="block text-3xl sm:text-4xl font-black text-amber-400" id="finalScore">0</span>
-            <span class="text-xs text-slate-300 font-medium">總得分</span>
-          </div>
-          <div class="h-10 w-px bg-white/20"></div>
-          <div class="text-center px-2">
-            <span class="block text-2xl font-bold text-emerald-400" id="correctCount">0</span>
-            <span class="text-xs text-slate-300 font-medium">答對題數</span>
-          </div>
-          <div class="h-10 w-px bg-white/20"></div>
-          <div class="text-center px-2">
-            <span class="block text-2xl font-bold text-rose-400" id="wrongCount">0</span>
-            <span class="text-xs text-slate-300 font-medium">需訂正題</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 測驗內容表單 -->
-    <form id="quizForm" onsubmit="event.preventDefault();" class="space-y-8">
-
-      <!-- 第一大題：單字拼字填空題 (1-25) -->
-      <section class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200/80">
-        <div class="border-b border-slate-100 pb-4 mb-6">
-          <div class="inline-block px-3 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-lg mb-2">Part I</div>
-          <h2 class="text-xl font-black text-slate-900 tracking-tight">一、 單字拼寫與字形填空 (1 ~ 25 題，每題 1 分)</h2>
-          <p class="text-sm text-slate-500 mt-1">請依照中文提示或動詞原形/基數，於空格內填入正確英文字彙（大小寫皆可，系統自動寬容比對）。</p>
-        </div>
-        <div id="part1Container" class="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <!-- 題目由 JS 動態生成 -->
-        </div>
-      </section>
-
-      <!-- 第二大題：文法與字彙單選題 (26-60) -->
-      <section class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200/80">
-        <div class="border-b border-slate-100 pb-4 mb-6">
-          <div class="inline-block px-3 py-1 bg-blue-100 text-blue-800 text-xs font-bold rounded-lg mb-2">Part II</div>
-          <h2 class="text-xl font-black text-slate-900 tracking-tight">二、 文法與字彙單選題 (26 ~ 60 題，每題 1 分)</h2>
-          <p class="text-sm text-slate-500 mt-1">請選出最符合句意與文法規則的最佳答案。</p>
-        </div>
-        <div id="part2Container" class="space-y-5">
-          <!-- 題目由 JS 動態生成 -->
-        </div>
-      </section>
-
-      <!-- 第三大題：自然發音與字彙辨析題 (61-75) -->
-      <section class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200/80">
-        <div class="border-b border-slate-100 pb-4 mb-6">
-          <div class="inline-block px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-lg mb-2">Part III</div>
-          <h2 class="text-xl font-black text-slate-900 tracking-tight">三、 自然發音與字彙音辨題 (61 ~ 75 題，每題 1 分)</h2>
-          <p class="text-sm text-slate-500 mt-1">請依據發音規則（長短母音、軟硬音 c/g、開頭子音群）選出最適當的答案。</p>
-        </div>
-        <div id="part3Container" class="space-y-5">
-          <!-- 題目由 JS 動態生成 -->
-        </div>
-      </section>
-
-      <!-- 第四大題：情境對話選擇題 (76-90) -->
-      <section class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200/80">
-        <div class="border-b border-slate-100 pb-4 mb-6">
-          <div class="inline-block px-3 py-1 bg-purple-100 text-purple-800 text-xs font-bold rounded-lg mb-2">Part IV</div>
-          <h2 class="text-xl font-black text-slate-900 tracking-tight">四、 情境問答與生活對話題 (76 ~ 90 題，每題 1 分)</h2>
-          <p class="text-sm text-slate-500 mt-1">請根據生活溝通情境與對話邏輯，選出最切合提問的回答。</p>
-        </div>
-        <div id="part4Container" class="space-y-5">
-          <!-- 題目由 JS 動態生成 -->
-        </div>
-      </section>
-
-      <!-- 第五大題：閱讀理解題組 (91-100) -->
-      <section class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200/80">
-        <div class="border-b border-slate-100 pb-4 mb-6">
-          <div class="inline-block px-3 py-1 bg-rose-100 text-rose-800 text-xs font-bold rounded-lg mb-2">Part V</div>
-          <h2 class="text-xl font-black text-slate-900 tracking-tight">五、 閱讀理解題組 (91 ~ 100 題，每題 1 分)</h2>
-          <p class="text-sm text-slate-500 mt-1">請細心閱讀以下兩篇情境短文，並回答對應的問題。</p>
-        </div>
-        <div id="part5Container" class="space-y-8">
-          <!-- 題目由 JS 動態生成 -->
-        </div>
-      </section>
-
-      <!-- 底部控制按鈕區 -->
-      <div class="sticky bottom-4 z-20 flex items-center justify-center gap-4 bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-lg border border-slate-200">
-        <button type="button" id="submitBtn" onclick="gradeExam()" class="px-8 py-3.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold rounded-xl shadow-md transition transform active:scale-95 text-base flex items-center gap-2">
-          <span>📝 提交試卷並評分</span>
+      <div class="flex items-center gap-4 w-full sm:w-auto">
+        <button onclick="resetExam()" class="w-1/2 sm:w-auto px-6 py-3.5 rounded-2xl border-2 border-slate-300 text-slate-700 hover:bg-slate-100 font-bold text-base transition">
+          重新作答
         </button>
-        <button type="button" id="resetBtn" onclick="resetExam()" class="px-6 py-3.5 bg-slate-200 hover:bg-slate-300 active:bg-slate-400 text-slate-700 font-bold rounded-xl transition text-base">
-          🔄 重新測驗
+        <button onclick="checkPasswordAndGrade()" class="w-1/2 sm:w-auto px-8 py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-base sm:text-lg shadow-lg shadow-blue-500/30 transition">
+          提交試卷並評分
         </button>
       </div>
-
-    </form>
-  </main>
+    </footer>
+  </div>
 
   <script>
-    // 100 題題庫定義
+    // 試卷 100 題題庫資料
     const questions = [
-      // === 第一大題：單字拼寫與字形填空 (1-25) ===
-      { id: 1, type: "fill", prompt: "夜市 (名詞片語)", answer: "night market", hint: "n_____ m_____", exp: "night market 是常見夜市的英文拼法。" },
-      { id: 2, type: "fill", prompt: "百貨公司 (名詞片語)", answer: "department store", hint: "d_____ s_____", exp: "department store 指各類專櫃林立的百貨商場。" },
-      { id: 3, type: "fill", prompt: "遊樂園 (名詞片語)", answer: "amusement park", hint: "a_____ p_____", exp: "amusement park 為遊樂園（注意 amusement 拼法）。" },
-      { id: 4, type: "fill", prompt: "河濱公園 (名詞片語)", answer: "riverside park", hint: "r_____ p_____", exp: "riverside park 是河濱公園。" },
-      { id: 5, type: "fill", prompt: "外套、夾克 (單數名詞)", answer: "jacket", hint: "j_____", exp: "jacket 為夾克外套。" },
-      { id: 6, type: "fill", prompt: "牛仔褲 (恆用複數名詞)", answer: "jeans", hint: "j_____", exp: "jeans 自帶複數 s，指牛仔長褲。" },
-      { id: 7, type: "fill", prompt: "短褲 (恆用複數名詞)", answer: "shorts", hint: "s_____", exp: "shorts 指短褲，以複數型態出現。" },
-      { id: 8, type: "fill", prompt: "裙子 (單數名詞)", answer: "skirt", hint: "s_____", exp: "skirt 代表半身裙。" },
-      { id: 9, type: "fill", prompt: "多霧的 (天氣形容詞)", answer: "foggy", hint: "f_____", exp: "fog 結尾重複 g + y 形成形容詞 foggy。" },
-      { id: 10, type: "fill", prompt: "積雪的、下雪的 (天氣形容詞)", answer: "snowy", hint: "s_____", exp: "snow 字尾加 y 形成形容詞 snowy。" },
-      { id: 11, type: "fill", prompt: "乾燥的 (形容詞)", answer: "dry", hint: "d_____", exp: "dry 為乾燥的。" },
-      { id: 12, type: "fill", prompt: "潮濕的 (形容詞)", answer: "wet", hint: "w_____", exp: "wet 為潮濕的。" },
-      { id: 13, type: "fill", prompt: "第一 (1st 英文全拼)", answer: "first", hint: "f_____", exp: "1st 的序數全拼是 first。" },
-      { id: 14, type: "fill", prompt: "第二 (2nd 英文全拼)", answer: "second", hint: "s_____", exp: "2nd 的序數全拼是 second。" },
-      { id: 15, type: "fill", prompt: "第三 (3rd 英文全拼)", answer: "third", hint: "t_____", exp: "3rd 的序數全拼是 third。" },
-      { id: 16, type: "fill", prompt: "第五 (5th 英文全拼，注意拼字變化)", answer: "fifth", hint: "f_____", exp: "five 變序數時 ve 改為 f + th，拼作 fifth。" },
-      { id: 17, type: "fill", prompt: "第八 (8th 英文全拼，注意拼字變化)", answer: "eighth", hint: "e_____", exp: "eight 字尾已包含 t，只加 h 形成 eighth。" },
-      { id: 18, type: "fill", prompt: "第九 (9th 英文全拼，注意去 e)", answer: "ninth", hint: "n_____", exp: "nine 變序數時必須去掉 e 再加 th，拼作 ninth。" },
-      { id: 19, type: "fill", prompt: "第十二 (12th 英文全拼，注意 ve 變 f)", answer: "twelfth", hint: "t_____", exp: "twelve 變序數時 ve 改為 f + th，拼作 twelfth。" },
-      { id: 20, type: "fill", prompt: "第二十 (20th 英文全拼，注意 y 變 ie)", answer: "twentieth", hint: "t_____", exp: "twenty 的 y 變 ie + th，拼作 twentieth。" },
-      { id: 21, type: "fill", prompt: "吃 (eat 的過去式動詞)", answer: "ate", hint: "a_____", exp: "eat 的不規則過去式是 ate。" },
-      { id: 22, type: "fill", prompt: "喝 (drink 的過去式動詞)", answer: "drank", hint: "d_____", exp: "drink 的不規則過去式是 drank。" },
-      { id: 23, type: "fill", prompt: "放(風箏) / 飛 (fly 的過去式動詞)", answer: "flew", hint: "f_____", exp: "fly 的不規則過去式是 flew。" },
-      { id: 24, type: "fill", prompt: "游泳 (swim 的過去式動詞)", answer: "swam", hint: "s_____", exp: "swim 的不規則過去式是 swam。" },
-      { id: 25, type: "fill", prompt: "寫 (write 的過去式動詞)", answer: "wrote", hint: "w_____", exp: "write 的不規則過去式是 wrote。" },
+      // Part I: 單字拼寫填空 (1-20)
+      { id: 1, type: "fill", q: "夜市 (n_____ m_____)", answer: "night market", explanation: "Unit 1 主題單字：night market (夜市)。" },
+      { id: 2, type: "fill", q: "百貨公司 (d_____ s_____)", answer: "department store", explanation: "Unit 1 主題單字：department store (百貨公司)。" },
+      { id: 3, type: "fill", q: "遊樂園 (a_____ p_____)", answer: "amusement park", explanation: "Unit 1 主題單字：amusement park (遊樂園)。" },
+      { id: 4, type: "fill", q: "河濱公園 (r_____ p_____)", answer: "riverside park", explanation: "Unit 1 主題單字：riverside park (河濱公園)。" },
+      { id: 5, type: "fill", q: "第十二 (序數，注意 ve 改為 f + th)", answer: "twelfth", explanation: "序數 12th 拼寫為 twelfth（twelve 去掉 ve 改 f 加 th）。" },
+      { id: 6, type: "fill", q: "第九 (序數，注意去掉 e + th)", answer: "ninth", explanation: "序數 9th 拼寫為 ninth（nine 去掉 e 加 th）。" },
+      { id: 7, type: "fill", q: "第二十 (序數，注意 y 改 ie + th)", answer: "twentieth", explanation: "序數 20th 拼寫為 twentieth（twenty 去 y 改 ie 加 th）。" },
+      { id: 8, type: "fill", q: "第二 (序數 2nd)", answer: "second", explanation: "序數 2nd 為 second。" },
+      { id: 9, type: "fill", q: "第三 (序數 3rd)", answer: "third", explanation: "序數 3rd 為 third。" },
+      { id: 10, type: "fill", q: "第一 (序數 1st)", answer: "first", explanation: "序數 1st 為 first。" },
+      { id: 11, type: "fill", q: "放風箏 (過去式動詞: f_____ a kite)", answer: "flew", explanation: "fly 的過去式為 flew。" },
+      { id: 12, type: "fill", q: "喝果汁 (過去式動詞: d_____ juice)", answer: "drank", explanation: "drink 的過去式為 drank。" },
+      { id: 13, type: "fill", q: "吃點心 (過去式動詞: a_____ snacks)", answer: "ate", explanation: "eat 的過去式為 ate。" },
+      { id: 14, type: "fill", q: "騎腳踏車 (過去式動詞: r_____ a bike)", answer: "rode", explanation: "ride 的過去式為 rode。" },
+      { id: 15, type: "fill", q: "看電影 (過去式動詞: s_____ a movie)", answer: "saw", explanation: "see 的過去式為 saw。" },
+      { id: 16, type: "fill", q: "畫了一幅畫 (過去式動詞: d_____ a picture)", answer: "drew", explanation: "draw 的過去式為 drew。" },
+      { id: 17, type: "fill", q: "去野餐 (過去式動詞: h_____ a picnic)", answer: "had", explanation: "have 的過去式為 had。" },
+      { id: 18, type: "fill", q: "游泳 (過去式動詞: s_____)", answer: "swam", explanation: "swim 的過去式為 swam。" },
+      { id: 19, type: "fill", q: "唱歌 (過去式動詞: s_____ songs)", answer: "sang", explanation: "sing 的過去式為 sang。" },
+      { id: 20, type: "fill", q: "寫信 (過去式動詞: w_____ a letter)", answer: "wrote", explanation: "write 的過去式為 wrote。" },
 
-      // === 第二大題：文法與字彙單選題 (26-60) ===
-      { id: 26, type: "choice", q: "Where ______ you go last Saturday?", options: ["(A) do", "(B) did", "(C) are", "(D) were"], answer: "B", exp: "句尾有過去時間 last Saturday，疑問句助動詞應使用 did。" },
-      { id: 27, type: "choice", q: "My brother and I ______ to the amusement park yesterday.", options: ["(A) go", "(B) goes", "(C) went", "(D) going"], answer: "C", exp: "過去時間 yesterday 代表過去事實，go 應改為過去式 went。" },
-      { id: 28, type: "choice", q: "What did you ______ at the night market?", options: ["(A) ate", "(B) eat", "(C) eats", "(D) eating"], answer: "B", exp: "助動詞 did 後面動詞必須還原為原形動詞 eat。" },
-      { id: 29, type: "choice", q: "Gary ______ a kite in the riverside park last Sunday.", options: ["(A) fly", "(B) flies", "(C) flew", "(D) flowing"], answer: "C", exp: "last Sunday 為過去式，fly 的過去式為不規則變化 flew。" },
-      { id: 30, type: "choice", q: "— Did Gina ______ a picnic yesterday? — Yes, she did.", options: ["(A) have", "(B) had", "(C) has", "(D) having"], answer: "A", exp: "助動詞 Did 啟動的疑問句，主要動詞需用原形 have。" },
-      { id: 31, type: "choice", q: "He didn't go to school. He ______ a cold yesterday.", options: ["(A) catch", "(B) have", "(C) had", "(D) has"], answer: "C", exp: "搭配過去時間，患感冒的過去式是 had a cold。" },
-      { id: 32, type: "choice", q: "Look! The fast runner won ______ place in the race!", options: ["(A) one", "(B) first", "(C) 1th", "(D) oneth"], answer: "B", exp: "獲得名次必須使用序數 first place (第一名)。" },
-      { id: 33, type: "choice", q: "Mother's Day is on the second Sunday ______ May.", options: ["(A) in", "(B) on", "(C) of", "(D) at"], answer: "C", exp: "表示五月的第二個星期日，月份所屬用介系詞 of。" },
-      { id: 34, type: "choice", q: "He is a ______ student in our school.", options: ["(A) six grade", "(B) sixth-grade", "(C) grade sixths", "(D) six-grades"], answer: "B", exp: "作複合形容詞修飾 student 時，使用「序數-單數名詞」：sixth-grade。" },
-      { id: 35, type: "choice", q: "— ______ was your weekend? — It was wonderful! I loved it.", options: ["(A) How", "(B) What", "(C) Where", "(D) When"], answer: "A", exp: "詢問「某事情況如何」常用 How was...？" },
-      { id: 36, type: "choice", q: "Where ______ you yesterday afternoon?", options: ["(A) did", "(B) was", "(C) were", "(D) are"], answer: "C", exp: "主詞是 you，過去時間搭配的 be 動詞是 were。" },
-      { id: 37, type: "choice", q: "I ______ at the public library with my classmates yesterday.", options: ["(A) am", "(B) was", "(C) were", "(D) did"], answer: "B", exp: "主詞是第一人稱單數 I，過去式 be 動詞應使用 was。" },
-      { id: 38, type: "choice", q: "How much ______ these blue jeans?", options: ["(A) is", "(B) am", "(C) are", "(D) do"], answer: "C", exp: "jeans 是恆用複數名詞，be 動詞問句應使用 are。" },
-      { id: 39, type: "choice", q: "The jacket is one ______ dollars.", options: ["(A) hundreds", "(B) hundred", "(C) hundred of", "(D) hundreds of"], answer: "B", exp: "具體數字 one/two 後面的 hundred 不加 s。" },
-      { id: 40, type: "choice", q: "What's your favorite season? I like ______ best because it's cool and dry.", options: ["(A) spring", "(B) summer", "(C) fall", "(D) winter"], answer: "C", exp: "課本描述秋天 (fall) 的特色即為 cool and dry (涼爽且乾燥)。" },
-      { id: 41, type: "choice", q: "It is very cold and ______ in winter in the high mountains.", options: ["(A) snowy", "(B) sun", "(C) rain", "(D) wind"], answer: "A", exp: "and 左右詞性應一致，cold (形容詞) 搭配天氣形容詞 snowy。" },
-      { id: 42, type: "choice", q: "Edison ______ basketball with his friends yesterday.", options: ["(A) play", "(B) played", "(C) plays", "(D) playing"], answer: "B", exp: "過去時間 yesterday 搭配規則過去式動詞 played。" },
-      { id: 43, type: "choice", q: "I ______ a movie with my sister at the theater last night.", options: ["(A) see", "(B) saw", "(C) seen", "(D) looking"], answer: "B", exp: "last night 為過去式，see 的過去式為 saw。" },
-      { id: 44, type: "choice", q: "Did your brother ______ a haircut this morning?", options: ["(A) get", "(B) got", "(C) gets", "(D) getting"], answer: "A", exp: "助動詞 Did 引導的疑問句，後方動詞還原為原形 get。" },
-      { id: 45, type: "choice", q: "Nina didn't ______ songs yesterday; she danced.", options: ["(A) sing", "(B) sang", "(C) sung", "(D) sings"], answer: "A", exp: "否定助動詞 didn't 後面接原形動詞 sing。" },
-      { id: 46, type: "choice", q: "Ken ______ a letter to his pen pal two days ago.", options: ["(A) writes", "(B) write", "(C) wrote", "(D) writing"], answer: "C", exp: "two days ago (兩天前) 是過去式，write 的過去式為 wrote。" },
-      { id: 47, type: "choice", q: "— What did Gary do yesterday? — He ______ in the pool.", options: ["(A) swim", "(B) swam", "(C) swum", "(D) swims"], answer: "B", exp: "答句敘述昨天的動作，swim 需使用過去式 swam。" },
-      { id: 48, type: "choice", q: "They ______ shopping at Taipei 101 last weekend.", options: ["(A) went", "(B) go", "(C) goes", "(D) were gone"], answer: "A", exp: "go shopping (逛街購物) 的過去式為 went shopping。" },
-      { id: 49, type: "choice", q: "We walked for five hours, so we ______ really hungry.", options: ["(A) are", "(B) was", "(C) were", "(D) did"], answer: "C", exp: "主詞為 we，過去式 be 動詞應填 were。" },
-      { id: 50, type: "choice", q: "The English proverb says, 'The early bird gets the ______.'", options: ["(A) worm", "(B) fish", "(C) bread", "(D) fruit"], answer: "A", exp: "第一單元經典名句：The early bird gets the worm. (早起的鳥兒有蟲吃)。" },
-      { id: 51, type: "choice", q: "The wise proverb says, 'It's never too late to ______.'", options: ["(A) sleep", "(B) learn", "(C) play", "(D) run"], answer: "B", exp: "第二單元經典名句：It's never too late to learn. (活到老，學到老)。" },
-      { id: 52, type: "choice", q: "I ______ the dog in the park after dinner last night.", options: ["(A) walked", "(B) walk", "(C) walks", "(D) walking"], answer: "A", exp: "last night 代表過去動作，walk 加 ed 形成 walked。" },
-      { id: 53, type: "choice", q: "Did they ______ delicious street food at the night market?", options: ["(A) ate", "(B) eat", "(C) eats", "(D) eating"], answer: "B", exp: "Did 助動詞後方動詞必須使用原形 eat。" },
-      { id: 54, type: "choice", q: "The baby is their ______ child in the family.", options: ["(A) three", "(B) third", "(C) thirteen", "(D) thirty"], answer: "B", exp: "表示出生順序「第 3 個孩子」應使用序數 third。" },
-      { id: 55, type: "choice", q: "Abu and Teddy ______ at the zoo with Rocky yesterday morning.", options: ["(A) was", "(B) were", "(C) are", "(D) is"], answer: "B", exp: "主詞 Abu and Teddy 為複數，過去式 be 動詞使用 were。" },
-      { id: 56, type: "choice", q: "She ______ a picture of Taipei 101 yesterday.", options: ["(A) draw", "(B) drew", "(C) draws", "(D) drawing"], answer: "B", exp: "draw 的過去式為不規則變化 drew。" },
-      { id: 57, type: "choice", q: "My father ______ a quick walk with our puppy this morning.", options: ["(A) take", "(B) took", "(C) takes", "(D) taking"], answer: "B", exp: "take a walk 的過去式為 took a walk。" },
-      { id: 58, type: "choice", q: "Where ______ you at ten o'clock yesterday morning?", options: ["(A) was", "(B) were", "(C) did", "(D) are"], answer: "B", exp: "詢問昨天的位置，you 搭配的過去式 be 動詞為 were。" },
-      { id: 59, type: "choice", q: "He ______ fast in the running race yesterday afternoon.", options: ["(A) run", "(B) ran", "(C) runs", "(D) running"], answer: "B", exp: "run 的過去式為不規則變化 ran。" },
-      { id: 60, type: "choice", q: "How much ______ this warm coat?", options: ["(A) is", "(B) are", "(C) do", "(D) does"], answer: "A", exp: "coat 為單數名詞，詢問價格之 be 動詞用 is。" },
+      // Part II: 文法與字彙單選 (21-70)
+      { id: 21, type: "choice", q: "Where ______ you go last weekend?", options: ["do", "did", "are", "were"], answer: "B", explanation: "last weekend 為過去時間，疑問句助動詞用 did。" },
+      { id: 22, type: "choice", q: "I ______ to the riverside park yesterday.", options: ["go", "goes", "went", "going"], answer: "C", explanation: "yesterday 需使用 go 的過去式 went。" },
+      { id: 23, type: "choice", q: "What ______ Gary do yesterday afternoon?", options: ["does", "did", "is", "was"], answer: "B", explanation: "yesterday afternoon 過去式問句助動詞用 did。" },
+      { id: 24, type: "choice", q: "Did Gina ______ a picnic yesterday?", options: ["have", "had", "has", "having"], answer: "A", explanation: "助動詞 Did 後面動詞必須回歸原形 have。" },
+      { id: 25, type: "choice", q: "No, she didn't. She ______ songs.", options: ["sing", "sings", "sang", "singing"], answer: "C", explanation: "否定回答後的補述肯定句，需用 sing 的過去式 sang。" },
+      { id: 26, type: "choice", q: "The girl won ______ place in the race.", options: ["one", "first", "1", "once"], answer: "B", explanation: "得到第幾名使用序數 first place。" },
+      { id: 27, type: "choice", q: "Mother's Day is on the ______ Sunday of May.", options: ["two", "second", "2", "twice"], answer: "B", explanation: "五月的第二個星期日，使用序數 second Sunday。" },
+      { id: 28, type: "choice", q: "He is a ______ student.", options: ["six grade", "sixth-grade", "sixth grade", "six-grades"], answer: "B", explanation: "修飾名詞 student 作複合形容詞時用 sixth-grade。" },
+      { id: 29, type: "choice", q: "The baby is their ______ child.", options: ["three", "third", "threes", "3rd of"], answer: "B", explanation: "第幾個小孩用序數 third child。" },
+      { id: 30, type: "choice", q: "How much ______ the jeans?", options: ["is", "are", "do", "does"], answer: "B", explanation: "jeans（牛仔褲）為複數名詞，be 動詞用 are。" },
+      { id: 31, type: "choice", q: "They ______ one hundred dollars.", options: ["is", "are", "costing", "has"], answer: "B", explanation: "代名詞 They 指代 jeans，be 動詞用 are。" },
+      { id: 32, type: "choice", q: "Where ______ you yesterday?", options: ["was", "were", "are", "did"], answer: "B", explanation: "you 在過去式的 be 動詞為 were。" },
+      { id: 33, type: "choice", q: "I ______ at the movie theater last night.", options: ["was", "were", "am", "did"], answer: "A", explanation: "第一人稱 I 在過去式的 be 動詞為 was。" },
+      { id: 34, type: "choice", q: "We went shopping and walked a lot, so we ______ really hungry.", options: ["are", "was", "were", "did"], answer: "C", explanation: "主詞 we 在過去式的 be 動詞為 were。" },
+      { id: 35, type: "choice", q: "How ______ your weekend? — It was great!", options: ["is", "was", "were", "did"], answer: "B", explanation: "詢問過去過得如何用 How was your weekend?" },
+      { id: 36, type: "choice", q: "What did you do last night? — I ______ my dog.", options: ["walk", "walks", "walked", "walking"], answer: "C", explanation: "回答過去從事的活動，動詞 walk 加 ed 變 walked。" },
+      { id: 37, type: "choice", q: "My brother ______ his room yesterday morning.", options: ["clean", "cleans", "cleaned", "cleaning"], answer: "C", explanation: "yesterday morning 過去式，使用 cleaned。" },
+      { id: 38, type: "choice", q: "Did you ______ a letter to your teacher?", options: ["wrote", "write", "writing", "writes"], answer: "B", explanation: "Did 後面動詞用原形 write。" },
+      { id: 39, type: "choice", q: "No, I didn't. I ______ a friend.", options: ["visit", "visited", "visiting", "visits"], answer: "B", explanation: "過去式肯定句，動詞用 visited。" },
+      { id: 40, type: "choice", q: "He ______ a haircut yesterday.", options: ["get", "gets", "got", "gotten"], answer: "C", explanation: "get 的過去式為 got。" },
+      { id: 41, type: "choice", q: "What's your favorite season? — My favorite season is ______.", options: ["cool", "fall", "wet", "dry"], answer: "B", explanation: "詢問季節（season），選項中只有 fall（秋天）是季節。" },
+      { id: 42, type: "choice", q: "It's cool and ______ in fall.", options: ["coat", "dry", "shorts", "pants"], answer: "B", explanation: "秋天天氣涼爽且乾燥（dry）。" },
+      { id: 43, type: "choice", q: "It's very ______ in winter. There is lots of snow.", options: ["snowy", "rain", "fog", "sun"], answer: "A", explanation: "形容詞 snowy 表示下雪的、積雪的。" },
+      { id: 44, type: "choice", q: "Today is very ______; I can hardly see the buildings.", options: ["wet", "foggy", "dry", "hot"], answer: "B", explanation: "看不太清建築物表示霧很大（foggy）。" },
+      { id: 45, type: "choice", q: "The early bird ______ the worm.", options: ["catch", "catches", "gets", "getting"], answer: "C", explanation: "經典名句：The early bird gets the worm. (早起的鳥兒有蟲吃)。" },
+      { id: 46, type: "choice", q: "It's never too late to ______.", options: ["learn", "learned", "learning", "learns"], answer: "A", explanation: "經典名句：It's never too late to learn. (活到老學到老)。" },
+      { id: 47, type: "choice", q: "Never judge a book by its ______.", options: ["title", "cover", "color", "price"], answer: "B", explanation: "經典名句：Never judge a book by its cover. (勿以貌取人)。" },
+      { id: 48, type: "choice", q: "I am so hungry, I could eat a ______!", options: ["cow", "pig", "horse", "sheep"], answer: "C", explanation: "經典名句：I could eat a horse! (我餓得能吞下一匹馬)。" },
+      { id: 49, type: "choice", q: "The fifth month of the year is ______.", options: ["March", "April", "May", "June"], answer: "C", explanation: "一年中的第五個月是一月起算第五個：May（五月）。" },
+      { id: 50, type: "choice", q: "Which of the following is in pair? (哪一項通常成雙成對？)", options: ["a jacket", "a hat", "shorts", "a dress"], answer: "C", explanation: "shorts（短褲）有兩條褲管，恆為複數名詞。" },
+      { id: 51, type: "choice", q: "Rocky and Thor ______ in Taipei last weekend.", options: ["was", "were", "did", "are"], answer: "B", explanation: "複數主詞 Rocky and Thor 在過去式的 be 動詞為 were。" },
+      { id: 52, type: "choice", q: "Did Thor go to Taipei 101? — Yes, he ______.", options: ["was", "is", "did", "does"], answer: "C", explanation: "Did 開頭的問句簡答用 did。" },
+      { id: 53, type: "choice", q: "Edison ______ basketball with his friends yesterday.", options: ["play", "plays", "played", "playing"], answer: "C", explanation: "過去式動詞加 ed 變 played。" },
+      { id: 54, type: "choice", q: "Where ______ you at 8:00 last night?", options: ["was", "were", "are", "did"], answer: "B", explanation: "主詞 you 搭配過去式 be 動詞 were。" },
+      { id: 55, type: "choice", q: "I was ______ home with my parents.", options: ["in", "on", "at", "to"], answer: "C", explanation: "在家裡的固定介系詞片語為 at home。" },
+      { id: 56, type: "choice", q: "They were at the ______ to see monkeys and lions.", options: ["mall", "zoo", "theater", "school"], answer: "B", explanation: "看猴子與獅子的地方是 zoo（動物園）。" },
+      { id: 57, type: "choice", q: "We were at the ______ to buy some new clothes.", options: ["zoo", "mall", "riverside", "restaurant"], answer: "B", explanation: "買新衣服的地方是 mall（購物中心/商場）。" },
+      { id: 58, type: "choice", q: "They ate steak at a famous ______.", options: ["restaurant", "night market", "school", "park"], answer: "A", explanation: "吃牛排的地方是 restaurant（餐廳）。" },
+      { id: 59, type: "choice", q: "He ______ a walk along the river yesterday.", options: ["take", "takes", "took", "taking"], answer: "C", explanation: "take a walk 的過去式為 took a walk。" },
+      { id: 60, type: "choice", q: "What did Mia ______ yesterday? — She drew a picture.", options: ["do", "did", "does", "doing"], answer: "A", explanation: "疑問句助動詞 did 後面動詞用原形 do。" },
+      { id: 61, type: "choice", q: "Did Edison fly a kite? — No, he ______.", options: ["did", "didn't", "wasn't", "doesn't"], answer: "B", explanation: "Did 問句的否定簡答為 didn't。" },
+      { id: 62, type: "choice", q: "Amber ______ shopping with Thor last Saturday.", options: ["go", "goes", "went", "going"], answer: "C", explanation: "過去時間 last Saturday 動詞用 went。" },
+      { id: 63, type: "choice", q: "Gary ______ fast in the race and won.", options: ["run", "ran", "runs", "running"], answer: "B", explanation: "run 的過去式為 ran。" },
+      { id: 64, type: "choice", q: "Did she ______ a haircut? — Yes, she did.", options: ["get", "got", "gets", "getting"], answer: "A", explanation: "助動詞 Did 後接原形動詞 get。" },
+      { id: 65, type: "choice", q: "Tomorrow is December ______. (第十二天)", options: ["12th", "12st", "12nd", "12rd"], answer: "A", explanation: "12 的序數字尾是 th (12th)。" },
+      { id: 66, type: "choice", q: "May is the ______ month of the year.", options: ["5th", "5st", "5nd", "5rd"], answer: "A", explanation: "序數 5th 為 fifth。" },
+      { id: 67, type: "choice", q: "Look at the runner in front! He is in ______ place.", options: ["1st", "1th", "1nd", "1rd"], answer: "A", explanation: "第一名的序數簡寫是 1st。" },
+      { id: 68, type: "choice", q: "She is the ______ child in her family. (第三個)", options: ["3th", "3rd", "3st", "3nd"], answer: "B", explanation: "第三的序數簡寫是 3rd。" },
+      { id: 69, type: "choice", q: "What did you do? — I ______ snacks at the night market.", options: ["eat", "ate", "eats", "eating"], answer: "B", explanation: "問句用 did，回答需用過去式 ate。" },
+      { id: 70, type: "choice", q: "Did you drink juice? — Yes, I ______ orange juice.", options: ["drink", "drank", "drinks", "drinking"], answer: "B", explanation: "過去式肯定句動詞用 drank。" },
 
-      // === 第三大題：自然發音與字彙辨析題 (61-75) ===
-      { id: 61, type: "choice", q: "下列哪一個單字中的 c 發 **soft c**（/s/ 音）？", options: ["(A) cat", "(B) cup", "(C) city", "(D) cold"], answer: "C", exp: "c 後面接 e, i, y 時通常發 soft c (/s/)，例如 city。" },
-      { id: 62, type: "choice", q: "下列哪一個單字中的 c 發 **hard c**（/k/ 音）？", options: ["(A) pencil", "(B) ice", "(C) circle", "(D) cake"], answer: "D", exp: "cake 中的 c 接在 a 前面，發 hard c (/k/) 音。" },
-      { id: 63, type: "choice", q: "下列哪一個單字中的 g 發 **soft g**（/dʒ/ 音）？", options: ["(A) giant", "(B) girl", "(C) garden", "(D) game"], answer: "A", exp: "giant 中的 g 後接 i，發 soft g (/dʒ/)。" },
-      { id: 64, type: "choice", q: "下列哪一個單字中的 g 發 **hard g**（/ɡ/ 音）？", options: ["(A) giraffe", "(B) gym", "(C) Greece", "(D) magic"], answer: "C", exp: "Greece 中的 g 接 r，發 hard g (/ɡ/) 音。" },
-      { id: 65, type: "choice", q: "下列哪一個單字含有 **母音 a 的長母音**（long a，/eɪ/）？", options: ["(A) bag", "(B) cap", "(C) lake", "(D) clap"], answer: "C", exp: "lake 是 a_e 開音節結構，發長母音 /eɪ/；bag, cap, clap 發短母音 /æ/。" },
-      { id: 66, type: "choice", q: "下列哪一個單字含有 **母音 e 的長母音**（long e，/i/）？", options: ["(A) bed", "(B) shell", "(C) peach", "(D) red"], answer: "C", exp: "peach 包含 ea，發長母音 /i/；其餘為短母音 /ɛ/。" },
-      { id: 67, type: "choice", q: "下列哪一個單字含有 **母音 i 的短母音**（short i，/ɪ/）？", options: ["(A) brick", "(B) shine", "(C) pie", "(D) fly"], answer: "A", exp: "brick 中的 i 發短母音 /ɪ/；shine, pie, fly 皆為長母音 /aɪ/。" },
-      { id: 68, type: "choice", q: "下列哪一個單字含有 **母音 o 的短母音**（short o，/ɑ/）？", options: ["(A) rose", "(B) toast", "(C) blow", "(D) rock"], answer: "D", exp: "rock 中的 o 發短母音 /ɑ/；其餘皆為長母音 /oʊ/。" },
-      { id: 69, type: "choice", q: "下列哪一個單字含有 **母音 u 的長母音**（long u，/ju/ 或 /u/）？", options: ["(A) jump", "(B) run", "(C) cute", "(D) truck"], answer: "C", exp: "cute 為 u_e 結構，發長母音 /ju/；其餘發短母音 /ʌ/。" },
-      { id: 70, type: "choice", q: "單字 **planet** 與 **plum** 的字首開頭子音群是？", options: ["(A) bl-", "(B) pl-", "(C) cl-", "(D) gl-"], answer: "B", exp: "planet 和 plum 皆為 pl- 子音群發音。" },
-      { id: 71, type: "choice", q: "單字 **clock** 與 **clap** 的字首開頭子音群是？", options: ["(A) cl-", "(B) cr-", "(C) gl-", "(D) gr-"], answer: "A", exp: "clock 和 clap 皆為 cl- 開頭。" },
-      { id: 72, type: "choice", q: "單字 **train** 與 **truck** 的字首開頭子音群是？", options: ["(A) dr-", "(B) tr-", "(C) gr-", "(D) cr-"], answer: "B", exp: "train 和 truck 皆為 tr- 子音群發音。" },
-      { id: 73, type: "choice", q: "單字 **drink** 與 **drum** 的字首開頭子音群是？", options: ["(A) dr-", "(B) tr-", "(C) br-", "(D) pr-"], answer: "A", exp: "drink 和 drum 皆為 dr- 開頭。" },
-      { id: 74, type: "choice", q: "單字 **spoon** 與 **spade** 的字首開頭子音群是？", options: ["(A) sw-", "(B) sp-", "(C) st-", "(D) sk-"], answer: "B", exp: "spoon 與 spade 皆以 sp- 開頭。" },
-      { id: 75, type: "choice", q: "單字 **skunk** 與 **sky** 的字首開頭子音群是？", options: ["(A) sk-", "(B) st-", "(C) sw-", "(D) sp-"], answer: "A", exp: "skunk 與 sky 皆為 sk- 開頭。" },
+      // Part III: 情境對話理解 (71-80)
+      { id: 71, type: "choice", q: "A: How was your weekend? — B: ______", options: ["I went to Taipei.", "It was great!", "I ate snacks.", "Yes, it did."], answer: "B", explanation: "詢問週末過得如何，回答感受「It was great!」最恰當。" },
+      { id: 72, type: "choice", q: "A: Where did you go last Sunday? — B: ______", options: ["I went to the amusement park.", "I rode a bike.", "It is sunny.", "Yes, I was."], answer: "A", explanation: "Where 詢問地點，回答「I went to the amusement park.」。" },
+      { id: 73, type: "choice", q: "A: What did you do at the park? — B: ______", options: ["I was happy.", "I flew a kite.", "At the park.", "No, I didn't."], answer: "B", explanation: "What did you do 詢問從事的活動，回答「I flew a kite.」。" },
+      { id: 74, type: "choice", q: "A: Did you have a picnic yesterday? — B: No, I didn't. ______", options: ["I had a picnic.", "I drew a picture.", "Yes, I did.", "I am at home."], answer: "B", explanation: "否定回答後說明實際做的事情：「I drew a picture.」。" },
+      { id: 75, type: "choice", q: "A: How much are the pants? — B: ______", options: ["It's fifty dollars.", "They are fifty dollars.", "They are blue.", "Yes, they are."], answer: "B", explanation: "pants 為複數，回答價錢用「They are fifty dollars.」。" },
+      { id: 76, type: "choice", q: "A: What's your favorite season? — B: ______", options: ["I like spring.", "It's cool today.", "It's rainy.", "I have a coat."], answer: "A", explanation: "詢問最喜愛的季節，回答「I like spring.」。" },
+      { id: 77, type: "choice", q: "A: Did Gina swim yesterday? — B: Yes, she did. ______", options: ["She sang songs.", "She swam in the pool.", "She didn't swim.", "She ran fast."], answer: "B", explanation: "肯定回答後補充游泳地點：「She swam in the pool.」。" },
+      { id: 78, type: "choice", q: "A: Where were you yesterday afternoon? — B: ______", options: ["I was at the department store.", "I bought a hat.", "I am at school.", "Yes, I was."], answer: "A", explanation: "Where were you 詢問過去人在哪裡，回答「I was at the department store.」。" },
+      { id: 79, type: "choice", q: "A: What did you do last night? — B: ______", options: ["I watched videos.", "I am watching TV.", "It's cold.", "At home."], answer: "A", explanation: "詢問昨晚做的事，用過去式「I watched videos.」。" },
+      { id: 80, type: "choice", q: "A: Why are you so hungry? — B: ______", options: ["Because we walked a lot today.", "Because it's sunny.", "Because I am at the zoo.", "No, I'm not."], answer: "A", explanation: "詢問原因，回答走很多路所以很餓。" },
 
-      // === 第四大題：情境問答與生活對話題 (76-90) ===
-      { id: 76, type: "choice", q: "Amber: How was your weekend, Thor?\nThor: ______________________", options: ["(A) I went there by MRT.", "(B) It was great! Taipei is lovely.", "(C) I am ten years old.", "(D) She drew a picture."], answer: "B", exp: "對方詢問週末過得如何，回答「棒極了！台北很迷人」最自然切題。" },
-      { id: 77, type: "choice", q: "Edison: Where did you go last weekend?\nMia: ______________________", options: ["(A) I went to the department store with my mom.", "(B) I am watching TV now.", "(C) I like sunny days.", "(D) It is eighty dollars."], answer: "A", exp: "提問過去去了哪裡，以過去式回答地點：I went to the department store..." },
-      { id: 78, type: "choice", q: "Teacher: What did you do at the riverside park yesterday?\nRocky: ______________________", options: ["(A) I flew a kite with my sister.", "(B) It is five o'clock.", "(C) She swam yesterday.", "(D) It's on the first floor."], answer: "A", exp: "詢問在河濱公園從事的活動，回答 I flew a kite... 最正確。" },
-      { id: 79, type: "choice", q: "Clerk: May I help you?\nCustomer: Yes. ______________________ How much are they?", options: ["(A) I want to try on these shorts.", "(B) I like winter very much.", "(C) The weather is foggy.", "(D) He had a picnic yesterday."], answer: "A", exp: "後句用複數 are they 詢問價格，因此想試穿 shorts (短褲) 最合理。" },
-      { id: 80, type: "choice", q: "Judy: ______________________\nClerk: They're one hundred dollars.", options: ["(A) What do you do?", "(B) How much are the jeans?", "(C) Where are you going?", "(D) What's the date today?"], answer: "B", exp: "店員回答「它們是一百元」，問句必然是詢問價格。" },
-      { id: 81, type: "choice", q: "Ken: Did you clean your room yesterday?\nLeo: No, I didn't. ______________________", options: ["(A) I cleaned my room.", "(B) I listened to music and watched videos.", "(C) Yes, I did.", "(D) I am playing basketball."], answer: "B", exp: "回答沒有打掃房間，隨後說明自己其實聽了音樂並看影片。" },
-      { id: 82, type: "choice", q: "Tony: What's your favorite season?\nAmy: ______________________ It's warm and full of flowers.", options: ["(A) I like spring best.", "(B) I don't like summer.", "(C) It's cold and snowy.", "(D) I bought a skirt."], answer: "A", exp: "後句提到溫暖且花開，最喜歡的季節為春天 (spring)。" },
-      { id: 83, type: "choice", q: "Tom: What did Gary do yesterday?\nSam: ______________________", options: ["(A) He goes to school.", "(B) He swam in the community pool.", "(C) He is swimming now.", "(D) He will swim tomorrow."], answer: "B", exp: "詢問 Gary 昨天的活動，答句需使用過去式 swam。" },
-      { id: 84, type: "choice", q: "Lisa: Did Gina have a picnic yesterday?\nBetty: ______________________ She stayed home and drew a picture.", options: ["(A) Yes, she did.", "(B) Yes, she was.", "(C) No, she didn't.", "(D) No, she wasn't."], answer: "C", exp: "後句表示她待在家裡畫畫，故為否定簡答 No, she didn't。" },
-      { id: 85, type: "choice", q: "Abu: Why were you so hungry?\nAmber: ______________________", options: ["(A) Because we walked a lot and went shopping for hours.", "(B) Because we ate big hamburgers.", "(C) It was on the second floor.", "(D) The food was too sweet."], answer: "A", exp: "課本故事提到：走了一下午且逛街，所以肚子非常餓。" },
-      { id: 86, type: "choice", q: "Student A: Which place did our runner get in the race?\nStudent B: ______________________ He was the fastest!", options: ["(A) He won first place!", "(B) He was at the mall.", "(C) It's ninety dollars.", "(D) Today is Monday."], answer: "A", exp: "詢問名次且後句說跑得最快，可知榮獲第一名 (first place)。" },
-      { id: 87, type: "choice", q: "Friend: Where were you yesterday afternoon?\nYou: ______________________", options: ["(A) I was at the movie theater.", "(B) I am at home.", "(C) I go to school tomorrow.", "(D) It's dry and cool."], answer: "A", exp: "提問過去的時間地點，回答 I was at the movie theater。" },
-      { id: 88, type: "choice", q: "Mark: What did you eat at the night market?\nPeter: ______________________ They were so delicious!", options: ["(A) I drank some water.", "(B) I ate tasty snacks.", "(C) I watched videos.", "(D) I wrote a letter."], answer: "B", exp: "詢問在夜市吃了什麼，以過去式回答吃了美味小吃。" },
-      { id: 89, type: "choice", q: "Mom: Did you write a letter to grandma yesterday?\nSon: ______________________ I sent it this morning.", options: ["(A) No, I didn't.", "(B) Yes, I did.", "(C) I don't want to.", "(D) She wrote a letter."], answer: "B", exp: "後句說今早就寄出去了，前面應為肯定簡答 Yes, I did。" },
-      { id: 90, type: "choice", q: "Visitor: Which grade are you in?\nStudent: ______________________", options: ["(A) I am a fifth-grade student.", "(B) I have five pens.", "(C) I like grade six.", "(D) My birthday is in May."], answer: "A", exp: "詢問年級，標準答覆為 I am a fifth-grade student (五年級學生)。" },
+      // Part IV: 自然發音與母音辨析 (81-90)
+      { id: 81, type: "choice", q: "Which word starts with the 'pl' sound?", options: ["planet", "black", "clap", "glad"], answer: "A", explanation: "planet 的開頭混合音為 pl。" },
+      { id: 82, type: "choice", q: "Which word starts with the 'gr' sound?", options: ["crab", "grass", "train", "drum"], answer: "B", explanation: "grass 的開頭混合音為 gr。" },
+      { id: 83, type: "choice", q: "Which word starts with the 'sk' sound?", options: ["star", "spoon", "skunk", "swan"], answer: "C", explanation: "skunk 的開頭混合音為 sk。" },
+      { id: 84, type: "choice", q: "Which word has the 'soft c' sound (發 /s/ 音)?", options: ["cat", "cap", "city", "cup"], answer: "C", explanation: "c 在 e, i, y 前發軟音 soft c (/s/)，city 為 soft c。" },
+      { id: 85, type: "choice", q: "Which word has the 'soft g' sound (發 /dʒ/ 音)?", options: ["gem", "game", "go", "gun"], answer: "A", explanation: "g 在 e, i, y 前常發軟音 soft g (/dʒ/)，gem 為 soft g。" },
+      { id: 86, type: "choice", q: "Which word has a 'long a' sound (發 /eɪ/)?", options: ["bag", "cap", "lake", "hat"], answer: "C", explanation: "lake 為開音節長母音 a (/eɪ/)。" },
+      { id: 87, type: "choice", q: "Which word has a 'long e' sound (發 /i/)?", options: ["bed", "shell", "peach", "pen"], answer: "C", explanation: "peach 中的 ea 發長母音 /i/。" },
+      { id: 88, type: "choice", q: "Which word has a 'long o' sound (發 /oʊ/)?", options: ["fox", "rock", "rose", "hot"], answer: "C", explanation: "rose 為長母音 o (/oʊ/)。" },
+      { id: 89, type: "choice", q: "Mom: Did you write a letter to grandma yesterday?\nSon: ____________. I sent it this morning.", options: ["No, I didn't.", "Yes, I did.", "I don't want to.", "She wrote a letter."], answer: "B", explanation: "考點重點：後句說今早就寄出去了，代表昨天確實寫好了，前面應為肯定簡答 Yes, I did。" },
+      { id: 90, type: "choice", q: "Which word has a 'short u' sound (發 /ʌ/)?", options: ["jump", "cute", "flute", "suit"], answer: "A", explanation: "jump 中的 u 發短母音 /ʌ/。" },
 
-      // === 第五大題：閱讀理解題組 (91-100) ===
-      // Passage 1: 91-95
-      { id: 91, type: "choice", q: "【閱讀題 1】Who visited Taipei for the very first time last weekend?", options: ["(A) Amber", "(B) Edison", "(C) Thor", "(D) Rocky"], answer: "C", exp: "根據短文第一句，Thor 是第一次造訪台北。" },
-      { id: 92, type: "choice", q: "【閱讀題 2】Where did they go on Saturday morning?", options: ["(A) Taipei 101", "(B) The zoo", "(C) The amusement park", "(D) The library"], answer: "A", exp: "短文敘述 Saturday morning 他們前往台北 101。" },
-      { id: 93, type: "choice", q: "【閱讀題 3】Why were they so hungry at noon?", options: ["(A) They ran a race.", "(B) They walked for hours while shopping.", "(C) They forgot to eat dinner.", "(D) They swam in the river."], answer: "B", exp: "文章提及 Because they walked for hours, they were very hungry at noon。" },
-      { id: 94, type: "choice", q: "【閱讀題 4】What did Thor love best at the night market?", options: ["(A) Watermelon juice", "(B) Pearl milk tea", "(C) Hot dogs", "(D) Apple pie"], answer: "B", exp: "文中明確說明：He loved pearl milk tea best!" },
-      { id: 95, type: "choice", q: "【閱讀題 5】What did they do in the riverside park on Sunday?", options: ["(A) They rode bikes and had a picnic.", "(B) They watched a movie.", "(C) They cleaned their bedrooms.", "(D) They swam in the river."], answer: "A", exp: "短文指出週日活動是 had a picnic and rode bikes in the riverside park。" },
-
-      // Passage 2: 96-100
-      { id: 96, type: "choice", q: "【閱讀題 6】How was Gina's weekend?", options: ["(A) It was boring.", "(B) It was busy but fun.", "(C) It was terrible.", "(D) She was sick."], answer: "B", exp: "文章首句：Gina had a very busy but fun weekend。" },
-      { id: 97, type: "choice", q: "【閱讀題 7】What did Gina do on Saturday morning?", options: ["(A) She got a haircut.", "(B) She had a picnic.", "(C) She wrote a letter.", "(D) She sang songs."], answer: "A", exp: "文中敘述 Saturday morning 第一件事是 got a haircut at the salon。" },
-      { id: 98, type: "choice", q: "【閱讀題 8】Who had a picnic and drew pictures in the afternoon?", options: ["(A) Gina and Gary", "(B) Thor and Amber", "(C) Ken and Leo", "(D) Mia and Abu"], answer: "A", exp: "文章說明 In the afternoon, she met Gary; they had a picnic and drew pictures。" },
-      { id: 99, type: "choice", q: "【閱讀題 9】What did Gina write on Sunday morning?", options: ["(A) A story book", "(B) A test paper", "(C) A warm letter to her grandma", "(D) A song"], answer: "C", exp: "文中提到 On Sunday morning, she wrote a warm letter to her grandma。" },
-      { id: 100, type: "choice", q: "【閱讀題 10】What did Gina and Gary do on Sunday afternoon?", options: ["(A) They swam in the pool.", "(B) They went shopping.", "(C) They flew kites.", "(D) They cleaned their school."], answer: "A", exp: "短文最後說明：she and Gary swam in the pool on Sunday afternoon。" }
+      // Part V: 題組情境閱讀 (91-100)
+      { id: 91, type: "choice", q: "[閱讀測驗一] Where did Thor and Amber go last weekend?", options: ["To the zoo", "To Taipei 101", "To the night market", "To the riverside park"], answer: "B", explanation: "由情境故事可知，他們週末去了 Taipei 101。" },
+      { id: 92, type: "choice", q: "[閱讀測驗一] What did they do at Taipei 101?", options: ["They swam.", "They went shopping and walked a lot.", "They flew a kite.", "They took a test."], answer: "B", explanation: "文章提到：We went shopping and walked a lot." },
+      { id: 93, type: "choice", q: "[閱讀測驗一] Why were they very hungry after shopping?", options: ["Because they had no lunch.", "Because they walked a lot.", "Because the food was bad.", "Because it was cold."], answer: "B", explanation: "因為走了很多路：walked a lot, so we were really hungry。" },
+      { id: 94, type: "choice", q: "[閱讀測驗一] What food did they eat after shopping?", options: ["Pizza", "Beef noodles", "Sandwiches", "Sushi"], answer: "B", explanation: "課本漫畫插圖與對話顯示他們去吃了牛肉麵 (beef noodles)。" },
+      { id: 95, type: "choice", q: "[閱讀測驗一] How was Thor's weekend in Taipei?", options: ["It was terrible.", "It was boring.", "It was great.", "It was rainy."], answer: "C", explanation: "Thor 回答：It was great! Taipei is lovely." },
+      { id: 96, type: "choice", q: "[閱讀測驗二] Who is Abu?", options: ["A dog", "A bear mascot in Taipei", "A student", "A teacher"], answer: "B", explanation: "課本漫畫中穿藍白科技裝的熊熊角色是 Abu。" },
+      { id: 97, type: "choice", q: "[閱讀測驗二] What did Rocky and Mia hold at Taipei Main Station?", options: ["A big kite", "A welcome banner 'Welcome to Taiwan!'", "A dog", "A suitcase"], answer: "B", explanation: "漫畫第 xv 頁中，角色們拿著布條寫著「Welcome to Taiwan!」。" },
+      { id: 98, type: "choice", q: "[閱讀測驗二] Where does Thor come from (根據衣服上的標語)?", options: ["America", "Iceland", "Japan", "Canada"], answer: "B", explanation: "Thor 穿的白色 T-shirt 上印有「I love Iceland」。" },
+      { id: 99, type: "choice", q: "[閱讀測驗二] What did Gary do yesterday afternoon?", options: ["He swam.", "He ran and had a picnic.", "He slept.", "He bought shoes."], answer: "A", explanation: "Unit 2 句型例句：He swam yesterday." },
+      { id: 100, type: "choice", q: "[閱讀測驗二] Did Gina have a picnic yesterday?", options: ["Yes, she did.", "No, she didn't. She drew a picture.", "Yes, she drew a picture.", "No, she swam."], answer: "B", explanation: "Unit 2 句型例句：No, she didn't. She drew a picture yesterday." }
     ];
 
-    // 初始化測驗介面
+    // 動態渲染試卷題目
     function renderQuiz() {
-      // Part 1
-      const p1 = document.getElementById("part1Container");
-      p1.innerHTML = "";
-      for (let i = 0; i < 25; i++) {
-        const q = questions[i];
-        p1.innerHTML += `
-          <div id="card_${q.id}" class="p-4 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-white transition space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-bold px-2 py-0.5 rounded-md bg-slate-200 text-slate-700">第 ${q.id} 題</span>
-              <span id="badge_${q.id}" class="hidden text-xs font-bold px-2 py-0.5 rounded-md"></span>
-            </div>
-            <p class="text-sm font-semibold text-slate-800">${q.prompt}</p>
-            <div class="relative">
-              <input type="text" id="ans_${q.id}" placeholder="${q.hint}" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm font-medium">
-            </div>
-            <div id="exp_${q.id}" class="hidden mt-2 p-2.5 rounded-xl text-xs space-y-1"></div>
+      const container = document.getElementById('quizContainer');
+      let html = '';
+
+      // 大題分類呈現
+      const sections = [
+        { title: "Part I: 單字拼寫填空題 (1 ~ 20 題)", desc: "請依中文提示與提示字母，拼出正確的英語單字或動詞過去式（請注意拼字完整度）", start: 1, end: 20 },
+        { title: "Part II: 文法、字彙與句型單選題 (21 ~ 70 題)", desc: "請選出一個最正確、最適當的選項代號", start: 21, end: 70 },
+        { title: "Part III: 日常情境對話理解 (71 ~ 80 題)", desc: "請依前後文語境，選出最恰當的生活會話回應", start: 71, end: 80 },
+        { title: "Part IV: 自然發音、母音與常用語辨析 (81 ~ 90 題)", desc: "請依發音規則與語境邏輯，選出最相符的答案", start: 81, end: 90 },
+        { title: "Part V: 故事閱讀與情境理解 (91 ~ 100 題)", desc: "請依 Unit 1~2 課文情境故事與角色背景，回答下列問題", start: 91, end: 100 }
+      ];
+
+      sections.forEach(sec => {
+        html += `
+          <div class="border-b-2 border-slate-200 pb-4">
+            <h2 class="text-2xl sm:text-3xl font-black text-slate-800">${sec.title}</h2>
+            <p class="text-slate-500 text-base sm:text-lg mt-2">${sec.desc}</p>
           </div>
+          <div class="grid grid-cols-1 gap-6">
         `;
-      }
 
-      // Part 2
-      const p2 = document.getElementById("part2Container");
-      p2.innerHTML = "";
-      for (let i = 25; i < 60; i++) {
-        p2.appendChild(createChoiceCard(questions[i]));
-      }
+        const secQuestions = questions.filter(item => item.id >= sec.start && item.id <= sec.end);
+        secQuestions.forEach(item => {
+          html += `
+            <div id="card-${item.id}" class="bg-white rounded-2xl border-2 border-slate-200 p-6 sm:p-7 shadow-sm transition hover:border-slate-300">
+              <div class="flex items-start justify-between gap-4 mb-4">
+                <span class="inline-flex items-center px-4 py-1.5 rounded-xl text-base font-extrabold bg-blue-50 text-blue-700 border border-blue-200">
+                  第 ${item.id} 題
+                </span>
+                <span id="badge-${item.id}" class="hidden text-base font-extrabold px-3 py-1 rounded-lg"></span>
+              </div>
+              <p class="text-lg sm:text-xl font-bold text-slate-800 whitespace-pre-line leading-relaxed mb-5">${item.q}</p>
+          `;
 
-      // Part 3
-      const p3 = document.getElementById("part3Container");
-      p3.innerHTML = "";
-      for (let i = 60; i < 75; i++) {
-        p3.appendChild(createChoiceCard(questions[i]));
-      }
+          if (item.type === "fill") {
+            html += `
+              <div class="mt-3">
+                <input type="text" id="input-${item.id}" placeholder="請在此輸入英文單字..." class="w-full sm:w-2/3 px-5 py-3.5 text-lg sm:text-xl rounded-xl border-2 border-slate-300 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition">
+              </div>
+            `;
+          } else if (item.type === "choice") {
+            html += `<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">`;
+            const letters = ["A", "B", "C", "D"];
+            item.options.forEach((opt, idx) => {
+              const letter = letters[idx];
+              html += `
+                <label id="opt-label-${item.id}-${letter}" class="flex items-center gap-3.5 p-4 rounded-xl border-2 border-slate-200 hover:bg-slate-50 cursor-pointer transition text-base sm:text-lg">
+                  <input type="radio" name="q-${item.id}" value="${letter}" class="w-5 h-5 text-blue-600 focus:ring-blue-500">
+                  <span class="font-extrabold text-blue-600">${letter}.</span>
+                  <span class="font-medium text-slate-700">${opt}</span>
+                </label>
+              `;
+            });
+            html += `</div>`;
+          }
 
-      // Part 4
-      const p4 = document.getElementById("part4Container");
-      p4.innerHTML = "";
-      for (let i = 75; i < 90; i++) {
-        p4.appendChild(createChoiceCard(questions[i], true));
-      }
+          // 答案與解析反饋框（評分後展開）
+          html += `
+              <div id="feedback-${item.id}" class="hidden mt-6 pt-5 border-t-2 border-dashed border-slate-200 text-base sm:text-lg">
+                <div class="font-bold text-slate-700 mb-2">
+                  你的作答：<span id="user-ans-${item.id}" class="font-bold"></span> 
+                  <span class="mx-2 text-slate-300">|</span> 
+                  標準答案：<span id="correct-ans-${item.id}" class="text-emerald-700 font-extrabold"></span>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-slate-600 leading-relaxed">
+                  <span class="font-extrabold text-blue-600">考點解析：</span>${item.explanation}
+                </div>
+              </div>
+            </div>
+          `;
+        });
 
-      // Part 5 (包含兩篇短文)
-      const p5 = document.getElementById("part5Container");
-      p5.innerHTML = `
-        <!-- 短文一 -->
-        <div class="bg-indigo-50/80 p-5 rounded-2xl border border-indigo-100">
-          <div class="flex items-center gap-2 mb-2 text-indigo-800 font-bold text-sm">
-            <span>📖</span> 閱讀短文一 (Passage 1: Thor's Weekend in Taipei)
-          </div>
-          <p class="text-sm text-slate-700 leading-relaxed italic bg-white p-4 rounded-xl border border-indigo-100/50">
-            Last weekend was very special for Thor. He visited Taipei for the very first time. On Saturday morning, Amber and Edison took him to Taipei 101. They went shopping and took many photos. Because they walked for hours, they were very hungry at noon. In the evening, they went to a famous night market. Thor ate street snacks and drank watermelon juice, but he loved pearl milk tea best! On Sunday, they had a picnic and rode bikes in the riverside park. Thor smiled and said, "Taipei is lovely, and the people are wonderful!"
-          </p>
-          <div id="subP5_1" class="mt-4 space-y-4"></div>
-        </div>
-
-        <!-- 短文二 -->
-        <div class="bg-emerald-50/80 p-5 rounded-2xl border border-emerald-100">
-          <div class="flex items-center gap-2 mb-2 text-emerald-800 font-bold text-sm">
-            <span>📖</span> 閱讀短文二 (Passage 2: Gina and Gary's Busy Weekend)
-          </div>
-          <p class="text-sm text-slate-700 leading-relaxed italic bg-white p-4 rounded-xl border border-emerald-100/50">
-            Gina had a very busy but fun weekend. On Saturday morning, she got a haircut at the salon near her home. In the afternoon, she met Gary at the park; they had a picnic and drew pictures together. In the evening, she sang songs with her family. On Sunday morning, she wrote a warm letter to her grandma in Hualien. In the afternoon, because the weather was hot, she and Gary swam in the pool. They had a great time!
-          </p>
-          <div id="subP5_2" class="mt-4 space-y-4"></div>
-        </div>
-      `;
-
-      const sub1 = document.getElementById("subP5_1");
-      for (let i = 90; i < 95; i++) {
-        sub1.appendChild(createChoiceCard(questions[i]));
-      }
-      const sub2 = document.getElementById("subP5_2");
-      for (let i = 95; i < 100; i++) {
-        sub2.appendChild(createChoiceCard(questions[i]));
-      }
-    }
-
-    // 輔助函式：建立選擇題卡片
-    function createChoiceCard(q, isDialog = false) {
-      const card = document.createElement("div");
-      card.id = `card_${q.id}`;
-      card.className = "p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-slate-300 transition space-y-3";
-
-      let promptHtml = "";
-      if (isDialog) {
-        promptHtml = `<div class="text-sm font-semibold text-slate-800 whitespace-pre-line leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">${q.q}</div>`;
-      } else {
-        promptHtml = `<p class="text-sm sm:text-base font-semibold text-slate-800">${q.q}</p>`;
-      }
-
-      let optionsHtml = `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">`;
-      const letters = ["A", "B", "C", "D"];
-      q.options.forEach((opt, idx) => {
-        const letter = letters[idx];
-        optionsHtml += `
-          <div>
-            <input type="radio" name="q_${q.id}" id="opt_${q.id}_${letter}" value="${letter}" class="hidden">
-            <label for="opt_${q.id}_${letter}" class="flex items-center px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-medium text-slate-700 cursor-pointer hover:bg-slate-50 active:scale-[0.99] transition select-none">
-              <span class="w-6 h-6 rounded-full border border-slate-300 flex items-center justify-center mr-3 text-xs font-bold text-slate-500">${letter}</span>
-              <span>${opt.replace(/^\([A-D]\)\s*/, '')}</span>
-            </label>
-          </div>
-        `;
+        html += `</div>`;
       });
-      optionsHtml += `</div>`;
 
-      card.innerHTML = `
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-bold px-2 py-0.5 rounded-md bg-slate-200 text-slate-700">第 ${q.id} 題</span>
-          <span id="badge_${q.id}" class="hidden text-xs font-bold px-2 py-0.5 rounded-md"></span>
-        </div>
-        ${promptHtml}
-        ${optionsHtml}
-        <div id="exp_${q.id}" class="hidden p-3 rounded-xl text-xs space-y-1"></div>
-      `;
-      return card;
+      container.innerHTML = html;
     }
 
-    // 自動計分與詳解展開
+    // 密碼保護驗證並評分
+    function checkPasswordAndGrade() {
+      const pwd = prompt("請輸入對答案密碼 (Password)：");
+      if (pwd === null) {
+        return; // 使用者按取消
+      }
+      if (pwd.trim() !== "0216") {
+        alert("密碼錯誤！請輸入正確的 4 位數密碼以解鎖答案。");
+        return;
+      }
+      gradeExam();
+    }
+
+    // 自動計分與對答案邏輯
     function gradeExam() {
       let score = 0;
       let correct = 0;
       let wrong = 0;
 
-      questions.forEach(q => {
-        const card = document.getElementById(`card_${q.id}`);
-        const badge = document.getElementById(`badge_${q.id}`);
-        const exp = document.getElementById(`exp_${q.id}`);
+      questions.forEach(item => {
+        let userAns = "";
         let isCorrect = false;
-        let studentAns = "";
+        const feedbackBox = document.getElementById(`feedback-${item.id}`);
+        const userAnsSpan = document.getElementById(`user-ans-${item.id}`);
+        const correctAnsSpan = document.getElementById(`correct-ans-${item.id}`);
+        const badge = document.getElementById(`badge-${item.id}`);
+        const card = document.getElementById(`card-${item.id}`);
 
-        if (q.type === "fill") {
-          const input = document.getElementById(`ans_${q.id}`);
-          studentAns = input.value.trim().toLowerCase();
-          const target = q.answer.trim().toLowerCase();
-          if (studentAns === target) {
+        if (item.type === "fill") {
+          const inputEl = document.getElementById(`input-${item.id}`);
+          userAns = inputEl.value.trim();
+          // 比對答案（忽略大小寫）
+          if (userAns.toLowerCase() === item.answer.toLowerCase()) {
             isCorrect = true;
           }
-        } else {
-          const selected = document.querySelector(`input[name="q_${q.id}"]:checked`);
-          if (selected) {
-            studentAns = selected.value;
-            if (studentAns === q.answer) {
-              isCorrect = true;
-            }
+          userAnsSpan.innerText = userAns ? userAns : "(未作答)";
+          correctAnsSpan.innerText = item.answer;
+        } else if (item.type === "choice") {
+          const checked = document.querySelector(`input[name="q-${item.id}"]:checked`);
+          userAns = checked ? checked.value : "";
+          if (userAns === item.answer) {
+            isCorrect = true;
           }
+          userAnsSpan.innerText = userAns ? userAns : "(未作答)";
+          correctAnsSpan.innerText = item.answer;
+
+          // 標記選項顏色
+          const letters = ["A", "B", "C", "D"];
+          letters.forEach(letter => {
+            const labelEl = document.getElementById(`opt-label-${item.id}-${letter}`);
+            if (letter === item.answer) {
+              labelEl.classList.add("correct-choice");
+            } else if (letter === userAns && !isCorrect) {
+              labelEl.classList.add("wrong-choice");
+            }
+          });
         }
 
-        // 標記紅綠色與顯示解析
+        feedbackBox.classList.remove("hidden");
         badge.classList.remove("hidden");
-        exp.classList.remove("hidden");
 
         if (isCorrect) {
           score += 1;
           correct += 1;
-          card.classList.remove("border-slate-200", "border-rose-300", "bg-rose-50/20");
+          badge.innerText = "✓ 答對";
+          badge.className = "text-base font-extrabold px-3 py-1 rounded-lg bg-emerald-100 text-emerald-800 border border-emerald-300";
           card.classList.add("border-emerald-300", "bg-emerald-50/20");
-
-          badge.className = "text-xs font-bold px-2.5 py-0.5 rounded-md bg-emerald-100 text-emerald-800";
-          badge.textContent = "✓ 正確 (+1分)";
-
-          exp.className = "p-3 rounded-xl text-xs bg-emerald-50 text-emerald-900 border border-emerald-200/60";
-          exp.innerHTML = `<strong>解析：</strong>${q.exp}`;
         } else {
           wrong += 1;
-          card.classList.remove("border-slate-200", "border-emerald-300", "bg-emerald-50/20");
+          badge.innerText = "✗ 需訂正";
+          badge.className = "text-base font-extrabold px-3 py-1 rounded-lg bg-rose-100 text-rose-800 border border-rose-300";
           card.classList.add("border-rose-300", "bg-rose-50/20");
-
-          badge.className = "text-xs font-bold px-2.5 py-0.5 rounded-md bg-rose-100 text-rose-800";
-          badge.textContent = "✗ 需訂正";
-
-          exp.className = "p-3 rounded-xl text-xs bg-rose-50 text-rose-900 border border-rose-200/60";
-          exp.innerHTML = `
-            <div class="font-bold text-rose-700 mb-0.5">你的回答：${studentAns ? studentAns.toUpperCase() : "未作答"} | 正確解答：${q.answer}</div>
-            <div><strong>考點重點：</strong>${q.exp}</div>
-          `;
         }
       });
 
-      // 更新頂部小標籤與成績結算看板
-      const topBadge = document.getElementById("topScoreBadge");
-      topBadge.classList.remove("hidden");
-      topBadge.classList.add("flex");
-      document.getElementById("badgeScore").textContent = score;
-
-      const resultCard = document.getElementById("resultCard");
-      resultCard.classList.remove("hidden");
-      document.getElementById("finalScore").textContent = score;
-      document.getElementById("correctCount").textContent = correct;
-      document.getElementById("wrongCount").textContent = wrong;
-
-      const studentName = document.getElementById("studentName").value.trim();
-      if (studentName) {
-        document.getElementById("resultGreetings").textContent = `${studentName} 同學的測驗成果`;
-      } else {
-        document.getElementById("resultGreetings").textContent = `測驗成績結算`;
-      }
-
-      // 平滑捲動至頂端查看成績
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      // 呈現成績看板
+      document.getElementById("finalScore").innerText = score;
+      document.getElementById("correctCount").innerText = correct;
+      document.getElementById("wrongCount").innerText = wrong;
+      
+      const scoreBoard = document.getElementById("scoreBoard");
+      scoreBoard.classList.remove("hidden");
+      scoreBoard.scrollIntoView({ behavior: 'smooth' });
     }
 
-    // 重新測驗清空狀態
+    // 重新作答
     function resetExam() {
-      if (window.confirm("確定要重新開始測驗嗎？這將會清除您目前所有的作答內容。")) {
-        document.getElementById("quizForm").reset();
-        document.getElementById("topScoreBadge").classList.add("hidden");
-        document.getElementById("resultCard").classList.add("hidden");
+      if (confirm("確定要清除所有作答紀錄並重新測驗嗎？")) {
         renderQuiz();
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        document.getElementById("scoreBoard").classList.add("hidden");
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     }
 
-    // 頁面加載完成後自動初始化
-    window.addEventListener("DOMContentLoaded", () => {
-      renderQuiz();
-    });
+    // 初始化渲染
+    window.onload = renderQuiz;
   </script>
 </body>
 </html>
