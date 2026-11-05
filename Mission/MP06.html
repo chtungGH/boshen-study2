@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>敦小512特務大作戰 - 任務終端機</title>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+  <style>
+    :root {
+      --primary: #10b981;
+      --primary-dark: #059669;
+      --accent: #f59e0b;
+      --danger: #ef4444;
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --surface-light: #334155;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: var(--bg); color: var(--text); padding-bottom: 80px; min-height: 100vh; overflow-x: hidden; }
+
+    header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(30, 41, 59, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 2px solid var(--surface-light);
+      padding: 10px 14px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .team-badge-wrap { display: flex; align-items: center; gap: 8px; }
+    .team-avatar { font-size: 1.8rem; background: var(--surface-light); border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; }
+    .team-title { font-size: 1rem; font-weight: 800; color: #fff; }
+    .team-meta { font-size: 0.75rem; color: var(--text-muted); }
+    
+    .top-qr-btn {
+      background: #0284c7; color: #fff; border: none; border-radius: 8px;
+      padding: 6px 10px; font-size: 0.75rem; font-weight: 800; cursor: pointer;
+      display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
+      white-space: nowrap;
+    }
+    .top-qr-btn:active { background: #0369a1; }
+
+    .score-box {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      padding: 6px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; color: #fff;
+      display: flex; align-items: center; gap: 4px; white-space: nowrap;
+      box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+    }
+    .score-val { font-size: 0.85rem; font-weight: 900; color: #fff; }
+
+    .radar-bar {
+      background: #022c22; border-bottom: 1px solid #065f46;
+      padding: 8px 16px; font-size: 0.78rem; color: #6ee7b7;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .timer-badge { font-weight: 800; color: #fef08a; letter-spacing: 0.5px; }
+
+    .container { max-width: 500px; margin: 0 auto; padding: 16px; }
+
+    .mission-card {
+      background: var(--surface); border: 1px solid var(--surface-light);
+      border-radius: 16px; padding: 18px; margin-bottom: 16px; position: relative;
+    }
+    .mission-card.completed {
+      border-color: #059669;
+      background: linear-gradient(180deg, rgba(6,78,59,0.25) 0%, var(--surface) 100%);
+    }
+    .mission-card.skipped {
+      border-color: #475569; background: rgba(30, 41, 59, 0.4); opacity: 0.75;
+    }
+    .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .tag-group { display: flex; align-items: center; gap: 6px; }
+    .category-tag { font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: 6px; background: var(--surface-light); color: #38bdf8; }
+    .score-tag { font-size: 0.85rem; font-weight: 800; color: var(--accent); background: rgba(245, 158, 11, 0.1); padding: 4px 8px; border-radius: 6px; }
+    .skip-btn-text { background: transparent; border: none; color: #94a3b8; font-size: 0.8rem; cursor: pointer; padding: 4px 6px; border-radius: 4px; }
+    .skip-btn-text:active { color: #f87171; }
+
+    .mission-title { font-size: 1.15rem; font-weight: 800; margin-bottom: 6px; color: #fff; }
+    .mission-desc { font-size: 0.9rem; color: #cbd5e1; line-height: 1.45; margin-bottom: 14px; }
+
+    /* 保留原圖比例預覽容器 */
+    .preview-box {
+      width: 100%; background: #000;
+      border-radius: 10px; overflow: hidden; border: 2px solid var(--accent);
+      margin-bottom: 10px; display: flex; align-items: center; justify-content: center;
+    }
+    .preview-box img { width: 100%; height: auto; display: block; object-fit: contain; }
+
+    .completed-proof-box {
+      margin-top: 12px; border-radius: 12px; background: rgba(0,0,0,0.3);
+      padding: 12px; border: 1px dashed #059669; text-align: center;
+    }
+    .skipped-box {
+      margin-top: 12px; border-radius: 12px; background: rgba(0,0,0,0.2);
+      padding: 12px; border: 1px dashed #64748b; text-align: center;
+    }
+
+    .action-box { background: rgba(0,0,0,0.25); border-radius: 12px; padding: 14px; margin-top: 10px; }
+    .btn {
+      display: block; width: 100%; padding: 12px; border-radius: 10px;
+      border: none; font-size: 0.95rem; font-weight: 700; cursor: pointer;
+      text-align: center; transition: all 0.2s;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:active { background: var(--primary-dark); }
+    .btn-secondary { background: var(--surface-light); color: #fff; }
+    .btn-accent { background: #0284c7; color: #fff; }
+    .btn-gold { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4); }
+    .btn-outline-gold { background: transparent; border: 2px solid var(--accent); color: var(--accent); font-weight: 800; }
+    .btn-danger-outline { background: transparent; border: 1px dashed #ef4444; color: #ef4444; font-size: 0.8rem; padding: 8px; margin-top: 24px; }
+    
+    .btn-split-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px; }
+
+    .input-code {
+      width: 100%; padding: 12px; border-radius: 8px; border: 2px solid var(--surface-light);
+      background: #0f172a; color: #fff; font-size: 1.15rem; text-align: center;
+      margin-bottom: 8px; letter-spacing: 2px;
+    }
+    .input-code.error { border-color: var(--danger) !important; animation: shake 0.3s ease-in-out; }
+    .error-msg-banner {
+      background: rgba(239, 68, 68, 0.2); border: 1px solid var(--danger);
+      color: #fca5a5; padding: 8px 12px; border-radius: 8px; font-size: 0.85rem;
+      font-weight: bold; margin-bottom: 10px; text-align: center; display: none;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+
+    .live-camera-overlay {
+      position: fixed; inset: 0; background: #000; z-index: 2000;
+      display: flex; flex-direction: column; justify-content: space-between; padding: 20px;
+    }
+    .live-video-wrap {
+      flex: 1; position: relative; border-radius: 16px; overflow: hidden;
+      background: #111; display: flex; align-items: center; justify-content: center;
+      max-height: 70vh;
+    }
+    .live-video-wrap video { width: 100%; height: 100%; object-fit: cover; }
+    .camera-control-bar {
+      display: flex; gap: 12px; padding-top: 16px; align-items: center; justify-content: center;
+    }
+
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.88); backdrop-filter: blur(8px);
+      z-index: 999; display: flex; align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-box {
+      background: var(--surface); border: 1px solid var(--surface-light);
+      width: 100%; max-width: 420px; border-radius: 20px; padding: 24px;
+      max-height: 90vh; overflow-y: auto; text-align: center;
+    }
+    .modal-title { font-size: 1.35rem; font-weight: 900; margin-bottom: 16px; color: var(--accent); }
+    .form-group { margin-bottom: 14px; text-align: left; }
+    .form-label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px; font-weight: 600; }
+    .form-select, .form-input {
+      width: 100%; padding: 12px; border-radius: 8px; background: #0f172a;
+      border: 1px solid var(--surface-light); color: #fff; font-size: 1rem;
+    }
+    .badge-picker { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 6px; }
+    .badge-opt { font-size: 1.7rem; padding: 8px; border-radius: 8px; background: #0f172a; border: 1px solid var(--surface-light); text-align: center; cursor: pointer; }
+    .badge-opt.selected { border-color: var(--primary); background: rgba(16, 185, 129, 0.2); }
+
+    #qrcode-display {
+      display: flex; justify-content: center; align-items: center;
+      background: #fff; padding: 16px; border-radius: 12px; margin: 16px auto;
+      width: 220px; height: 220px; min-height: 220px;
+    }
+    #qrcode-display img, #qrcode-display canvas { display: block; margin: 0 auto; max-width: 100%; max-height: 100%; }
+    #qr-reader-box { width: 100%; border-radius: 12px; overflow: hidden; margin-bottom: 12px; display: none; background: #000; }
+
+    .coop-matched-box {
+      background: rgba(16, 185, 129, 0.15); border: 2px solid var(--primary);
+      padding: 12px; border-radius: 10px; margin-bottom: 12px; font-weight: 800; color: #6ee7b7;
+    }
+
+    .cert-card {
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      border: 3px solid var(--accent); border-radius: 16px; padding: 20px; text-align: center; margin-bottom: 16px;
+    }
+    .cert-photo-wrap {
+      width: 100%; background: #000;
+      border-radius: 10px; overflow: hidden; margin: 12px 0; border: 2px dashed #94a3b8;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .cert-photo-wrap img { width: 100%; height: auto; display: block; object-fit: contain; }
+
+    #confetti-canvas {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      pointer-events: none; z-index: 1000; display: none;
+    }
+    #all-done-banner {
+      display: none; padding: 14px 16px; background: linear-gradient(90deg, #064e3b, #0f766e);
+      border-bottom: 3px solid #34d399; text-align: center; position: sticky; top: 68px; z-index: 90;
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="confetti-canvas"></canvas>
+  <canvas id="snapshot-canvas" style="display:none;"></canvas>
+
+  <!-- 內嵌相機畫面 (支援前後鏡頭切換) -->
+  <div id="live-camera-modal" class="live-camera-overlay" style="display: none;">
+    <div style="display: flex; justify-content: space-between; align-items: center; color: #fff; font-weight: 800;">
+      <span id="camera-title-label">📸 現場拍照</span>
+      <div style="display: flex; gap: 8px;">
+        <button class="btn btn-accent" onclick="switchCameraFacing()" style="width: auto; padding: 6px 12px; font-size: 0.8rem;">🔄 切換鏡頭</button>
+        <button class="btn btn-secondary" onclick="closeLiveCamera()" style="width: auto; padding: 6px 14px;">✕ 關閉</button>
+      </div>
+    </div>
+    <div class="live-video-wrap">
+      <video id="live-video-element" autoplay playsinline></video>
+    </div>
+    <div class="camera-control-bar">
+      <button class="btn btn-gold" onclick="captureLivePhoto()" style="font-size: 1.1rem; padding: 16px;">📸 點選拍照！</button>
+    </div>
+  </div>
+
+  <header>
+    <div class="team-badge-wrap">
+      <div class="team-avatar" id="disp-badge">🦅</div>
+      <div>
+        <div class="team-title" id="disp-team-name">連線準備中</div>
+        <div class="team-meta" id="disp-team-id">ID: ----</div>
+      </div>
+    </div>
+    
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <button class="top-qr-btn" onclick="showMyQrCode()">📱 出示QR</button>
+      <div class="score-box">
+        <span>🏆 積分:</span>
+        <span class="score-val" id="disp-score">0</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="radar-bar">
+    <div class="timer-badge" id="disp-timer">⏱️ 任務耗時: 00:00:00</div>
+    <div id="disp-progress">進度: 0/0</div>
+  </div>
+
+  <div id="all-done-banner">
+    <button class="btn btn-gold" onclick="openCertModal()" style="font-size: 1.05rem; padding: 14px;">
+      🏆 恭喜全滿貫通關！點此領取特務榮譽勳章 🏆
+    </button>
+  </div>
+
+  <div class="container" id="mission-list">
+    <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+      📡 正在從總部載入任務...
+    </div>
+  </div>
+
+  <div id="cert-trigger-wrap" style="display: none; max-width: 500px; margin: 0 auto; padding: 0 16px 12px 16px;">
+    <button class="btn btn-outline-gold" onclick="openCertModal()" style="padding: 14px;">
+      以現有成績申請結業證書！
+    </button>
+  </div>
+
+  <div id="reset-trigger-wrap" style="display: none; max-width: 500px; margin: 0 auto; padding: 0 16px 20px 16px; text-align: center;">
+    <button class="btn btn-danger-outline" onclick="resetLocalProgress()">
+      重置本機所有任務進度並重新開始
+    </button>
+  </div>
+
+  <div class="modal-overlay" id="reg-modal" style="display: none;">
+    <div class="modal-box">
+      <div class="modal-title">🎖️ 特務小隊出發認證</div>
+      
+      <div class="form-group">
+        <label class="form-label">選擇所屬小隊（共 10 組）</label>
+        <select class="form-select" id="reg-team-id">
+          <option value="T01">第 1 組 (T01)</option>
+          <option value="T02">第 2 組 (T02)</option>
+          <option value="T03">第 3 組 (T03)</option>
+          <option value="T04">第 4 組 (T04)</option>
+          <option value="T05">第 5 組 (T05)</option>
+          <option value="T06">第 6 組 (T06)</option>
+          <option value="T07">第 7 組 (T07)</option>
+          <option value="T08">第 8 組 (T08)</option>
+          <option value="T09">第 9 組 (T09)</option>
+          <option value="T10">第 10 組 (T10)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">小隊自訂名稱</label>
+        <input type="text" class="form-input" id="reg-team-name" placeholder="例如：音速狂狼隊" maxlength="8">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">挑選小隊代表隊徽</label>
+        <div class="badge-picker" id="badge-picker">
+          <div class="badge-opt selected">🐘</div>
+          <div class="badge-opt">🐯</div>
+          <div class="badge-opt">🐰</div>
+          <div class="badge-opt">🐱</div>
+          <div class="badge-opt">🐶</div>
+          <div class="badge-opt">🦚</div>
+          <div class="badge-opt">🦄</div>
+          <div class="badge-opt">🦋</div>
+          <div class="badge-opt">🐞</div>
+          <div class="badge-opt">🐹</div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="submitRegistration()" style="margin-top: 14px;">
+        🚀 確認隊名，極速出發！
+      </button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="qr-modal" style="display: none;">
+    <div class="modal-box">
+      <div class="modal-title">📡 本小隊特務連線碼</div>
+      <p style="font-size: 0.85rem; color: var(--text-muted);">請將此螢幕出示給另一組特務掃描</p>
+      <div id="qrcode-display"></div>
+      <div id="qr-team-summary" style="font-weight: 800; font-size: 1.15rem; color: #fff; margin-bottom: 14px;"></div>
+      <button class="btn btn-secondary" onclick="closeQrModal()">關閉返回</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="cert-modal" style="display: none;">
+    <div class="modal-box">
+      <div class="cert-card" id="cert-area">
+        <div style="font-size: 2.6rem;" id="cert-badge">🏆</div>
+        <h2 style="color: var(--accent); margin: 8px 0; font-size: 1.3rem;" id="cert-title-text">特務榮譽結業證書</h2>
+        <div style="font-size: 1.15rem; font-weight: bold; color: #fff;" id="cert-team-title">音速狂狼隊</div>
+        <p style="font-size: 0.85rem; color: #cbd5e1; margin: 6px 0 10px 0; line-height: 1.4;" id="cert-cheer-text">在 512 戶外特務大作戰中全力以赴！</p>
+        <div class="cert-photo-wrap">
+          <span style="color: #64748b; font-size: 0.85rem;" id="cert-photo-placeholder">點擊下方按鈕拍攝結業合影</span>
+          <img id="cert-img" style="display: none;">
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; margin-top: 12px; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 8px;">
+          <div><div style="font-size:0.7rem; color:#94a3b8;">最終總積分</div><div style="font-size:1.1rem; font-weight:900; color:var(--accent);" id="cert-score">0</div></div>
+          <div><div style="font-size:0.7rem; color:#94a3b8;">達成進度</div><div style="font-size:1.05rem; font-weight:900; color:#34d399;" id="cert-tasks">0/0</div></div>
+          <div><div style="font-size:0.7rem; color:#94a3b8;">總耗時</div><div style="font-size:0.95rem; font-weight:900; color:#fef08a;" id="cert-duration">--:--</div></div>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="openLiveCameraForCert()">📸 現場拍照</button>
+      <button class="btn btn-secondary" onclick="window.print()" style="margin-top: 8px;">🖨️ 列印 / 截圖保存此證書</button>
+      <button class="btn btn-secondary" onclick="document.getElementById('cert-modal').style.display='none'" style="margin-top: 8px;">返回繼續挑戰</button>
+    </div>
+  </div>
+
+  <script>
+    // ==================== 1. 請在此填入您的 GAS API 網址 ====================
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbz7HApic5eT96-aAZ2bT5ypvxM4sXgB-n4GCeUckO_-rX0gYKwL9J0Mb5TEuRTJzRJh/exec";
+
+    let currentTeam = { id: "", name: "", badge: "🦅" };
+    let activeMissions = [];
+    let completedMissionIds = new Set();
+    let skippedMissionIds = new Set();
+    let missionPhotos = {};
+    let matchedCoopTeams = {};
+    let currentScore = 0;
+    let tempPhotos = {};
+    let startTime = null;
+    let timerInterval = null;
+    let wakeLock = null;
+    let awayStartTime = null;
+    let html5QrScanner = null;
+
+    let activeCaptureTarget = null;
+    let activeCameraStream = null;
+    let currentFacingMode = "environment"; // 預設後鏡頭，可切換為 "user" (前鏡頭/自拍)
+
+    window.addEventListener("DOMContentLoaded", async () => {
+      loadLocalProfile();
+      setupBadgePicker();
+      setupWakeLock();
+      setupVisibilityMonitor();
+
+      if (!currentTeam.id) {
+        await checkTakenTeams();
+        document.getElementById("reg-modal").style.display = "flex";
+      } else {
+        updateTeamHeader();
+        startTimer();
+        await fetchMissions();
+      }
+
+      setInterval(() => {
+        if (currentTeam.id) sendHeartbeat("active");
+      }, 15000);
+    });
+
+    function loadLocalProfile() {
+      const saved = localStorage.getItem("team_profile_v3");
+      if (saved) currentTeam = JSON.parse(saved);
+
+      const savedDone = localStorage.getItem("completed_missions_v3");
+      if (savedDone) completedMissionIds = new Set(JSON.parse(savedDone));
+
+      const savedSkipped = localStorage.getItem("skipped_missions_v3");
+      if (savedSkipped) skippedMissionIds = new Set(JSON.parse(savedSkipped));
+
+      const savedScore = localStorage.getItem("current_score_v3");
+      if (savedScore) currentScore = Number(savedScore);
+
+      const savedPhotos = localStorage.getItem("mission_photos_v3");
+      if (savedPhotos) missionPhotos = JSON.parse(savedPhotos);
+
+      const savedCoop = localStorage.getItem("matched_coop_teams_v3");
+      if (savedCoop) matchedCoopTeams = JSON.parse(savedCoop);
+
+      const savedStart = localStorage.getItem("start_time_v3");
+      if (savedStart) startTime = Number(savedStart);
+
+      const savedCertImg = localStorage.getItem("cert_img_v3");
+      if (savedCertImg) {
+        const cImg = document.getElementById("cert-img");
+        cImg.src = savedCertImg;
+        cImg.style.display = "block";
+        document.getElementById("cert-photo-placeholder").style.display = "none";
+      }
+    }
+
+    function startTimer() {
+      if (!startTime) {
+        startTime = new Date().getTime();
+        localStorage.setItem("start_time_v3", startTime);
+      }
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        const now = new Date().getTime();
+        const diffSec = Math.floor((now - startTime) / 1000);
+        const hrs = String(Math.floor(diffSec / 3600)).padStart(2, '0');
+        const mins = String(Math.floor((diffSec % 3600) / 60)).padStart(2, '0');
+        const secs = String(diffSec % 60).padStart(2, '0');
+        document.getElementById("disp-timer").innerText = `⏱️ 任務耗時: ${hrs}:${mins}:${secs}`;
+      }, 1000);
+    }
+
+    async function checkTakenTeams() {
+      if (!GAS_API_URL || GAS_API_URL.includes("在此貼上")) return;
+      try {
+        const res = await fetch(`${GAS_API_URL}?action=GET_DASHBOARD`);
+        const data = await res.json();
+        if (data && data.teams) {
+          const selectEl = document.getElementById("reg-team-id");
+          data.teams.forEach(t => {
+            if (t.status !== "Offline") {
+              const opt = selectEl.querySelector(`option[value="${t.teamId}"]`);
+              if (opt) {
+                opt.disabled = true;
+                opt.innerText += " (已被選取)";
+              }
+            }
+          });
+        }
+      } catch (e) {}
+    }
+
+    function setupBadgePicker() {
+      const opts = document.querySelectorAll(".badge-opt");
+      opts.forEach(el => {
+        el.addEventListener("click", () => {
+          opts.forEach(o => o.classList.remove("selected"));
+          el.classList.add("selected");
+        });
+      });
+    }
+
+    function submitRegistration() {
+      const teamId = document.getElementById("reg-team-id").value;
+      const teamName = document.getElementById("reg-team-name").value.trim() || `${teamId}小隊`;
+      const selectedBadgeEl = document.querySelector(".badge-opt.selected");
+      const badge = selectedBadgeEl ? selectedBadgeEl.innerText : "🦅";
+
+      currentTeam = { id: teamId, name: teamName, badge: badge };
+      localStorage.setItem("team_profile_v3", JSON.stringify(currentTeam));
+
+      document.getElementById("reg-modal").style.display = "none";
+      updateTeamHeader();
+      startTimer();
+
+      postApi({
+        action: "REGISTER_TEAM",
+        teamId: currentTeam.id,
+        teamName: currentTeam.name,
+        badge: currentTeam.badge
+      });
+
+      fetchMissions();
+    }
+
+    function updateTeamHeader() {
+      document.getElementById("disp-team-name").innerText = currentTeam.name;
+      document.getElementById("disp-team-id").innerText = `小隊: ${currentTeam.id}`;
+      document.getElementById("disp-badge").innerText = currentTeam.badge;
+      document.getElementById("disp-score").innerText = currentScore;
+    }
+
+    async function fetchMissions() {
+      const listEl = document.getElementById("mission-list");
+      
+      if (!GAS_API_URL || GAS_API_URL.includes("在此貼上")) {
+        listEl.innerHTML = `<div style="text-align: center; padding: 40px; color: var(--danger); font-weight: bold;">❌ 錯誤：尚未設定 GAS_API_URL 網址，程式停止。</div>`;
+        return;
+      }
+
+      try {
+        const res = await fetch(`${GAS_API_URL}?action=GET_MISSIONS`);
+        if (!res.ok) throw new Error(`HTTP 狀態碼錯誤: ${res.status}`);
+        
+        const data = await res.json();
+        if (!data || !data.missions || data.missions.length === 0) {
+          throw new Error("伺服器回傳的題庫資料為空或格式錯誤");
+        }
+
+        activeMissions = data.missions;
+        renderMissions();
+      } catch (err) {
+        console.error("載入題庫失敗:", err);
+        listEl.innerHTML = `
+          <div style="text-align: center; padding: 30px; background: rgba(239,68,68,0.15); border: 2px solid var(--danger); border-radius: 12px; margin-top: 20px;">
+            <div style="font-size: 1.2rem; font-weight: 900; color: #fca5a5; margin-bottom: 8px;">❌ 無法連線至雲端總部</div>
+            <div style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 14px; line-height: 1.5;">${err.message}</div>
+            <button class="btn btn-primary" onclick="location.reload()">🔄 點此重新連線嘗試</button>
+          </div>
+        `;
+      }
+    }
+
+    function renderMissions() {
+      const listEl = document.getElementById("mission-list");
+      listEl.innerHTML = "";
+
+      let doneCount = 0;
+      activeMissions.forEach((m, idx) => {
+        const isDone = completedMissionIds.has(m.id);
+        const isSkipped = skippedMissionIds.has(m.id);
+        if (isDone) doneCount++;
+
+        const card = document.createElement("div");
+        card.className = `mission-card ${isDone ? "completed" : ""} ${isSkipped ? "skipped" : ""}`;
+        card.id = `card-${m.id}`;
+
+        let actionHtml = "";
+        const savedThumb = missionPhotos[m.id];
+        const tempThumb = tempPhotos[m.id];
+
+        // 題目上方參考圖維持原比例顯示
+        const missionImageHtml = m.image 
+          ? `<div style="margin: 8px 0 10px 0;"><img src="${m.image}" style="width: 100%; height: auto; border-radius: 8px; display: block;" alt="任務參考圖"></div>` 
+          : '';
+
+        if (isDone) {
+          if (m.type === "CODE") {
+            actionHtml = `
+              <div class="completed-proof-box">
+                <div style="color: #34d399; font-weight: 800; font-size: 0.95rem;">✓ 本解謎任務已圓滿通關 (+${m.score}分)</div>
+              </div>`;
+          } else {
+            actionHtml = `
+              <div class="completed-proof-box">
+                <div style="color: #34d399; font-weight: 800; font-size: 0.95rem;">✓ 本任務已圓滿通關 (+${m.score}分)</div>
+                ${savedThumb ? `<div class="preview-box" style="margin-top:8px;"><img src="${savedThumb}" id="thumb-${m.id}" alt="存證照片"></div>` : ''}
+                
+                <input type="file" id="file-lib-${m.id}" accept="image/*" style="display: none;" onchange="handleFilePicked('${m.id}')">
+                <div class="btn-split-row" style="margin-top: 10px;">
+                  <button class="btn btn-secondary" onclick="document.getElementById('file-lib-${m.id}').click()">🖼️ 另選圖片</button>
+                  <button class="btn btn-secondary" onclick="openLiveCamera('${m.id}')">📸 重新拍照</button>
+                </div>
+              </div>`;
+          }
+        } else if (isSkipped) {
+          actionHtml = `
+            <div class="skipped-box">
+              <div style="color: #94a3b8; font-weight: 700;">🏳️ 此任務已暫時戰略放棄</div>
+              <button class="btn btn-secondary" onclick="resumeMission('${m.id}')" style="margin-top: 8px; font-size: 0.85rem; padding: 8px;">
+                🔄 恢復挑戰此任務
+              </button>
+            </div>`;
+        } else {
+          if (m.type === "CODE") {
+            actionHtml = `
+              <div class="action-box">
+                <div class="error-msg-banner" id="err-${m.id}">❌ 暗號不正確，再仔細確認一次現場線索！</div>
+                <input type="text" class="input-code" id="input-${m.id}" placeholder="請輸入現場解鎖密碼">
+                <button class="btn btn-primary" onclick="verifyCode('${m.id}', '${m.passcode}', ${m.score})">🔓 驗證暗號</button>
+              </div>`;
+          } else if (m.type === "PHOTO") {
+            actionHtml = `
+              <div class="action-box">
+                <input type="file" id="file-lib-${m.id}" accept="image/*" style="display: none;" onchange="handleFilePicked('${m.id}')">
+                
+                <div class="preview-box" id="prev-wrap-${m.id}" style="display: ${tempThumb ? 'flex' : 'none'};">
+                  <img id="prev-img-${m.id}" src="${tempThumb || ''}">
+                </div>
+
+                <div class="btn-split-row" id="picker-btn-row-${m.id}" style="margin-bottom: ${tempThumb ? '8px' : '0'};">
+                  <button class="btn btn-secondary" onclick="document.getElementById('file-lib-${m.id}').click()">🖼️ 另選圖片</button>
+                  <button class="btn btn-primary" onclick="openLiveCamera('${m.id}')">📸 現場拍照</button>
+                </div>
+
+                ${tempThumb ? `
+                  <div class="btn-group" style="display:flex; gap:8px;">
+                    <button class="btn btn-secondary" onclick="resetPicker('${m.id}')" style="flex:1;">🔄 重選</button>
+                    <button class="btn btn-gold" onclick="confirmPhotoUpload('${m.id}', ${m.score})" style="flex:2;">🚀 確認送出！</button>
+                  </div>
+                ` : ''}
+              </div>`;
+          } else if (m.type === "COOP") {
+            const matchedAlly = matchedCoopTeams[m.id];
+            actionHtml = `
+              <div class="action-box">
+                <div class="error-msg-banner" id="err-${m.id}"></div>
+                
+                <div id="qr-reader-box">
+                  <div id="qr-reader" style="width: 100%;"></div>
+                  <button class="btn btn-secondary" onclick="stopQrScanner()" style="margin-top: 6px;">關閉掃描鏡頭</button>
+                </div>
+
+                ${matchedAlly ? `
+                  <div class="coop-matched-box">
+                    🤝 已成功與【${matchedAlly.name} ${matchedAlly.badge}】完成特務連線！
+                  </div>
+                ` : `
+                  <div class="btn-split-row" style="margin-bottom: 12px;">
+                    <button class="btn btn-accent" onclick="showMyQrCode()">📱 出示本隊 QR</button>
+                    <button class="btn btn-primary" onclick="startQrScanner('${m.id}')">📷 掃描盟友 QR</button>
+                  </div>
+                `}
+
+                <input type="file" id="file-lib-${m.id}" accept="image/*" style="display: none;" onchange="handleFilePicked('${m.id}')">
+
+                <div class="preview-box" id="prev-wrap-${m.id}" style="display: ${tempThumb ? 'flex' : 'none'};">
+                  <img id="prev-img-${m.id}" src="${tempThumb || ''}">
+                </div>
+
+                <div class="btn-split-row" id="picker-btn-row-${m.id}" style="margin-bottom: 8px;">
+                  <button class="btn btn-secondary" onclick="document.getElementById('file-lib-${m.id}').click()">🖼️ 另選圖片</button>
+                  <button class="btn btn-secondary" onclick="openLiveCamera('${m.id}')">📸 現場拍照</button>
+                </div>
+
+                <button class="btn btn-primary" onclick="submitCoopMission('${m.id}', ${m.score})">
+                  🚀 提交結盟成果與合影
+                </button>
+              </div>`;
+          }
+        }
+
+        const skipBtnHtml = (!isDone && !isSkipped) 
+          ? `<button class="skip-btn-text" onclick="skipMission('${m.id}', '${m.title}')">🏳️ 放棄此題</button>` 
+          : '';
+
+        card.innerHTML = `
+          <div class="card-top">
+            <div class="tag-group">
+              <span class="category-tag">${m.category}</span>
+              <span class="score-tag">+${m.score} 分</span>
+            </div>
+            ${skipBtnHtml}
+          </div>
+          ${missionImageHtml}
+          <div class="mission-title">${idx + 1}. ${m.title}</div>
+          <div class="mission-desc">${m.desc}</div>
+          ${actionHtml}
+        `;
+        listEl.appendChild(card);
+      });
+
+      document.getElementById("disp-progress").innerText = `進度: ${doneCount}/${activeMissions.length}`;
+
+      document.getElementById("cert-trigger-wrap").style.display = "block";
+      document.getElementById("reset-trigger-wrap").style.display = "block";
+
+      const allDoneBanner = document.getElementById("all-done-banner");
+      if (doneCount > 0 && doneCount === activeMissions.length) {
+        allDoneBanner.style.display = "block";
+      } else {
+        allDoneBanner.style.display = "none";
+      }
+    }
+
+    async function handleFilePicked(mId) {
+      const fileInput = document.getElementById(`file-lib-${mId}`);
+      if (!fileInput || !fileInput.files[0]) return;
+      const file = fileInput.files[0];
+
+      const base64Img = await compressOriginalImage(file, 800);
+      tempPhotos[mId] = base64Img;
+      renderMissions();
+    }
+
+    async function compressOriginalImage(file, maxWidth = 800) {
+      return new Promise((resolve) => {
+        const blobUrl = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => {
+          URL.revokeObjectURL(blobUrl);
+          const scale = maxWidth / img.width;
+          const targetWidth = scale < 1 ? maxWidth : img.width;
+          const targetHeight = scale < 1 ? Math.round(img.height * scale) : img.height;
+
+          const canvas = document.createElement('canvas');
+          canvas.width = targetWidth;
+          canvas.height = targetHeight;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+          resolve(canvas.toDataURL('image/jpeg', 0.5));
+        };
+        img.src = blobUrl;
+      });
+    }
+
+    function resetPicker(mId) {
+      delete tempPhotos[mId];
+      renderMissions();
+    }
+
+    // ==================== 支援前後鏡頭切換的內嵌相機 ====================
+    async function openLiveCamera(targetId) {
+      activeCaptureTarget = targetId;
+      const modal = document.getElementById("live-camera-modal");
+      modal.style.display = "flex";
+      await startCameraStream();
+    }
+
+    async function startCameraStream() {
+      const videoEl = document.getElementById("live-video-element");
+      if (activeCameraStream) {
+        activeCameraStream.getTracks().forEach(track => track.stop());
+      }
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: currentFacingMode, width: { ideal: 1280 }, height: { ideal: 720 } },
+          audio: false
+        });
+        activeCameraStream = stream;
+        videoEl.srcObject = stream;
+      } catch (err) {
+        alert("❌ 無法開啟相機，請確認瀏覽器已授權相機權限！");
+        closeLiveCamera();
+      }
+    }
+
+    async function switchCameraFacing() {
+      // 點擊切換：後鏡頭 <-> 自拍鏡頭(前鏡頭)
+      currentFacingMode = (currentFacingMode === "environment") ? "user" : "environment";
+      await startCameraStream();
+    }
+
+    function openLiveCameraForCert() {
+      openLiveCamera("cert");
+    }
+
+    function closeLiveCamera() {
+      if (activeCameraStream) {
+        activeCameraStream.getTracks().forEach(track => track.stop());
+        activeCameraStream = null;
+      }
+      document.getElementById("live-camera-modal").style.display = "none";
+      activeCaptureTarget = null;
+    }
+
+    function captureLivePhoto() {
+      const videoEl = document.getElementById("live-video-element");
+      const canvas = document.getElementById("snapshot-canvas");
+      
+      if (!videoEl.videoWidth) {
+        alert("❌ 相機尚未準備好，請稍候再按快照！");
+        return;
+      }
+
+      let vw = videoEl.videoWidth;
+      let vh = videoEl.videoHeight;
+      const isUser = (currentFacingMode === "user");
+
+      const ctx = canvas.getContext("2d");
+
+      if (vw > vh) {
+        // 橫式：轉 90 度變成直式 (寬高對調)
+        canvas.width = vh;
+        canvas.height = vw;
+        ctx.save();
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.rotate(Math.PI / 2); // 旋轉 90 度
+        
+        if (isUser) {
+          // 自拍鏡頭若上下顛倒且橫式，需額外處理反轉
+          // 透過經驗測試，自拍橫式旋轉後常需要上下或左右反轉
+          ctx.scale(-1, -1);
+        }
+        
+        ctx.drawImage(videoEl, -vw / 2, -vh / 2, vw, vh);
+        ctx.restore();
+      } else {
+        // 直式：不用轉 90 度
+        canvas.width = vw;
+        canvas.height = vh;
+        ctx.save();
+        
+        if (isUser) {
+          // 自拍鏡頭上下顛倒修正：同時做水平與垂直鏡像翻轉，或上下顛倒翻轉
+          // 用戶提到「自拍的時候人上下顛倒」，代表原本上下顛倒了，因此需要垂直翻轉 (scale(1, -1) 或者是 translate/scale)
+          ctx.translate(0, canvas.height);
+          ctx.scale(1, -1);
+        }
+        
+        ctx.drawImage(videoEl, 0, 0, vw, vh);
+        ctx.restore();
+      }
+
+      const base64Data = canvas.toDataURL("image/jpeg", 0.5);
+      const target = activeCaptureTarget;
+
+      closeLiveCamera();
+
+      if (target === "cert") {
+        document.getElementById("cert-photo-placeholder").style.display = "none";
+        const cImg = document.getElementById("cert-img");
+        cImg.src = base64Data;
+        cImg.style.display = "block";
+        localStorage.setItem("cert_img_v3", base64Data);
+      } else {
+        if (completedMissionIds.has(target)) {
+          missionPhotos[target] = base64Data;
+          localStorage.setItem("mission_photos_v3", JSON.stringify(missionPhotos));
+          
+          postApi({
+            action: "SUBMIT_MISSION",
+            teamId: currentTeam.id,
+            badge: currentTeam.badge,
+            missionId: target,
+            answerText: "PHOTO_UPDATE",
+            photoBase64: base64Data,
+            deviceInfo: navigator.userAgent.substring(0, 50)
+          });
+        } else {
+          tempPhotos[target] = base64Data;
+        }
+        renderMissions();
+      }
+    }function skipMission(mId, mTitle) {
+      if (confirm(`確定要戰略放棄「${mTitle}」嗎？`)) {
+        skippedMissionIds.add(mId);
+        localStorage.setItem("skipped_missions_v3", JSON.stringify(Array.from(skippedMissionIds)));
+        renderMissions();
+      }
+    }
+
+    function resumeMission(mId) {
+      skippedMissionIds.delete(mId);
+      localStorage.setItem("skipped_missions_v3", JSON.stringify(Array.from(skippedMissionIds)));
+      renderMissions();
+    }
+
+    function showMyQrCode() {
+      if (!currentTeam.id) {
+        alert("請先完成小隊出發認證！");
+        return;
+      }
+      const modal = document.getElementById("qr-modal");
+      modal.style.display = "flex";
+      const dispEl = document.getElementById("qrcode-display");
+      dispEl.innerHTML = "";
+      document.getElementById("qr-team-summary").innerText = `${currentTeam.name} (${currentTeam.id}) ${currentTeam.badge}`;
+
+      const rawPayload = `${currentTeam.id}|${currentTeam.name}|${currentTeam.badge}`;
+      const qrText = `AGENT_AUTH:${encodeURIComponent(rawPayload)}`;
+
+      try {
+        new QRCode(dispEl, {
+          text: qrText, width: 188, height: 188,
+          colorDark: "#0f172a", colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      } catch (err) {
+        dispEl.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=188x188&data=${encodeURIComponent(qrText)}" alt="QR" style="width:188px;height:188px;">`;
+      }
+    }
+
+    function closeQrModal() {
+      document.getElementById("qr-modal").style.display = "none";
+    }
+
+    function startQrScanner(mId) {
+      const readerBox = document.getElementById("qr-reader-box");
+      readerBox.style.display = "block";
+      if (html5QrScanner) { try { html5QrScanner.stop(); } catch(e){} }
+
+      html5QrScanner = new Html5Qrcode("qr-reader");
+      html5QrScanner.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 220, height: 220 } },
+        (decodedText) => { handleQrScanSuccess(mId, decodedText); },
+        (error) => {}
+      ).catch(err => {
+        alert("❌ 無法啟動相機掃描！");
+        readerBox.style.display = "none";
+      });
+    }
+
+    function stopQrScanner() {
+      if (html5QrScanner) {
+        html5QrScanner.stop().then(() => {
+          document.getElementById("qr-reader-box").style.display = "none";
+        }).catch(() => { document.getElementById("qr-reader-box").style.display = "none"; });
+      } else {
+        document.getElementById("qr-reader-box").style.display = "none";
+      }
+    }
+
+    function handleQrScanSuccess(mId, decodedText) {
+      const text = (decodedText || "").trim();
+      if (!text.includes("AGENT_AUTH:")) {
+        alert("❌ 此非合法特務條碼！");
+        return;
+      }
+      const encodedContent = text.split("AGENT_AUTH:")[1];
+      const content = decodeURIComponent(encodedContent);
+      const parts = content.split("|");
+      const allyId = parts[0];
+      const allyName = parts[1] || "盟友小隊";
+      const allyBadge = parts[2] || "🤝";
+
+      if (allyId === currentTeam.id) {
+        alert("❌ 無法與自己小隊結盟！");
+        return;
+      }
+
+      stopQrScanner();
+      matchedCoopTeams[mId] = { id: allyId, name: allyName, badge: allyBadge };
+      localStorage.setItem("matched_coop_teams_v3", JSON.stringify(matchedCoopTeams));
+      alert(`🎉 成功與【${allyName} ${allyBadge}】建立特務連線！`);
+      renderMissions();
+    }
+
+    function submitCoopMission(mId, score) {
+      const matchedAlly = matchedCoopTeams[mId];
+      if (!matchedAlly) {
+        alert("❌ 請先完成特務 QR Code 掃描連線！");
+        return;
+      }
+      const photo = tempPhotos[mId];
+      if (!photo) {
+        alert("❌ 請務必選擇或拍攝合照證明！");
+        return;
+      }
+      completeMission(mId, score, `COOP_WITH:${matchedAlly.id}(${matchedAlly.name})`, photo);
+    }
+
+    function confirmPhotoUpload(mId, score) {
+      const base64 = tempPhotos[mId];
+      if (!base64) return;
+      completeMission(mId, score, "PHOTO_UPLOAD", base64);
+    }
+
+    function verifyCode(mId, correctPasscode, score) {
+      const inputEl = document.getElementById(`input-${mId}`);
+      const errBanner = document.getElementById(`err-${mId}`);
+      const val = inputEl.value.trim();
+
+      if (val.toLowerCase() === String(correctPasscode).toLowerCase() || correctPasscode === "") {
+        errBanner.style.display = "none";
+        completeMission(mId, score, val, "");
+      } else {
+        inputEl.classList.add("error");
+        errBanner.style.display = "block";
+        setTimeout(() => inputEl.classList.remove("error"), 400);
+      }
+    }
+
+    function completeMission(mId, score, ansText, photoBase64) {
+      const wasAllDoneBefore = (completedMissionIds.size === activeMissions.length);
+
+      completedMissionIds.add(mId);
+      skippedMissionIds.delete(mId);
+      currentScore += score;
+      if (photoBase64) missionPhotos[mId] = photoBase64;
+      delete tempPhotos[mId];
+
+      localStorage.setItem("completed_missions_v3", JSON.stringify(Array.from(completedMissionIds)));
+      localStorage.setItem("skipped_missions_v3", JSON.stringify(Array.from(skippedMissionIds)));
+      localStorage.setItem("current_score_v3", currentScore);
+      localStorage.setItem("mission_photos_v3", JSON.stringify(missionPhotos));
+
+      updateTeamHeader();
+      renderMissions();
+
+      postApi({
+        action: "SUBMIT_MISSION",
+        teamId: currentTeam.id,
+        badge: currentTeam.badge,
+        missionId: mId,
+        answerText: ansText,
+        photoBase64: photoBase64,
+        deviceInfo: navigator.userAgent.substring(0, 50)
+      });
+
+      if (!wasAllDoneBefore && completedMissionIds.size === activeMissions.length && activeMissions.length > 0) {
+        triggerGrandFinale();
+      }
+    }
+
+    function triggerGrandFinale() {
+      startConfetti();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      document.getElementById("all-done-banner").style.display = "block";
+      setTimeout(() => { openCertModal(); }, 2500);
+    }
+
+    function openCertModal() {
+      const totalCount = activeMissions.length;
+      const doneCount = completedMissionIds.size;
+      document.getElementById("cert-modal").style.display = "flex";
+      document.getElementById("cert-team-title").innerText = `${currentTeam.name} (${currentTeam.id})`;
+      document.getElementById("cert-score").innerText = currentScore;
+      document.getElementById("cert-tasks").innerText = `${doneCount} / ${totalCount}`;
+
+      if (startTime) {
+        const diffSec = Math.floor((new Date().getTime() - startTime) / 1000);
+        const mins = String(Math.floor(diffSec / 60)).padStart(2, '0');
+        const secs = String(diffSec % 60).padStart(2, '0');
+        document.getElementById("cert-duration").innerText = `${mins}分${secs}秒`;
+      }
+    }
+
+    function startConfetti() {
+      const canvas = document.getElementById("confetti-canvas");
+      const ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      canvas.style.display = "block";
+      const particles = [];
+      const colors = ["#f59e0b", "#10b981", "#3b82f6", "#ef4444", "#ec4899", "#8b5cf6"];
+
+      for (let i = 0; i < 120; i++) {
+        particles.push({
+          x: canvas.width / 2, y: canvas.height / 2,
+          r: Math.random() * 6 + 3,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          vx: (Math.random() - 0.5) * 16, vy: (Math.random() - 0.5) * 16 - 3,
+          gravity: 0.25, alpha: 1, decay: Math.random() * 0.015 + 0.008
+        });
+      }
+
+      function render() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let alive = false;
+        particles.forEach(p => {
+          p.x += p.vx; p.y += p.vy; p.vy += p.gravity; p.alpha -= p.decay;
+          if (p.alpha > 0) {
+            alive = true;
+            ctx.save(); ctx.globalAlpha = p.alpha; ctx.fillStyle = p.color;
+            ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+          }
+        });
+        if (alive) requestAnimationFrame(render);
+        else canvas.style.display = "none";
+      }
+      render();
+    }
+
+    function resetLocalProgress() {
+      if (confirm("⚠️ 確定要重置本機小隊的所有進度嗎？")) {
+        localStorage.clear();
+        location.reload();
+      }
+    }
+
+    async function setupWakeLock() {
+      try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch (err) {}
+    }
+
+    function setupVisibilityMonitor() {
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+          awayStartTime = new Date().getTime();
+          sendHeartbeat("away");
+        } else {
+          let awaySec = awayStartTime ? Math.round((new Date().getTime() - awayStartTime) / 1000) : 0;
+          awayStartTime = null;
+          setupWakeLock();
+          sendHeartbeat("resume", awaySec);
+        }
+      });
+    }
+
+    function sendHeartbeat(state, awaySec = 0) {
+      postApi({ action: "HEARTBEAT", teamId: currentTeam.id, state: state, awayDurationSec: awaySec });
+    }
+
+    function postApi(payload) {
+      if (!GAS_API_URL || GAS_API_URL.includes("在此貼上")) return;
+      fetch(GAS_API_URL, {
+        method: "POST", mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      }).catch(err => {});
+    }
+  </script>
+</body>
+</html>
