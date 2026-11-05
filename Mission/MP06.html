@@ -83,7 +83,6 @@
     .mission-title { font-size: 1.15rem; font-weight: 800; margin-bottom: 6px; color: #fff; }
     .mission-desc { font-size: 0.9rem; color: #cbd5e1; line-height: 1.45; margin-bottom: 14px; }
 
-    /* 保留原圖比例預覽容器 */
     .preview-box {
       width: 100%; background: #000;
       border-radius: 10px; overflow: hidden; border: 2px solid var(--accent);
@@ -548,7 +547,6 @@
         const savedThumb = missionPhotos[m.id];
         const tempThumb = tempPhotos[m.id];
 
-        // 題目上方參考圖維持原比例顯示
         const missionImageHtml = m.image 
           ? `<div style="margin: 8px 0 10px 0;"><img src="${m.image}" style="width: 100%; height: auto; border-radius: 8px; display: block;" alt="任務參考圖"></div>` 
           : '';
@@ -746,7 +744,6 @@
     }
 
     async function switchCameraFacing() {
-      // 點擊切換：後鏡頭 <-> 自拍鏡頭(前鏡頭)
       currentFacingMode = (currentFacingMode === "environment") ? "user" : "environment";
       await startCameraStream();
     }
@@ -764,55 +761,52 @@
       activeCaptureTarget = null;
     }
 
+    // 🏆 【已修正】完美適配手機直式/橫式與前後鏡頭的拍照與方向校正函式
     function captureLivePhoto() {
       const videoEl = document.getElementById("live-video-element");
       const canvas = document.getElementById("snapshot-canvas");
       
-      if (!videoEl.videoWidth) {
+      if (!videoEl.videoWidth || !videoEl.videoHeight) {
         alert("❌ 相機尚未準備好，請稍候再按快照！");
         return;
       }
 
-      let vw = videoEl.videoWidth;
-      let vh = videoEl.videoHeight;
+      const vw = videoEl.videoWidth;
+      const vh = videoEl.videoHeight;
       const isUser = (currentFacingMode === "user");
-
       const ctx = canvas.getContext("2d");
 
-      if (vw > vh) {
-        // 橫式：轉 90 度變成直式 (寬高對調)
+      // 檢查當前畫面是否為直式介面 (UI 呈現直式但影片串流常為橫式 1280x720)
+      const isPortraitUI = videoEl.clientHeight > videoEl.clientWidth;
+
+      if (isPortraitUI && vw > vh) {
+        // 需旋轉 90 度以適配直式螢幕
         canvas.width = vh;
         canvas.height = vw;
         ctx.save();
         ctx.translate(canvas.width / 2, canvas.height / 2);
-        ctx.rotate(Math.PI / 2); // 旋轉 90 度
+        ctx.rotate(Math.PI / 2);
         
         if (isUser) {
-          // 自拍鏡頭若上下顛倒且橫式，需額外處理反轉
-          // 透過經驗測試，自拍橫式旋轉後常需要上下或左右反轉
-          ctx.scale(-1, -1);
+          ctx.scale(-1, 1); // 前鏡頭水平鏡像翻轉
         }
-        
         ctx.drawImage(videoEl, -vw / 2, -vh / 2, vw, vh);
         ctx.restore();
       } else {
-        // 直式：不用轉 90 度
+        // 標準同向
         canvas.width = vw;
         canvas.height = vh;
         ctx.save();
         
         if (isUser) {
-          // 自拍鏡頭上下顛倒修正：同時做水平與垂直鏡像翻轉，或上下顛倒翻轉
-          // 用戶提到「自拍的時候人上下顛倒」，代表原本上下顛倒了，因此需要垂直翻轉 (scale(1, -1) 或者是 translate/scale)
-          ctx.translate(0, canvas.height);
-          ctx.scale(1, -1);
+          ctx.translate(canvas.width, 0);
+          ctx.scale(-1, 1); // 前鏡頭水平鏡像翻轉
         }
-        
         ctx.drawImage(videoEl, 0, 0, vw, vh);
         ctx.restore();
       }
 
-      const base64Data = canvas.toDataURL("image/jpeg", 0.5);
+      const base64Data = canvas.toDataURL("image/jpeg", 0.7);
       const target = activeCaptureTarget;
 
       closeLiveCamera();
@@ -842,7 +836,9 @@
         }
         renderMissions();
       }
-    }function skipMission(mId, mTitle) {
+    }
+
+    function skipMission(mId, mTitle) {
       if (confirm(`確定要戰略放棄「${mTitle}」嗎？`)) {
         skippedMissionIds.add(mId);
         localStorage.setItem("skipped_missions_v3", JSON.stringify(Array.from(skippedMissionIds)));
