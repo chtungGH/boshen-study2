@@ -132,18 +132,6 @@
       40%, 80% { transform: translateX(8px); }
     }
 
-    /* 處理中讀取遮罩樣式 */
-    .loading-overlay {
-      position: fixed; inset: 0; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(6px);
-      z-index: 3000; display: none; flex-direction: column; align-items: center; justify-content: center; color: #fff;
-    }
-    .spinner {
-      width: 48px; height: 48px; border: 4px solid var(--surface-light);
-      border-top: 4px solid var(--accent); border-radius: 50%;
-      animation: spin 0.8s linear infinite; margin-bottom: 14px;
-    }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
     .modal-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,0.88); backdrop-filter: blur(8px);
       z-index: 999; display: flex; align-items: center; justify-content: center; padding: 20px;
@@ -201,12 +189,6 @@
 <body>
 
   <canvas id="confetti-canvas"></canvas>
-
-  <!-- 處理中載入遮罩 -->
-  <div id="loading-overlay" class="loading-overlay">
-    <div class="spinner"></div>
-    <div style="font-weight: 800; font-size: 1.05rem;" id="loading-text">正在準備照片預覽...</div>
-  </div>
 
   <header>
     <div class="team-badge-wrap">
@@ -330,12 +312,8 @@
         </div>
       </div>
       
-      <!-- 結業證書拍照隱藏 input -->
       <input type="file" id="cert-file-input" accept="image/*" capture="environment" style="display: none;" onchange="handleCertFilePicked(event)">
       <button class="btn btn-primary" onclick="document.getElementById('cert-file-input').click()">📸 拍攝結業合影</button>
-      
-      <!-- 已移除列印/PDF功能按鈕 -->
-      
       <button class="btn btn-secondary" onclick="document.getElementById('cert-modal').style.display='none'" style="margin-top: 12px;">返回繼續挑戰</button>
     </div>
   </div>
@@ -437,10 +415,21 @@
               const opt = selectEl.querySelector(`option[value="${t.teamId}"]`);
               if (opt) {
                 opt.disabled = true;
-                opt.innerText += " (已被選取)";
+                if (!opt.innerText.includes("(已被選取)")) {
+                  opt.innerText += " (已被選取)";
+                }
               }
             }
           });
+          // 如果目前預設選中的選項剛好是被禁用的，自動往下切換到第一個可用的選項
+          if (selectEl.options[selectEl.selectedIndex].disabled) {
+            for (let i = 0; i < selectEl.options.length; i++) {
+              if (!selectEl.options[i].disabled) {
+                selectEl.selectedIndex = i;
+                break;
+              }
+            }
+          }
         }
       } catch (e) {}
     }
@@ -456,7 +445,16 @@
     }
 
     function submitRegistration() {
-      const teamId = document.getElementById("reg-team-id").value;
+      const selectEl = document.getElementById("reg-team-id");
+      const selectedOpt = selectEl.options[selectEl.selectedIndex];
+
+      // 【新增防護】嚴格檢查若選到已被選取/禁用的隊伍，直接阻擋送出
+      if (selectedOpt.disabled) {
+        alert("❌ 此小隊已經被其他組別選走了，請選擇其他尚未被選取的小隊！");
+        return;
+      }
+
+      const teamId = selectEl.value;
       const teamName = document.getElementById("reg-team-name").value.trim() || `${teamId}小隊`;
       const selectedBadgeEl = document.querySelector(".badge-opt.selected");
       const badge = selectedBadgeEl ? selectedBadgeEl.innerText : "🦅";
@@ -667,25 +665,17 @@
       }
     }
 
-    // ==================== 帶有「處理中」遮罩的圖片處理流程 ====================
     async function handleFilePicked(mId) {
       const fileInput = document.getElementById(`file-lib-${mId}`);
       if (!fileInput || !fileInput.files[0]) return;
       const file = fileInput.files[0];
 
-      // 顯示「處理中」載入遮罩
-      showLoading(true, "正在準備照片預覽...");
-
       try {
-        // 透過 setTimeout 讓畫面有時間渲染出 loading 遮罩再開始壓縮運算
-        await new Promise(resolve => setTimeout(resolve, 50));
         const base64Img = await compressOriginalImage(file, 800);
         tempPhotos[mId] = base64Img;
         renderMissions();
       } catch (err) {
         alert("❌ 圖片處理失敗，請重新拍攝！");
-      } finally {
-        showLoading(false);
       }
     }
 
@@ -693,10 +683,7 @@
       const file = e.target.files[0];
       if (!file) return;
 
-      showLoading(true, "正在處理結業合影...");
-
       try {
-        await new Promise(resolve => setTimeout(resolve, 50));
         const base64Img = await compressOriginalImage(file, 800);
         document.getElementById("cert-photo-placeholder").style.display = "none";
         const cImg = document.getElementById("cert-img");
@@ -705,16 +692,7 @@
         localStorage.setItem("cert_img_v3", base64Img);
       } catch (err) {
         alert("❌ 結業合影處理失敗！");
-      } finally {
-        showLoading(false);
       }
-    }
-
-    function showLoading(show, text = "處理中...") {
-      const overlay = document.getElementById("loading-overlay");
-      const textEl = document.getElementById("loading-text");
-      if (textEl) textEl.innerText = text;
-      overlay.style.display = show ? "flex" : "none";
     }
 
     async function compressOriginalImage(file, maxWidth = 800) {
@@ -993,7 +971,7 @@
       postApi({ action: "HEARTBEAT", teamId: currentTeam.id, state: state, awayDurationSec: awaySec });
     }
 
-    postApi = function(payload) {
+    function postApi(payload) {
       if (!GAS_API_URL || GAS_API_URL.includes("在此貼上")) return;
       fetch(GAS_API_URL, {
         method: "POST", mode: "no-cors",
