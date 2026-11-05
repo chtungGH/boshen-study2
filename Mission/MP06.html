@@ -761,7 +761,7 @@
       activeCaptureTarget = null;
     }
 
-    // 🏆 【已全面重構】完美校正行動裝置直式拿取與前後鏡頭方向的拍照函式
+    // 🏆 【已精準修正】直拍維持不變，橫拍自動旋轉配合直式網頁，自拍上下左右完美校正
     function captureLivePhoto() {
       const videoEl = document.getElementById("live-video-element");
       const canvas = document.getElementById("snapshot-canvas");
@@ -776,11 +776,9 @@
       const isUser = (currentFacingMode === "user");
       const ctx = canvas.getContext("2d");
 
-      // 強制依據視窗高度大於寬度判定為手機直式拿取模式
-      const isPortraitDevice = window.innerHeight > window.innerWidth;
-
-      if (isPortraitDevice && vw > vh) {
-        // 手機直拿，且鏡頭回傳橫向解析度 -> 旋轉 90 度轉正為直式照片
+      // 檢查是不是橫拍 (相機原始寬 > 高)
+      if (vw > vh) {
+        // 橫拍：將畫布高寬對調，並旋轉 90 度配合直式網頁
         canvas.width = vh;
         canvas.height = vw;
         ctx.save();
@@ -788,27 +786,27 @@
         ctx.rotate(Math.PI / 2);
         
         if (isUser) {
-          // 前鏡頭 (自拍)：旋轉後需做垂直或水平鏡像修正，確保上下左右正確
-          ctx.scale(-1, 1);
+          // 前鏡頭自拍橫拍時的上下與左右修正
+          ctx.scale(-1, -1);
         }
         ctx.drawImage(videoEl, -vw / 2, -vh / 2, vw, vh);
         ctx.restore();
       } else {
-        // 標準方向
+        // 直拍：相機本來就是直的，網頁也是直的，直接維持不用轉向
         canvas.width = vw;
         canvas.height = vh;
         ctx.save();
         
         if (isUser) {
-          // 前鏡頭 (自拍)：水平鏡像反轉
-          ctx.translate(canvas.width, 0);
-          ctx.scale(-1, 1);
+          // 前鏡頭自拍直拍時的上下顛倒修正與左右鏡像
+          ctx.translate(0, canvas.height);
+          ctx.scale(1, -1);
         }
         ctx.drawImage(videoEl, 0, 0, vw, vh);
         ctx.restore();
       }
 
-      const base64Data = canvas.toDataURL("image/jpeg", 0.7);
+      const base64Data = canvas.toDataURL("image/jpeg", 0.8);
       const target = activeCaptureTarget;
 
       closeLiveCamera();
