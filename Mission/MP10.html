@@ -262,16 +262,23 @@
     </button>
   </div>
 
-  <div class="modal-overlay" id="reg-modal" style="display: none;">
+<div class="modal-overlay" id="reg-modal" style="display: none;">
     <div class="modal-box">
       <div class="modal-title">🎖️ 特務小隊出發認證</div>
 
-      <!-- 活動安全與操作提醒告示 -->
+      <!-- 活動安全與操作提醒告示與勾選框 -->
       <div style="background: rgba(245, 158, 11, 0.15); border: 1px dashed var(--accent); border-radius: 10px; padding: 12px; margin-bottom: 14px; text-align: left; font-size: 0.82rem; color: #fef08a; line-height: 1.5;">
-        <div style="font-weight: 900; color: #f59e0b; margin-bottom: 4px; text-align: center;">⚠️ 特務行前重要叮嚀</div>
-        <div>1. 安全第一，任務蒐集不搶快，第一名完成沒有獎勵。</div>
-        <div>2. 拍照時按下快門，耐心等待預覽圖，切記切記，不要一直按。</div>
+        <div style="font-weight: 900; color: #f59e0b; margin-bottom: 4px; text-align: center;">⚠️ 特務行前安全守則</div>
+        <div>1. 安全第一，任務不搶快，第一名完成沒有獎勵！</div>
+        <div>2. 拍照按下快門，耐心等待預覽，切記不要一直按。</div>
         <div>3. 注意四周環境，注意自身安全。</div>
+        
+        <div style="margin-top: 10px; border-top: 1px dashed rgba(245, 158, 11, 0.4); padding-top: 8px; text-align: center;">
+          <label style="cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-weight: bold; color: #fff;">
+            <input type="checkbox" id="safety-check" onchange="toggleSubmitButton()" style="width: 16px; height: 16px; cursor: pointer;">
+            我已閱讀並同意以上安全與操作守則
+          </label>
+        </div>
       </div>
       
       <div class="form-group">
@@ -311,11 +318,29 @@
         </div>
       </div>
 
-      <button class="btn btn-primary" onclick="submitRegistration()" style="margin-top: 14px;">
+      <button class="btn btn-primary" id="submit-btn" onclick="submitRegistration()" style="margin-top: 14px; opacity: 0.5; cursor: not-allowed;" disabled>
         🚀 確認隊名，極速出發！
       </button>
     </div>
   </div>
+
+  <script>
+    // 控制安全守則勾選後才能點擊出發按鈕
+    function toggleSubmitButton() {
+      const checkbox = document.getElementById("safety-check");
+      const btn = document.getElementById("submit-btn");
+      
+      if (checkbox.checked) {
+        btn.disabled = false;
+        btn.style.opacity = "1";
+        btn.style.cursor = "pointer";
+      } else {
+        btn.disabled = true;
+        btn.style.opacity = "0.5";
+        btn.style.cursor = "not-allowed";
+      }
+    }
+  </script>
 
   <div class="modal-overlay" id="qr-modal" style="display: none;">
     <div class="modal-box">
