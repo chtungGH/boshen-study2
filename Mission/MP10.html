@@ -68,9 +68,9 @@
       border-bottom: 1px solid var(--surface-light);
       padding: 8px 12px;
       display: flex; gap: 6px; overflow-x: auto;
-      scrollbar-width: none; /* Firefox */
+      scrollbar-width: none;
     }
-    .mission-nav-bar::-webkit-scrollbar { display: none; /* Chrome/Safari */ }
+    .mission-nav-bar::-webkit-scrollbar { display: none; }
     .nav-pill {
       flex: 0 0 auto; background: var(--surface-light); color: var(--text-muted);
       font-size: 0.75rem; font-weight: 800; padding: 4px 10px; border-radius: 6px;
@@ -87,7 +87,7 @@
     .mission-card {
       background: var(--surface); border: 1px solid var(--surface-light);
       border-radius: 16px; padding: 18px; margin-bottom: 16px; position: relative;
-      scroll-margin-top: 130px; /* 確保點擊導覽列捲動時不會被上方sticky擋住 */
+      scroll-margin-top: 130px;
     }
     .mission-card.completed {
       border-color: #059669;
@@ -236,10 +236,7 @@
     <div id="disp-progress">進度: 0/0</div>
   </div>
 
-  <!-- 任務清單導覽列 (動態產生 01-20 小鈕) -->
-  <div class="mission-nav-bar" id="mission-nav-bar">
-    <!-- 動態填入 -->
-  </div>
+  <div class="mission-nav-bar" id="mission-nav-bar"></div>
 
   <div id="all-done-banner">
     <button class="btn btn-gold" onclick="openCertModal()" style="font-size: 1.05rem; padding: 14px;">
@@ -347,7 +344,6 @@
   </div>
 
   <script>
-    // ==================== 1. 請在此填入您的 GAS API 網址 ====================
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbz7HApic5eT96-aAZ2bT5ypvxM4sXgB-n4GCeUckO_-rX0gYKwL9J0Mb5TEuRTJzRJh/exec";
 
     let currentTeam = { id: "", name: "", badge: "🦅" };
@@ -527,7 +523,7 @@
         }
 
         activeMissions = data.missions;
-        renderMissionNavBar(); // 渲染導覽列
+        renderMissionNavBar();
         renderMissions();
       } catch (err) {
         console.error("載入題庫失敗:", err);
@@ -541,7 +537,6 @@
       }
     }
 
-    // 動態產生上方導覽列按鈕
     function renderMissionNavBar() {
       const navBarEl = document.getElementById("mission-nav-bar");
       navBarEl.innerHTML = "";
@@ -595,11 +590,14 @@
                 <div style="color: #34d399; font-weight: 800; font-size: 0.95rem;">✓ 本任務已圓滿通關 (+${m.score}分)</div>
                 ${savedThumb ? `<div class="preview-box" style="margin-top:8px;"><img src="${savedThumb}" id="thumb-${m.id}" alt="存證照片"></div>` : ''}
                 
-                <input type="file" id="file-retake-${m.id}" data-mid="${m.id}" accept="image/*" capture="environment" style="display: none;" onchange="handleRetakeFilePicked(event)">
+                <!-- 另選圖片：純相簿選圖 (無 capture) -->
+                <input type="file" id="file-lib-retake-${m.id}" data-mid="${m.id}" accept="image/*" style="display: none;" onchange="handleRetakeFilePicked(event)">
+                <!-- 重新拍照：呼叫相機 (帶 capture=environment) -->
+                <input type="file" id="file-cam-retake-${m.id}" data-mid="${m.id}" accept="image/*" capture="environment" style="display: none;" onchange="handleRetakeFilePicked(event)">
                 
                 <div class="btn-split-row" style="margin-top: 10px;">
-                  <button class="btn btn-secondary" onclick="document.getElementById('file-retake-${m.id}').click()">🖼️ 另選圖片</button>
-                  <button class="btn btn-primary" onclick="document.getElementById('file-retake-${m.id}').click()">📸 重新拍照</button>
+                  <button class="btn btn-secondary" onclick="document.getElementById('file-lib-retake-${m.id}').click()">🖼️ 另選圖片</button>
+                  <button class="btn btn-primary" onclick="document.getElementById('file-cam-retake-${m.id}').click()">📸 重新拍照</button>
                 </div>
               </div>`;
           }
@@ -622,7 +620,10 @@
           } else if (m.type === "PHOTO") {
             actionHtml = `
               <div class="action-box">
-                <input type="file" id="file-lib-${m.id}" data-mid="${m.id}" accept="image/*" capture="environment" style="display: none;" onchange="handleNewFilePicked(event)">
+                <!-- 另選圖片：純相簿選圖 (無 capture) -->
+                <input type="file" id="file-lib-${m.id}" data-mid="${m.id}" accept="image/*" style="display: none;" onchange="handleNewFilePicked(event)">
+                <!-- 現場拍照：呼叫相機 (帶 capture=environment) -->
+                <input type="file" id="file-cam-${m.id}" data-mid="${m.id}" accept="image/*" capture="environment" style="display: none;" onchange="handleNewFilePicked(event)">
                 
                 <div class="preview-box" id="prev-wrap-${m.id}" style="display: ${tempThumb ? 'flex' : 'none'};">
                   <img id="prev-img-${m.id}" src="${tempThumb || ''}">
@@ -630,7 +631,7 @@
 
                 <div class="btn-split-row" id="picker-btn-row-${m.id}" style="margin-bottom: ${tempThumb ? '8px' : '0'};">
                   <button class="btn btn-secondary" onclick="document.getElementById('file-lib-${m.id}').click()">🖼️ 相簿選圖</button>
-                  <button class="btn btn-primary" onclick="document.getElementById('file-lib-${m.id}').click()">📸 現場拍照</button>
+                  <button class="btn btn-primary" onclick="document.getElementById('file-cam-${m.id}').click()">📸 現場拍照</button>
                 </div>
 
                 ${tempThumb ? `
@@ -662,7 +663,10 @@
                   </div>
                 `}
 
-                <input type="file" id="file-lib-${m.id}" data-mid="${m.id}" accept="image/*" capture="environment" style="display: none;" onchange="handleNewFilePicked(event)">
+                <!-- 另選圖片：純相簿選圖 (無 capture) -->
+                <input type="file" id="file-lib-${m.id}" data-mid="${m.id}" accept="image/*" style="display: none;" onchange="handleNewFilePicked(event)">
+                <!-- 現場拍照：呼叫相機 (帶 capture=environment) -->
+                <input type="file" id="file-cam-${m.id}" data-mid="${m.id}" accept="image/*" capture="environment" style="display: none;" onchange="handleNewFilePicked(event)">
 
                 <div class="preview-box" id="prev-wrap-${m.id}" style="display: ${tempThumb ? 'flex' : 'none'};">
                   <img id="prev-img-${m.id}" src="${tempThumb || ''}">
@@ -670,7 +674,7 @@
 
                 <div class="btn-split-row" id="picker-btn-row-${m.id}" style="margin-bottom: 8px;">
                   <button class="btn btn-secondary" onclick="document.getElementById('file-lib-${m.id}').click()">🖼️ 相簿選圖</button>
-                  <button class="btn btn-secondary" onclick="document.getElementById('file-lib-${m.id}').click()">📸 拍8人合照</button>
+                  <button class="btn btn-primary" onclick="document.getElementById('file-cam-${m.id}').click()">📸 拍8人合照</button>
                 </div>
 
                 <button class="btn btn-primary" onclick="submitCoopMission('${m.id}', ${m.score})">
@@ -701,8 +705,6 @@
       });
 
       document.getElementById("disp-progress").innerText = `進度: ${doneCount}/${activeMissions.length}`;
-
-      // 同步更新導覽列狀態
       renderMissionNavBar();
 
       document.getElementById("cert-trigger-wrap").style.display = "block";
@@ -727,7 +729,7 @@
         tempPhotos[mId] = base64Img;
         renderMissions();
       } catch (err) {
-        alert("❌ 圖片處理失敗，請重新拍攝！");
+        alert("❌ 圖片處理失敗，請重新選擇！");
       }
     }
 
@@ -754,7 +756,7 @@
           deviceInfo: navigator.userAgent.substring(0, 50)
         });
       } catch (err) {
-        alert("❌ 照片更新失敗，請重新拍攝！");
+        alert("❌ 照片更新失敗，請重新選擇！");
       }
     }
 
