@@ -212,6 +212,19 @@
 
   <canvas id="confetti-canvas"></canvas>
 
+  <!-- 單項任務成功過關祝賀彈窗 -->
+  <div class="modal-overlay" id="mission-success-modal" style="display: none;">
+    <div class="modal-box" style="text-align: center; border: 2px solid var(--primary);">
+      <div style="font-size: 3.2rem; margin-bottom: 8px;">🎉</div>
+      <div class="modal-title" style="color: #34d399; margin-bottom: 8px;">恭喜過關啦！</div>
+      <div id="success-mission-title" style="font-size: 1.05rem; font-weight: 800; color: #fff; margin-bottom: 6px;">任務名稱</div>
+      <div id="success-mission-score" style="font-size: 0.9rem; color: var(--accent); font-weight: bold; margin-bottom: 20px;">獲得積分 +分數</div>
+      <button class="btn btn-primary" onclick="closeMissionSuccessModal()" style="font-size: 1rem; padding: 12px;">
+        🚀 太棒了，繼續迎戰下個任務！
+      </button>
+    </div>
+  </div>
+
   <header>
     <div class="team-badge-wrap">
       <div class="team-avatar" id="disp-badge">🦅</div>
@@ -269,8 +282,9 @@
         <div style="font-weight: 900; color: #f59e0b; margin-bottom: 4px; text-align: center;">⚠️ 特務行前安全守則</div>
         <div>1. 安全第一，任務不搶快，最先完成沒有獎勵！</div>
         <div>2. 拍照後，耐心等待3秒鐘預覽，別一直按。</div>
-        <div>3. 注意四周環境，注意自身及他人安全。</div>
-        <div>4. 無痕遊戲，只留足跡，不留垃圾。</div>
+        <div>3. 拍照或掃描時若跳出存取權限，請務必點選<b>「允許/同意」</b>，否則相機將無法開啟！</div>
+        <div>4. 注意四周環境，注意自身及他人安全。</div>
+        <div>5. 無痕遊戲，只留足跡，不留垃圾。</div>
         
         <div style="margin-top: 10px; border-top: 1px dashed rgba(245, 158, 11, 0.4); padding-top: 8px; text-align: center;">
           <label style="cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-weight: bold; color: #fff;">
@@ -673,7 +687,6 @@
               <div class="action-box">
                 <div class="error-msg-banner" id="err-${m.id}"></div>
                 
-                <!-- 動態 QR 讀取框，每個任務 ID 獨立 -->
                 <div id="qr-reader-box-${m.id}" style="display: none; width: 100%; border-radius: 12px; overflow: hidden; margin-bottom: 12px; background: #000;">
                   <div id="qr-reader-${m.id}" style="width: 100%;"></div>
                   <button class="btn btn-secondary" onclick="stopQrScanner('${m.id}')" style="margin-top: 6px;">關閉掃描鏡頭</button>
@@ -871,7 +884,6 @@
     }
 
     function startQrScanner(mId) {
-      // 隱藏其他可能還開著的掃描盒
       document.querySelectorAll('[id^="qr-reader-box-"]').forEach(el => el.style.display = 'none');
       
       const readerBox = document.getElementById(`qr-reader-box-${mId}`);
@@ -985,7 +997,14 @@
       localStorage.setItem("mission_photos_v3", JSON.stringify(missionPhotos));
 
       updateTeamHeader();
-      renderMissions();
+      
+      // 找到當前完成的任務標題與類型，準備跳出恭喜過關對話窗
+      const targetMission = activeMissions.find(m => m.id === mId);
+      const missionTitleText = targetMission ? targetMission.title : "指定任務";
+      
+      document.getElementById("success-mission-title").innerText = `🎯 ${missionTitleText}`;
+      document.getElementById("success-mission-score").innerText = `獲得任務積分：+${score} 分`;
+      document.getElementById("mission-success-modal").style.display = "flex";
 
       postApi({
         action: "SUBMIT_MISSION",
@@ -998,6 +1017,17 @@
       });
 
       if (!wasAllDoneBefore && completedMissionIds.size === activeMissions.length && activeMissions.length > 0) {
+        // 全滿貫通關延遲一點點觸發，讓單關成功彈窗先按掉
+        window._pendingGrandFinale = true;
+      }
+    }
+
+    function closeMissionSuccessModal() {
+      document.getElementById("mission-success-modal").style.display = "none";
+      renderMissions(); // 關閉彈窗後才更新畫面（導覽列變色、卡片狀態切換）
+
+      if (window._pendingGrandFinale) {
+        window._pendingGrandFinale = false;
         triggerGrandFinale();
       }
     }
