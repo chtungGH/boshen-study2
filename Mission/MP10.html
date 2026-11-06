@@ -181,7 +181,6 @@
       width: 220px; height: 220px; min-height: 220px;
     }
     #qrcode-display img, #qrcode-display canvas { display: block; margin: 0 auto; max-width: 100%; max-height: 100%; }
-    #qr-reader-box { width: 100%; border-radius: 12px; overflow: hidden; margin-bottom: 12px; display: none; background: #000; }
 
     .coop-matched-box {
       background: rgba(16, 185, 129, 0.15); border: 2px solid var(--primary);
@@ -262,11 +261,10 @@
     </button>
   </div>
 
-<div class="modal-overlay" id="reg-modal" style="display: none;">
+  <div class="modal-overlay" id="reg-modal" style="display: none;">
     <div class="modal-box">
       <div class="modal-title">🎖️ 特務小隊出發認證</div>
 
-      <!-- 活動安全與操作提醒告示與勾選框 -->
       <div style="background: rgba(245, 158, 11, 0.15); border: 1px dashed var(--accent); border-radius: 10px; padding: 12px; margin-bottom: 14px; text-align: left; font-size: 0.82rem; color: #fef08a; line-height: 1.5;">
         <div style="font-weight: 900; color: #f59e0b; margin-bottom: 4px; text-align: center;">⚠️ 特務行前安全守則</div>
         <div>1. 安全第一，任務不搶快，第一名完成沒有獎勵！</div>
@@ -325,11 +323,9 @@
   </div>
 
   <script>
-    // 控制安全守則勾選後才能點擊出發按鈕
     function toggleSubmitButton() {
       const checkbox = document.getElementById("safety-check");
       const btn = document.getElementById("submit-btn");
-      
       if (checkbox.checked) {
         btn.disabled = false;
         btn.style.opacity = "1";
@@ -623,9 +619,7 @@
                 <div style="color: #34d399; font-weight: 800; font-size: 0.95rem;">✓ 本任務已圓滿通關 (+${m.score}分)</div>
                 ${savedThumb ? `<div class="preview-box" style="margin-top:8px;"><img src="${savedThumb}" id="thumb-${m.id}" alt="存證照片"></div>` : ''}
                 
-                <!-- 另選圖片：純相簿選圖 (無 capture) -->
                 <input type="file" id="file-lib-retake-${m.id}" data-mid="${m.id}" accept="image/*" style="display: none;" onchange="handleRetakeFilePicked(event)">
-                <!-- 重新拍照：呼叫相機 (帶 capture=environment) -->
                 <input type="file" id="file-cam-retake-${m.id}" data-mid="${m.id}" accept="image/*" capture="environment" style="display: none;" onchange="handleRetakeFilePicked(event)">
                 
                 <div class="btn-split-row" style="margin-top: 10px;">
@@ -653,9 +647,7 @@
           } else if (m.type === "PHOTO") {
             actionHtml = `
               <div class="action-box">
-                <!-- 另選圖片：純相簿選圖 (無 capture) -->
                 <input type="file" id="file-lib-${m.id}" data-mid="${m.id}" accept="image/*" style="display: none;" onchange="handleNewFilePicked(event)">
-                <!-- 現場拍照：呼叫相機 (帶 capture=environment) -->
                 <input type="file" id="file-cam-${m.id}" data-mid="${m.id}" accept="image/*" capture="environment" style="display: none;" onchange="handleNewFilePicked(event)">
                 
                 <div class="preview-box" id="prev-wrap-${m.id}" style="display: ${tempThumb ? 'flex' : 'none'};">
@@ -680,9 +672,10 @@
               <div class="action-box">
                 <div class="error-msg-banner" id="err-${m.id}"></div>
                 
-                <div id="qr-reader-box">
-                  <div id="qr-reader" style="width: 100%;"></div>
-                  <button class="btn btn-secondary" onclick="stopQrScanner()" style="margin-top: 6px;">關閉掃描鏡頭</button>
+                <!-- 動態 QR 讀取框，每個任務 ID 獨立 -->
+                <div id="qr-reader-box-${m.id}" style="display: none; width: 100%; border-radius: 12px; overflow: hidden; margin-bottom: 12px; background: #000;">
+                  <div id="qr-reader-${m.id}" style="width: 100%;"></div>
+                  <button class="btn btn-secondary" onclick="stopQrScanner('${m.id}')" style="margin-top: 6px;">關閉掃描鏡頭</button>
                 </div>
 
                 ${matchedAlly ? `
@@ -696,9 +689,7 @@
                   </div>
                 `}
 
-                <!-- 另選圖片：純相簿選圖 (無 capture) -->
                 <input type="file" id="file-lib-${m.id}" data-mid="${m.id}" accept="image/*" style="display: none;" onchange="handleNewFilePicked(event)">
-                <!-- 現場拍照：呼叫相機 (帶 capture=environment) -->
                 <input type="file" id="file-cam-${m.id}" data-mid="${m.id}" accept="image/*" capture="environment" style="display: none;" onchange="handleNewFilePicked(event)">
 
                 <div class="preview-box" id="prev-wrap-${m.id}" style="display: ${tempThumb ? 'flex' : 'none'};">
@@ -879,11 +870,19 @@
     }
 
     function startQrScanner(mId) {
-      const readerBox = document.getElementById("qr-reader-box");
-      readerBox.style.display = "block";
-      if (html5QrScanner) { try { html5QrScanner.stop(); } catch(e){} }
+      // 隱藏其他可能還開著的掃描盒
+      document.querySelectorAll('[id^="qr-reader-box-"]').forEach(el => el.style.display = 'none');
+      
+      const readerBox = document.getElementById(`qr-reader-box-${mId}`);
+      if (readerBox) readerBox.style.display = "block";
 
-      html5QrScanner = new Html5Qrcode("qr-reader");
+      if (html5QrScanner) { 
+        try { 
+          html5QrScanner.stop().catch(() => {}); 
+        } catch(e) {} 
+      }
+
+      html5QrScanner = new Html5Qrcode(`qr-reader-${mId}`);
       html5QrScanner.start(
         { facingMode: "environment" },
         { fps: 10, qrbox: { width: 220, height: 220 } },
@@ -891,17 +890,22 @@
         (error) => {}
       ).catch(err => {
         alert("❌ 無法啟動相機掃描！");
-        readerBox.style.display = "none";
+        if (readerBox) readerBox.style.display = "none";
       });
     }
 
-    function stopQrScanner() {
+    function stopQrScanner(mId) {
       if (html5QrScanner) {
         html5QrScanner.stop().then(() => {
-          document.getElementById("qr-reader-box").style.display = "none";
-        }).catch(() => { document.getElementById("qr-reader-box").style.display = "none"; });
+          const readerBox = document.getElementById(`qr-reader-box-${mId}`);
+          if (readerBox) readerBox.style.display = "none";
+        }).catch(() => {
+          const readerBox = document.getElementById(`qr-reader-box-${mId}`);
+          if (readerBox) readerBox.style.display = "none";
+        });
       } else {
-        document.getElementById("qr-reader-box").style.display = "none";
+        const readerBox = document.getElementById(`qr-reader-box-${mId}`);
+        if (readerBox) readerBox.style.display = "none";
       }
     }
 
@@ -923,7 +927,7 @@
         return;
       }
 
-      stopQrScanner();
+      stopQrScanner(mId);
       matchedCoopTeams[mId] = { id: allyId, name: allyName, badge: allyBadge };
       localStorage.setItem("matched_coop_teams_v3", JSON.stringify(matchedCoopTeams));
       alert(`🎉 成功與【${allyName} ${allyBadge}】建立特務連線！`);
