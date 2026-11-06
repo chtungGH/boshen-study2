@@ -267,9 +267,10 @@
 
       <div style="background: rgba(245, 158, 11, 0.15); border: 1px dashed var(--accent); border-radius: 10px; padding: 12px; margin-bottom: 14px; text-align: left; font-size: 0.82rem; color: #fef08a; line-height: 1.5;">
         <div style="font-weight: 900; color: #f59e0b; margin-bottom: 4px; text-align: center;">⚠️ 特務行前安全守則</div>
-        <div>1. 安全第一，任務不搶快，第一名完成沒有獎勵！</div>
-        <div>2. 拍照按下快門，耐心等待預覽，切記不要一直按。</div>
-        <div>3. 注意四周環境，注意自身安全。</div>
+        <div>1. 安全第一，任務不搶快，最先完成沒有獎勵！</div>
+        <div>2. 拍照後，耐心等待3秒鐘預覽，別一直按。</div>
+        <div>3. 注意四周環境，注意自身及他人安全。</div>
+        <div>4. 無痕遊戲，只留足跡，不留垃圾。</div>
         
         <div style="margin-top: 10px; border-top: 1px dashed rgba(245, 158, 11, 0.4); padding-top: 8px; text-align: center;">
           <label style="cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-weight: bold; color: #fff;">
@@ -353,7 +354,7 @@
       <div class="cert-card" id="cert-area">
         <div style="font-size: 2.6rem;" id="cert-badge">🏆</div>
         <h2 style="color: var(--accent); margin: 8px 0; font-size: 1.3rem;" id="cert-title-text">特務榮譽結業證書</h2>
-        <div style="font-size: 1.15rem; font-weight: bold; color: #fff;" id="cert-team-title">音速狂狼隊</div>
+        <div style="font-size: 1.15rem; font-weight: bold; color: #fff;" id="cert-team-title">512貓頭鷹隊</div>
         <p style="font-size: 0.85rem; color: #cbd5e1; margin: 6px 0 10px 0; line-height: 1.4;" id="cert-cheer-text">在 512 戶外特務大作戰中全力以赴！</p>
         <div class="cert-photo-wrap">
           <span style="color: #64748b; font-size: 0.85rem;" id="cert-photo-placeholder">點擊下方按鈕拍攝結業合影</span>
@@ -508,7 +509,7 @@
       const teamId = selectEl.value;
       const teamName = document.getElementById("reg-team-name").value.trim() || `${teamId}小隊`;
       const selectedBadgeEl = document.querySelector(".badge-opt.selected");
-      const badge = selectedBadgeEl ? selectedBadgeEl.innerText : "🦅";
+      const badge = selectedBadgeEl ? selectedBadgeEl.innerText : "🦉";
 
       currentTeam = { id: teamId, name: teamName, badge: badge };
       localStorage.setItem("team_profile_v3", JSON.stringify(currentTeam));
