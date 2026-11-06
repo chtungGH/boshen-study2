@@ -60,11 +60,34 @@
     }
     .timer-badge { font-weight: 800; color: #fef08a; letter-spacing: 0.5px; }
 
+    /* 任務導覽列樣式 */
+    .mission-nav-bar {
+      position: sticky; top: 64px; z-index: 95;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--surface-light);
+      padding: 8px 12px;
+      display: flex; gap: 6px; overflow-x: auto;
+      scrollbar-width: none; /* Firefox */
+    }
+    .mission-nav-bar::-webkit-scrollbar { display: none; /* Chrome/Safari */ }
+    .nav-pill {
+      flex: 0 0 auto; background: var(--surface-light); color: var(--text-muted);
+      font-size: 0.75rem; font-weight: 800; padding: 4px 10px; border-radius: 6px;
+      cursor: pointer; border: 1px solid transparent; transition: all 0.2s;
+    }
+    .nav-pill.completed {
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+      border-color: var(--primary);
+    }
+
     .container { max-width: 500px; margin: 0 auto; padding: 16px; }
 
     .mission-card {
       background: var(--surface); border: 1px solid var(--surface-light);
       border-radius: 16px; padding: 18px; margin-bottom: 16px; position: relative;
+      scroll-margin-top: 130px; /* 確保點擊導覽列捲動時不會被上方sticky擋住 */
     }
     .mission-card.completed {
       border-color: #059669;
@@ -182,7 +205,7 @@
     }
     #all-done-banner {
       display: none; padding: 14px 16px; background: linear-gradient(90deg, #064e3b, #0f766e);
-      border-bottom: 3px solid #34d399; text-align: center; position: sticky; top: 68px; z-index: 90;
+      border-bottom: 3px solid #34d399; text-align: center; position: sticky; top: 112px; z-index: 90;
     }
   </style>
 </head>
@@ -211,6 +234,11 @@
   <div class="radar-bar">
     <div class="timer-badge" id="disp-timer">⏱️ 任務耗時: 00:00:00</div>
     <div id="disp-progress">進度: 0/0</div>
+  </div>
+
+  <!-- 任務清單導覽列 (動態產生 01-20 小鈕) -->
+  <div class="mission-nav-bar" id="mission-nav-bar">
+    <!-- 動態填入 -->
   </div>
 
   <div id="all-done-banner">
@@ -499,6 +527,7 @@
         }
 
         activeMissions = data.missions;
+        renderMissionNavBar(); // 渲染導覽列
         renderMissions();
       } catch (err) {
         console.error("載入題庫失敗:", err);
@@ -510,6 +539,26 @@
           </div>
         `;
       }
+    }
+
+    // 動態產生上方導覽列按鈕
+    function renderMissionNavBar() {
+      const navBarEl = document.getElementById("mission-nav-bar");
+      navBarEl.innerHTML = "";
+
+      activeMissions.forEach((m, idx) => {
+        const isDone = completedMissionIds.has(m.id);
+        const pill = document.createElement("div");
+        pill.className = `nav-pill ${isDone ? "completed" : ""}`;
+        pill.innerText = `任務 ${idx + 1}`;
+        pill.onclick = () => {
+          const cardEl = document.getElementById(`card-${m.id}`);
+          if (cardEl) {
+            cardEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        };
+        navBarEl.appendChild(pill);
+      });
     }
 
     function renderMissions() {
@@ -652,6 +701,9 @@
       });
 
       document.getElementById("disp-progress").innerText = `進度: ${doneCount}/${activeMissions.length}`;
+
+      // 同步更新導覽列狀態
+      renderMissionNavBar();
 
       document.getElementById("cert-trigger-wrap").style.display = "block";
       document.getElementById("reset-trigger-wrap").style.display = "block";
