@@ -657,7 +657,6 @@
                 <button class="btn btn-primary" onclick="verifyCode('${m.id}', '${m.passcode}', ${m.score})">🔓 驗證暗號</button>
               </div>`;
           } else if (m.type === "INPUT_TEXT") {
-            // 只要有輸入任何文字/內容就成功
             actionHtml = `
               <div class="action-box">
                 <div class="error-msg-banner" id="err-${m.id}">❌ 請至少輸入文字或通關內容才能送出！</div>
@@ -665,12 +664,13 @@
                 <button class="btn btn-primary" onclick="verifyInputText('${m.id}', ${m.score})">✅ 提交通關</button>
               </div>`;
           } else if (m.type === "INPUT_NUMBER") {
-            // 依照輸入的數值作為得分（例如輸入得分 300）
+            // 動態計分型：需要輸入關主解鎖密碼與獲得分數
             actionHtml = `
               <div class="action-box">
-                <div class="error-msg-banner" id="err-${m.id}">❌ 請輸入有效數字分數！</div>
-                <input type="number" class="input-code" id="input-${m.id}" placeholder="請輸入獲得的分數 (例如: 200)">
-                <button class="btn btn-gold" onclick="verifyInputNumber('${m.id}')">🎯 確認輸入並計分</button>
+                <div class="error-msg-banner" id="err-${m.id}">❌ 關主密碼錯誤或分數格式不正確！</div>
+                <input type="number" class="input-code" id="score-input-${m.id}" placeholder="請輸入本項獲得分數 (例如: 200)" style="margin-bottom: 6px;">
+                <input type="text" class="input-code" id="pass-input-${m.id}" placeholder="請輸入關主解鎖密碼" style="margin-bottom: 8px;">
+                <button class="btn btn-gold" onclick="verifyInputNumber('${m.id}', '${m.passcode || ""}')">🎯 驗證關主密碼並計分</button>
               </div>`;
           } else if (m.type === "PHOTO") {
             actionHtml = `
@@ -735,7 +735,7 @@
           }
         }
 
-        const scoreTagText = m.type === "INPUT_NUMBER" ? `自訂得分` : `+${m.score} 分`;
+        const scoreTagText = m.type === "INPUT_NUMBER" ? `關主計分` : `+${m.score} 分`;
         const skipBtnHtml = (!isDone && !isSkipped) 
           ? `<button class="skip-btn-text" onclick="skipMission('${m.id}', '${m.title}')">🏳️ 放棄此題</button>` 
           : '';
@@ -996,7 +996,6 @@
       }
     }
 
-    // 機制一：只要有輸入文字/內容就成功（固定給定分數）
     function verifyInputText(mId, score) {
       const inputEl = document.getElementById(`input-${mId}`);
       const errBanner = document.getElementById(`err-${mId}`);
@@ -1012,19 +1011,28 @@
       }
     }
 
-    // 機制二：依照輸入的數值動態決定得分（例如輸入 200，就得 200 分）
-    function verifyInputNumber(mId) {
-      const inputEl = document.getElementById(`input-${mId}`);
+    // 動態計分型：必須同時核對分數與關主密碼 (passcode)
+    function verifyInputNumber(mId, correctPasscode) {
+      const scoreInputEl = document.getElementById(`score-input-${mId}`);
+      const passInputEl = document.getElementById(`pass-input-${mId}`);
       const errBanner = document.getElementById(`err-${mId}`);
-      const val = Number(inputEl.value);
+      
+      const scoreVal = Number(scoreInputEl.value);
+      const passVal = passInputEl.value.trim();
 
-      if (!isNaN(val) && inputEl.value.trim() !== "") {
+      const isPasscodeValid = (correctPasscode === "" || passVal.toLowerCase() === String(correctPasscode).toLowerCase());
+
+      if (!isNaN(scoreVal) && scoreInputEl.value.trim() !== "" && isPasscodeValid) {
         errBanner.style.display = "none";
-        completeMission(mId, val, `SCORE_INPUT:${val}`, "");
+        completeMission(mId, scoreVal, `SCORE_INPUT:${scoreVal}`, "");
       } else {
-        inputEl.classList.add("error");
+        scoreInputEl.classList.add("error");
+        passInputEl.classList.add("error");
         errBanner.style.display = "block";
-        setTimeout(() => inputEl.classList.remove("error"), 400);
+        setTimeout(() => {
+          scoreInputEl.classList.remove("error");
+          passInputEl.classList.remove("error");
+        }, 400);
       }
     }
 
@@ -1034,7 +1042,6 @@
       completedMissionIds.add(mId);
       skippedMissionIds.delete(mId);
       
-      // 記錄該任務獲得的自訂分數
       const targetMission = activeMissions.find(m => m.id === mId);
       if (targetMission) {
         targetMission.earnedScore = score;
