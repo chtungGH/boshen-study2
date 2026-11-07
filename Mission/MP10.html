@@ -60,7 +60,6 @@
     }
     .timer-badge { font-weight: 800; color: #fef08a; letter-spacing: 0.5px; }
 
-    /* 任務導覽列樣式 */
     .mission-nav-bar {
       position: sticky; top: 64px; z-index: 95;
       background: rgba(15, 23, 42, 0.95);
@@ -141,7 +140,7 @@
     .input-code {
       width: 100%; padding: 12px; border-radius: 8px; border: 2px solid var(--surface-light);
       background: #0f172a; color: #fff; font-size: 1.15rem; text-align: center;
-      margin-bottom: 8px; letter-spacing: 2px;
+      margin-bottom: 8px; letter-spacing: 1px;
     }
     .input-code.error { border-color: var(--danger) !important; animation: shake 0.3s ease-in-out; }
     .error-msg-banner {
@@ -212,7 +211,6 @@
 
   <canvas id="confetti-canvas"></canvas>
 
-  <!-- 單項任務成功過關祝賀彈窗 -->
   <div class="modal-overlay" id="mission-success-modal" style="display: none;">
     <div class="modal-box" style="text-align: center; border: 2px solid var(--primary);">
       <div style="font-size: 3.2rem; margin-bottom: 8px;">🎉</div>
@@ -281,8 +279,8 @@
       <div style="background: rgba(245, 158, 11, 0.15); border: 1px dashed var(--accent); border-radius: 10px; padding: 12px; margin-bottom: 14px; text-align: left; font-size: 0.82rem; color: #fef08a; line-height: 1.5;">
         <div style="font-weight: 900; color: #f59e0b; margin-bottom: 4px; text-align: center;">⚠️ 特務行前安全守則</div>
         <div>1. 安全第一，任務不搶快，最先完成沒有獎勵！</div>
-        <div>2. 拍照後，耐心等待3秒鐘預覽，別一直按。</div>
-        <div>3. 拍照或掃描時若跳出存取權限，請務必點選<b>「允許/同意」</b>，否則相機將無法開啟！</div>
+        <div>2. 拍照或掃描時若跳出存取權限，請務必點選<b>「允許/同意」</b>，否則相機將無法開啟！</div>
+        <div>3. 拍照後請靜待三秒，圖片轉換為低畫素，不要一直按快門</div>
         <div>4. 注意四周環境，注意自身及他人安全。</div>
         <div>5. 無痕遊戲，只留足跡，不留垃圾。</div>
         
@@ -312,7 +310,7 @@
 
       <div class="form-group">
         <label class="form-label">小隊自訂名稱</label>
-        <input type="text" class="form-input" id="reg-team-name" placeholder="例如：音速狂狼隊" maxlength="8">
+        <input type="text" class="form-input" id="reg-team-name" placeholder="例如：512貓頭鷹隊" maxlength="8">
       </div>
 
       <div class="form-group">
@@ -388,7 +386,7 @@
   </div>
 
   <script>
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbz7HApic5eT96-aAZ2bT5ypvxM4sXgB-n4GCeUckO_-rX0gYKwL9J0Mb5TEuRTJzRJh/exec";
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxWggTgEk5n7NLE9oyIOM6PNZ3ULqESMZzf4fiz73ewrmsCg0XY1Q1k8yMgoxRYyeTHow/exec";
 
     let currentTeam = { id: "", name: "", badge: "🦅" };
     let activeMissions = [];
@@ -623,10 +621,10 @@
           : '';
 
         if (isDone) {
-          if (m.type === "CODE") {
+          if (m.type === "CODE" || m.type === "INPUT_TEXT" || m.type === "INPUT_NUMBER") {
             actionHtml = `
               <div class="completed-proof-box">
-                <div style="color: #34d399; font-weight: 800; font-size: 0.95rem;">✓ 本解謎任務已圓滿通關 (+${m.score}分)</div>
+                <div style="color: #34d399; font-weight: 800; font-size: 0.95rem;">✓ 本任務已圓滿通關 (+${m.earnedScore || m.score || 0}分)</div>
               </div>`;
           } else {
             actionHtml = `
@@ -658,6 +656,22 @@
                 <div class="error-msg-banner" id="err-${m.id}">❌ 暗號不正確，再仔細確認一次現場線索！</div>
                 <input type="text" class="input-code" id="input-${m.id}" placeholder="請輸入現場解鎖密碼">
                 <button class="btn btn-primary" onclick="verifyCode('${m.id}', '${m.passcode}', ${m.score})">🔓 驗證暗號</button>
+              </div>`;
+          } else if (m.type === "INPUT_TEXT") {
+            actionHtml = `
+              <div class="action-box">
+                <div class="error-msg-banner" id="err-${m.id}">❌ 請至少輸入文字或通關內容才能送出！</div>
+                <input type="text" class="input-code" id="input-${m.id}" placeholder="請輸入通關紀錄或心得">
+                <button class="btn btn-primary" onclick="verifyInputText('${m.id}', ${m.score})">✅ 提交通關</button>
+              </div>`;
+          } else if (m.type === "INPUT_NUMBER") {
+            // 動態計分型：需要輸入關主解鎖密碼與獲得分數
+            actionHtml = `
+              <div class="action-box">
+                <div class="error-msg-banner" id="err-${m.id}">❌ 關主密碼錯誤或分數格式不正確！</div>
+                <input type="number" class="input-code" id="score-input-${m.id}" placeholder="請輸入本項獲得分數 (例如: 200)" style="margin-bottom: 6px;">
+                <input type="text" class="input-code" id="pass-input-${m.id}" placeholder="請輸入關主解鎖密碼" style="margin-bottom: 8px;">
+                <button class="btn btn-gold" onclick="verifyInputNumber('${m.id}', '${m.passcode || ""}')">🎯 驗證關主密碼並計分</button>
               </div>`;
           } else if (m.type === "PHOTO") {
             actionHtml = `
@@ -722,6 +736,7 @@
           }
         }
 
+        const scoreTagText = m.type === "INPUT_NUMBER" ? `關主計分` : `+${m.score} 分`;
         const skipBtnHtml = (!isDone && !isSkipped) 
           ? `<button class="skip-btn-text" onclick="skipMission('${m.id}', '${m.title}')">🏳️ 放棄此題</button>` 
           : '';
@@ -730,7 +745,7 @@
           <div class="card-top">
             <div class="tag-group">
               <span class="category-tag">${m.category}</span>
-              <span class="score-tag">+${m.score} 分</span>
+              <span class="score-tag">${scoreTagText}</span>
             </div>
             ${skipBtnHtml}
           </div>
@@ -982,11 +997,57 @@
       }
     }
 
+    function verifyInputText(mId, score) {
+      const inputEl = document.getElementById(`input-${mId}`);
+      const errBanner = document.getElementById(`err-${mId}`);
+      const val = inputEl.value.trim();
+
+      if (val.length > 0) {
+        errBanner.style.display = "none";
+        completeMission(mId, score, `TEXT:${val}`, "");
+      } else {
+        inputEl.classList.add("error");
+        errBanner.style.display = "block";
+        setTimeout(() => inputEl.classList.remove("error"), 400);
+      }
+    }
+
+    // 動態計分型：必須同時核對分數與關主密碼 (passcode)
+    function verifyInputNumber(mId, correctPasscode) {
+      const scoreInputEl = document.getElementById(`score-input-${mId}`);
+      const passInputEl = document.getElementById(`pass-input-${mId}`);
+      const errBanner = document.getElementById(`err-${mId}`);
+      
+      const scoreVal = Number(scoreInputEl.value);
+      const passVal = passInputEl.value.trim();
+
+      const isPasscodeValid = (correctPasscode === "" || passVal.toLowerCase() === String(correctPasscode).toLowerCase());
+
+      if (!isNaN(scoreVal) && scoreInputEl.value.trim() !== "" && isPasscodeValid) {
+        errBanner.style.display = "none";
+        completeMission(mId, scoreVal, `SCORE_INPUT:${scoreVal}`, "");
+      } else {
+        scoreInputEl.classList.add("error");
+        passInputEl.classList.add("error");
+        errBanner.style.display = "block";
+        setTimeout(() => {
+          scoreInputEl.classList.remove("error");
+          passInputEl.classList.remove("error");
+        }, 400);
+      }
+    }
+
     function completeMission(mId, score, ansText, photoBase64) {
       const wasAllDoneBefore = (completedMissionIds.size === activeMissions.length);
 
       completedMissionIds.add(mId);
       skippedMissionIds.delete(mId);
+      
+      const targetMission = activeMissions.find(m => m.id === mId);
+      if (targetMission) {
+        targetMission.earnedScore = score;
+      }
+      
       currentScore += score;
       if (photoBase64) missionPhotos[mId] = photoBase64;
       delete tempPhotos[mId];
@@ -998,8 +1059,6 @@
 
       updateTeamHeader();
       
-      // 找到當前完成的任務標題與類型，準備跳出恭喜過關對話窗
-      const targetMission = activeMissions.find(m => m.id === mId);
       const missionTitleText = targetMission ? targetMission.title : "指定任務";
       
       document.getElementById("success-mission-title").innerText = `🎯 ${missionTitleText}`;
@@ -1017,14 +1076,13 @@
       });
 
       if (!wasAllDoneBefore && completedMissionIds.size === activeMissions.length && activeMissions.length > 0) {
-        // 全滿貫通關延遲一點點觸發，讓單關成功彈窗先按掉
         window._pendingGrandFinale = true;
       }
     }
 
     function closeMissionSuccessModal() {
       document.getElementById("mission-success-modal").style.display = "none";
-      renderMissions(); // 關閉彈窗後才更新畫面（導覽列變色、卡片狀態切換）
+      renderMissions();
 
       if (window._pendingGrandFinale) {
         window._pendingGrandFinale = false;
