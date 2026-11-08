@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>豪華賓果抽獎系統 - Bingo Grand Lucky Drawer</title>
+  <title>Bryson家豪華賓果抽獎系統 - Bingo Grand Lucky Drawer</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -222,13 +222,16 @@
 
     <!-- 右側：完整號碼看板牆與開獎紀錄 (佔 7 欄) -->
     <section class="lg:col-span-7 flex flex-col gap-5">
-      <!-- 開出號碼歷程時間軸 -->
+      <!-- 開出號碼歷程時間軸 (多行自適應換行排版) -->
       <div class="glass-panel rounded-2xl p-4 border border-amber-500/20">
-        <div class="flex items-center justify-between mb-2">
-          <h2 class="text-xs font-bold tracking-wider text-amber-300 uppercase">歷程順序 (Draw History)</h2>
-          <span id="historyStats" class="text-xs text-slate-400">依序排列</span>
+        <div class="flex items-center justify-between mb-2 pb-2 border-b border-slate-800">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold tracking-wider text-amber-300 uppercase">開獎先後順序板 (Draw History)</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/30">依抽出先後自動折行</span>
+          </div>
+          <span id="historyStats" class="text-xs text-slate-400">已開出 0 / 總計 75</span>
         </div>
-        <div id="historyBallsTimeline" class="flex items-center gap-2 overflow-x-auto py-2 px-1 min-h-[64px]">
+        <div id="historyBallsTimeline" class="flex flex-wrap items-center gap-2 max-h-[160px] overflow-y-auto p-1 content-start">
           <span class="text-xs text-slate-500 italic">尚無抽取紀錄</span>
         </div>
       </div>
@@ -769,26 +772,35 @@
       renderHistoryTimeline() {
         this.dom.historyBallsTimeline.innerHTML = '';
         if (this.drawnNumbers.length === 0) {
-          this.dom.historyBallsTimeline.innerHTML = `<span class="text-xs text-slate-500 italic">尚無抽取紀錄</span>`;
+          this.dom.historyBallsTimeline.innerHTML = `<span class="text-xs text-slate-500 italic py-2">尚無抽取紀錄</span>`;
           return;
         }
 
-        // 最新的顯示在最前面
-        const reversed = [...this.drawnNumbers].reverse();
-        reversed.forEach((num, idx) => {
+        // 依抽出的順序排列 (從第 1 球到最新一球)，最新一球具備高亮閃耀
+        this.drawnNumbers.forEach((num, idx) => {
+          const isLatest = idx === this.drawnNumbers.length - 1;
+          const isTensionHit = this.tensionNumbers.has(num);
+
           const item = document.createElement('div');
-          const isLatest = idx === 0;
-          item.className = `flex-shrink-0 w-11 h-11 rounded-xl flex flex-col items-center justify-center font-cinzel font-black transition-all ${
+          item.className = `flex-shrink-0 w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex flex-col items-center justify-center font-cinzel transition-all duration-300 ${
             isLatest
-              ? 'bg-gradient-to-tr from-yellow-300 to-amber-500 text-slate-950 shadow-md shadow-amber-400/40 scale-105 border border-yellow-200'
-              : 'bg-slate-900 text-amber-300 border border-amber-500/30'
+              ? 'bg-gradient-to-tr from-yellow-300 via-amber-400 to-yellow-500 text-slate-950 shadow-lg shadow-amber-400/50 scale-105 border-2 border-white ring-2 ring-amber-400/80 animate-pulse z-10'
+              : isTensionHit
+                ? 'bg-gradient-to-b from-rose-950 to-slate-900 text-rose-300 border border-rose-500/70 shadow-sm shadow-rose-900/40'
+                : 'bg-slate-900/90 text-amber-300 border border-amber-500/30 hover:border-amber-400'
           }`;
+
           item.innerHTML = `
-            <span class="text-xs ${isLatest ? 'text-slate-900' : 'text-slate-400'} font-normal text-[9px]">#${this.drawnNumbers.length - idx}</span>
-            <span class="text-sm font-black -mt-1">${num}</span>
+            <span class="text-[9px] ${isLatest ? 'text-slate-950 font-black' : isTensionHit ? 'text-rose-400 font-semibold' : 'text-slate-400 font-medium'} leading-none">#${idx + 1}</span>
+            <span class="text-sm sm:text-base font-black leading-tight ${isLatest ? 'text-slate-950' : 'text-amber-200'}">${num}</span>
           `;
+          
+          item.title = `第 ${idx + 1} 個開出號碼: ${num}${isTensionHit ? ' (聽牌命中)' : ''}`;
           this.dom.historyBallsTimeline.appendChild(item);
         });
+
+        // 自動聚焦滾動到底部最新號碼
+        this.dom.historyBallsTimeline.scrollTop = this.dom.historyBallsTimeline.scrollHeight;
       }
 
       // 聽牌號碼切換與管理
