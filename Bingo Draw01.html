@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>豪華賓果抽獎系統 - Bingo Grand Lucky Drawer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Noto+Sans+TC:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .font-cinzel {
+      font-family: 'Cinzel', serif;
+    }
+    /* 玻璃擬態與光暈 */
+    .glass-panel {
+      background: rgba(18, 18, 30, 0.78);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 215, 0, 0.2);
+    }
+    .glass-panel-glow {
+      box-shadow: 0 0 35px rgba(234, 179, 8, 0.15), inset 0 0 15px rgba(255, 255, 255, 0.05);
+    }
+    /* 滾筒 3D 視覺 */
+    .tumbler-sphere {
+      background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.25) 0%, rgba(30, 27, 75, 0.4) 50%, rgba(10, 10, 25, 0.95) 90%);
+      box-shadow: inset 0 0 40px rgba(147, 51, 234, 0.4), 0 0 30px rgba(192, 132, 252, 0.25);
+    }
+    /* 心跳緊張模式濾鏡 */
+    @keyframes heartbeat-pulse {
+      0%, 100% {
+        box-shadow: inset 0 0 30px rgba(239, 68, 68, 0.2), 0 0 15px rgba(220, 38, 38, 0.2);
+        border-color: rgba(239, 68, 68, 0.4);
+      }
+      50% {
+        box-shadow: inset 0 0 90px rgba(239, 68, 68, 0.65), 0 0 45px rgba(239, 68, 68, 0.6);
+        border-color: rgba(239, 68, 68, 0.9);
+      }
+    }
+    .tension-active {
+      animation: heartbeat-pulse 1.1s infinite ease-in-out;
+    }
+    /* 螢幕震動 */
+    @keyframes screen-shake {
+      0% { transform: translate(1px, 1px) rotate(0deg); }
+      10% { transform: translate(-2px, -3px) rotate(-1deg); }
+      20% { transform: translate(-3px, 0px) rotate(1deg); }
+      30% { transform: translate(3px, 2px) rotate(0deg); }
+      40% { transform: translate(1px, -1px) rotate(1deg); }
+      50% { transform: translate(-1px, 2px) rotate(-1deg); }
+      60% { transform: translate(-3px, 1px) rotate(0deg); }
+      70% { transform: translate(3px, 1px) rotate(-1deg); }
+      80% { transform: translate(-1px, -1px) rotate(1deg); }
+      90% { transform: translate(1px, 2px) rotate(0deg); }
+      100% { transform: translate(1px, -2px) rotate(-1deg); }
+    }
+    .shake-effect {
+      animation: screen-shake 0.5s ease-in-out;
+    }
+    /* 滾輪自訂捲軸 */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(234, 179, 8, 0.4);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(234, 179, 8, 0.7);
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen overflow-x-hidden flex flex-col relative selection:bg-amber-500 selection:text-black">
+  <!-- 粒子特效 Canvas -->
+  <canvas id="confettiCanvas" class="fixed inset-0 pointer-events-none z-50 w-full h-full"></canvas>
+
+  <!-- 頂部導航列與狀態指示 -->
+  <header class="w-full px-5 py-3 glass-panel border-b border-amber-500/20 flex flex-wrap items-center justify-between gap-4 z-20">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-300 flex items-center justify-center text-slate-950 font-black shadow-lg shadow-amber-500/30 text-xl font-cinzel">
+        B
+      </div>
+      <div>
+        <h1 class="text-xl font-black tracking-wider bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-500 bg-clip-text text-transparent">
+          BINGO GRAND LUCKY DRAWER
+        </h1>
+        <p class="text-xs text-slate-400">豪華極致賓果抽球機 &bull; 儀式感開獎現場</p>
+      </div>
+    </div>
+
+    <!-- 快捷功能開關群 -->
+    <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
+      <!-- 語音播報 -->
+      <button id="ttsToggleBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-700 hover:border-amber-400 bg-slate-900/80 text-xs font-semibold transition">
+        <span id="ttsIcon" class="text-amber-400">🔊</span>
+        <span id="ttsText">語音報號: 開啟</span>
+      </button>
+
+      <!-- 音效開關 -->
+      <button id="soundToggleBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-700 hover:border-amber-400 bg-slate-900/80 text-xs font-semibold transition">
+        <span id="soundIcon" class="text-emerald-400">🔔</span>
+        <span id="soundText">音效: 開啟</span>
+      </button>
+
+      <!-- 聽牌警戒開關 -->
+      <button id="tensionModeBtn" class="relative group flex items-center gap-2 px-3 py-1.5 rounded-lg border border-red-500/50 bg-red-950/40 hover:bg-red-900/60 text-red-200 text-xs font-bold transition shadow-sm">
+        <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"></span>
+        <span id="tensionBtnLabel">聽牌緊張模式</span>
+      </button>
+
+      <!-- 設定按鈕 -->
+      <button id="openConfigBtn" class="px-3 py-1.5 rounded-lg border border-slate-700 hover:border-amber-400 bg-slate-800 text-xs font-medium transition flex items-center gap-1">
+        ⚙️ 號碼設定
+      </button>
+
+      <!-- 全螢幕切換 -->
+      <button id="fullscreenBtn" class="p-2 rounded-lg border border-slate-700 hover:border-amber-400 bg-slate-800 text-xs transition" title="全螢幕模式">
+        ⛶
+      </button>
+    </div>
+  </header>
+
+  <!-- 主舞台區 (兩欄佈局：左邊滾球抽獎特寫，右邊號碼看板與聽牌池) -->
+  <main class="flex-1 w-full max-w-7xl mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10">
+
+    <!-- 左側：3D滾動攪拌機與開獎操控舞台 (佔 5 欄) -->
+    <section class="lg:col-span-5 flex flex-col gap-5">
+      <!-- 抽球展示機外殼 -->
+      <div id="mainStageBox" class="glass-panel glass-panel-glow rounded-3xl p-6 flex flex-col items-center justify-between border border-amber-500/30 transition-all duration-300 relative overflow-hidden min-h-[460px]">
+        <!-- 頂部數據標籤 -->
+        <div class="w-full flex items-center justify-between text-xs font-semibold">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span class="text-slate-300">總號碼數: <span id="totalBallCount" class="text-amber-400 font-bold text-sm">75</span></span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-slate-300">已開: <span id="drawnBallCount" class="text-emerald-400 font-bold text-sm">0</span></span>
+            <span class="text-slate-300">剩餘: <span id="remainBallCount" class="text-rose-400 font-bold text-sm">75</span></span>
+          </div>
+        </div>
+
+        <!-- 3D 擬態球籠 / 滾動攪拌腔體 -->
+        <div class="relative my-4 flex items-center justify-center">
+          <div class="tumbler-sphere w-64 h-64 sm:w-72 sm:h-72 rounded-full border-4 border-amber-400/30 relative flex items-center justify-center overflow-hidden">
+            <!-- 裝飾環與反射光 -->
+            <div class="absolute inset-0 rounded-full border border-white/20 pointer-events-none"></div>
+            <div class="absolute -top-10 -left-10 w-44 h-44 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+
+            <!-- 球籠內部飛舞的迷你彩球群 (動態生成) -->
+            <div id="cageBallsContainer" class="absolute inset-4 rounded-full overflow-hidden pointer-events-none">
+              <!-- JS 會動態注入漂浮滾動小球 -->
+            </div>
+
+            <!-- 核心待命 / 揭曉球大圖標 -->
+            <div id="ballCenterPlaceholder" class="z-10 flex flex-col items-center justify-center transition-all duration-500">
+              <div id="readyGlowRing" class="w-28 h-28 rounded-full bg-gradient-to-tr from-amber-600 via-yellow-400 to-amber-200 p-1 shadow-2xl shadow-amber-500/50 flex items-center justify-center animate-bounce">
+                <div class="w-full h-full rounded-full bg-slate-950 flex flex-col items-center justify-center border-2 border-amber-300">
+                  <span id="centerPreviewText" class="text-3xl font-black text-amber-400 font-cinzel">?</span>
+                  <span class="text-[10px] text-amber-300/80 font-bold tracking-widest mt-0.5">READY</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 聽牌模式呼吸燈外環 -->
+          <div id="tensionAura" class="absolute inset-0 rounded-full border-4 border-red-500/0 pointer-events-none transition-all duration-500"></div>
+        </div>
+
+        <!-- 開獎主控按鈕群 -->
+        <div class="w-full flex flex-col items-center gap-3">
+          <button id="drawBallBtn" class="w-full py-4 px-8 rounded-2xl bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black text-xl tracking-widest uppercase transition-all duration-300 transform active:scale-95 shadow-xl shadow-amber-500/30 hover:shadow-amber-400/50 flex items-center justify-center gap-3 group">
+            <span class="text-2xl group-hover:rotate-180 transition-transform duration-500">🎰</span>
+            <span id="drawBtnText">開 始 搖 號 抽 球</span>
+          </button>
+
+          <div class="flex items-center justify-between w-full text-xs text-slate-400 px-1">
+            <button id="resetGameBtn" class="hover:text-rose-400 transition underline underline-offset-4">
+              重新開始本局 (重置)
+            </button>
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+              <span id="lastDrawnLabel">尚未抽出任何號碼</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 聽牌關注區 (Tension Watchlist) -->
+      <div class="glass-panel rounded-2xl p-4 border border-rose-500/30">
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-2">
+            <span class="text-rose-500 font-bold text-sm">🎯 聽牌關注號碼</span>
+            <span class="text-[11px] text-slate-400">（點選下方看板或此處輸入聽牌號）</span>
+          </div>
+          <span id="tensionCountBadge" class="px-2 py-0.5 text-xs bg-rose-500/20 text-rose-300 rounded-full font-bold">0 號</span>
+        </div>
+        <div class="flex gap-2 mb-3">
+          <input id="quickTensionInput" type="number" placeholder="輸入聽牌號碼" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-rose-400 flex-1">
+          <button id="addTensionBtn" class="bg-rose-600 hover:bg-rose-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition">
+            加入關注
+          </button>
+          <button id="clearTensionBtn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded-lg text-xs transition">
+            清空
+          </button>
+        </div>
+        <!-- 聽牌號碼標籤容器 -->
+        <div id="tensionBadgesList" class="flex flex-wrap gap-2 min-h-[36px] max-h-24 overflow-y-auto p-1 bg-slate-950/50 rounded-lg border border-slate-800">
+          <div class="text-xs text-slate-500 italic p-1">尚未設定聽牌號碼。點擊右側看板數字可隨時加入！</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 右側：完整號碼看板牆與開獎紀錄 (佔 7 欄) -->
+    <section class="lg:col-span-7 flex flex-col gap-5">
+      <!-- 開出號碼歷程時間軸 -->
+      <div class="glass-panel rounded-2xl p-4 border border-amber-500/20">
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="text-xs font-bold tracking-wider text-amber-300 uppercase">歷程順序 (Draw History)</h2>
+          <span id="historyStats" class="text-xs text-slate-400">依序排列</span>
+        </div>
+        <div id="historyBallsTimeline" class="flex items-center gap-2 overflow-x-auto py-2 px-1 min-h-[64px]">
+          <span class="text-xs text-slate-500 italic">尚無抽取紀錄</span>
+        </div>
+      </div>
+
+      <!-- 全球狀態矩陣牆 (Ball Status Grid) -->
+      <div class="glass-panel rounded-3xl p-5 border border-amber-500/20 flex-1 flex flex-col">
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-3 mb-3 border-b border-slate-800">
+          <div>
+            <h2 class="text-base font-black tracking-wide text-white flex items-center gap-2">
+              <span>號碼全覽看板</span>
+              <span class="text-xs font-normal text-slate-400">（金色已抽中 / 紅心為聽牌中）</span>
+            </h2>
+          </div>
+          <div class="flex items-center gap-3 text-xs">
+            <div class="flex items-center gap-1.5">
+              <span class="w-3 h-3 rounded-full bg-slate-800 border border-slate-600"></span>
+              <span class="text-slate-400">未抽</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-3 h-3 rounded-full bg-gradient-to-tr from-amber-500 to-yellow-300 shadow-sm shadow-amber-500"></span>
+              <span class="text-amber-300 font-bold">已開出</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-3 h-3 rounded-full bg-rose-600 animate-pulse"></span>
+              <span class="text-rose-400 font-bold">聽牌中</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 號碼格子容器 (支援響應式自適應縮放) -->
+        <div id="ballsMatrixGrid" class="grid grid-cols-5 sm:grid-cols-10 md:grid-cols-10 lg:grid-cols-10 gap-2 overflow-y-auto max-h-[500px] p-1 flex-1 content-start">
+          <!-- JS 動態生成所有號碼球按鈕 -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 巨大特寫儀式感揭幕視窗 (Grand Reveal Modal) -->
+  <div id="grandRevealModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300">
+    <div id="grandCard" class="relative max-w-lg w-full bg-gradient-to-b from-slate-900 via-slate-900 to-indigo-950 border-2 border-amber-400/80 rounded-3xl p-8 text-center shadow-2xl shadow-amber-500/40 transform scale-75 transition-all duration-500 overflow-hidden">
+      <!-- 炫光背景裝飾 -->
+      <div class="absolute -top-24 -left-24 w-60 h-60 bg-amber-500/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-24 -right-24 w-60 h-60 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+      <!-- 命中聽牌特殊橫幅 -->
+      <div id="bingoHitBanner" class="hidden mb-4 py-1.5 px-4 rounded-full bg-gradient-to-r from-red-600 via-rose-500 to-amber-500 text-white font-black text-sm tracking-widest uppercase shadow-lg shadow-rose-500/50 animate-bounce">
+        🔥 驚喜命中！聽牌號碼開出！ 🔥
+      </div>
+
+      <div class="text-xs uppercase tracking-widest text-amber-400 font-bold mb-1">
+        LUCKY NUMBER REVEALED
+      </div>
+      <div id="revealSequenceTag" class="text-sm font-semibold text-slate-400 mb-6">
+        第 1 次抽獎
+      </div>
+
+      <!-- 放大特寫球核心 -->
+      <div class="relative my-6 flex items-center justify-center">
+        <!-- 旋轉高光背景環 -->
+        <div class="absolute w-56 h-56 rounded-full border border-dashed border-amber-300/40 animate-spin" style="animation-duration: 15s;"></div>
+        
+        <div id="revealBallSphere" class="w-44 h-44 sm:w-48 sm:h-48 rounded-full bg-gradient-to-tr from-amber-600 via-amber-400 to-yellow-200 p-2 shadow-2xl shadow-yellow-500/50 flex items-center justify-center transform transition duration-500 hover:scale-105">
+          <div class="w-full h-full rounded-full bg-slate-950 flex flex-col items-center justify-center border-4 border-yellow-300/80 relative overflow-hidden">
+            <!-- 表面高光 -->
+            <div class="absolute top-2 left-6 w-16 h-8 bg-white/30 rounded-full rotate-[-25deg] blur-xs"></div>
+            <span id="revealBigNumber" class="text-7xl sm:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-b from-yellow-100 via-amber-300 to-yellow-500 font-cinzel drop-shadow-[0_5px_15px_rgba(234,179,8,0.8)]">
+              --
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 揭幕提示與確認按鈕 -->
+      <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+        <button id="closeRevealBtn" class="w-full sm:w-auto px-10 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black text-base tracking-wider uppercase shadow-lg shadow-amber-500/30 transition transform active:scale-95">
+          收下號碼 &bull; 繼續
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 自訂號碼設定彈窗 (Settings Modal) -->
+  <div id="configModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm opacity-0 pointer-events-none transition-all duration-300">
+    <div class="max-w-md w-full bg-slate-900 border border-amber-500/30 rounded-2xl p-6 shadow-2xl transform scale-90 transition-all duration-300">
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-800">
+        <h3 class="text-base font-bold text-amber-300 flex items-center gap-2">
+          <span>⚙️ 自訂開獎號碼池</span>
+        </h3>
+        <button id="closeConfigModalBtn" class="text-slate-400 hover:text-white text-lg font-bold">&times;</button>
+      </div>
+
+      <div class="space-y-4 text-xs">
+        <!-- 快速預設 -->
+        <div>
+          <label class="block text-slate-300 font-bold mb-2">快速常用預設：</label>
+          <div class="grid grid-cols-3 gap-2">
+            <button class="preset-btn py-2 px-3 rounded-lg bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-slate-200 font-bold transition border border-slate-700" data-range="1-75">
+              標準 1 ~ 75
+            </button>
+            <button class="preset-btn py-2 px-3 rounded-lg bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-slate-200 font-bold transition border border-slate-700" data-range="1-100">
+              百數 1 ~ 100
+            </button>
+            <button class="preset-btn py-2 px-3 rounded-lg bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-slate-200 font-bold transition border border-slate-700" data-range="1-50">
+              精簡 1 ~ 50
+            </button>
+          </div>
+        </div>
+
+        <!-- 自訂輸入 -->
+        <div>
+          <label class="block text-slate-300 font-bold mb-1">自訂號碼清單：</label>
+          <p class="text-[11px] text-slate-400 mb-2">支援區間格式（例如 <code class="text-amber-400">1-50</code>）或以逗號/空格分隔任意數字。</p>
+          <textarea id="customNumbersInput" rows="4" class="w-full bg-slate-950 border border-slate-700 focus:border-amber-400 rounded-xl p-3 text-slate-100 font-mono text-xs focus:outline-none" placeholder="例如: 1-75 或 5, 8, 12, 19, 23, 77, 88"></textarea>
+        </div>
+
+        <!-- 錯誤提示 -->
+        <div id="configErrorMsg" class="hidden text-rose-400 text-xs font-semibold"></div>
+
+        <div class="pt-2 flex justify-end gap-2">
+          <button id="cancelConfigBtn" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition">
+            取消
+          </button>
+          <button id="saveConfigBtn" class="px-5 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold transition shadow-md shadow-amber-500/20">
+            套用並重新開局
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 客製化操作確認對話框 (替代原生 confirm) -->
+  <div id="confirmDialog" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm opacity-0 pointer-events-none transition-all duration-200">
+    <div class="max-w-sm w-full bg-slate-900 border border-slate-700 rounded-2xl p-5 shadow-2xl text-center">
+      <div class="text-3xl mb-2">⚠️</div>
+      <h4 id="confirmDialogTitle" class="text-base font-bold text-white mb-2">確認重置？</h4>
+      <p id="confirmDialogDesc" class="text-xs text-slate-400 mb-5">本局所有已開出的紀錄將會被清空，確定要重來嗎？</p>
+      <div class="flex justify-center gap-3">
+        <button id="confirmCancelBtn" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition">取消</button>
+        <button id="confirmOkBtn" class="px-5 py-2 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition">確定重置</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 音效核心 (Web Audio API) 與 應用程式主邏輯 -->
+  <script>
+    /* ==========================================================================
+       1. 音效合成系統 (Web Audio API - 無需外部依賴)
+       ========================================================================== */
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.enabled = true;
+        this.tensionOsc = null;
+        this.tensionGain = null;
+        this.tensionInterval = null;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) {
+            this.ctx = new AudioContext();
+          }
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      // 滾球碰撞聲 (Tick/Tumble)
+      playTick() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          const freq = 400 + Math.random() * 300;
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(80, this.ctx.currentTime + 0.05);
+
+          gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.05);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.05);
+        } catch (e) {
+          console.warn(e);
+        }
+      }
+
+      // 心跳緊張聲 (Heartbeat)
+      playHeartbeat() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const now = this.ctx.currentTime;
+          const playBeat = (time, freq, dur, vol) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, time);
+            osc.frequency.exponentialRampToValueAtTime(30, time + dur);
+
+            gain.gain.setValueAtTime(vol, time);
+            gain.gain.exponentialRampToValueAtTime(0.001, time + dur);
+
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(time);
+            osc.stop(time + dur);
+          };
+
+          // 模擬心跳兩聲 lub-dub
+          playBeat(now, 75, 0.12, 0.45);
+          playBeat(now + 0.16, 60, 0.15, 0.35);
+        } catch (e) {
+          console.warn(e);
+        }
+      }
+
+      // 中獎金彩號角 (Fanfare & Victory Chime)
+      playGrandReveal(isHitTension = false) {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const notes = isHitTension ? [261.6, 329.6, 392.0, 523.25, 659.25, 783.99, 1046.5] : [392.0, 523.25, 659.25, 783.99];
+          const now = this.ctx.currentTime;
+
+          notes.forEach((freq, idx) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = isHitTension ? 'sawtooth' : 'triangle';
+            osc.frequency.setValueAtTime(freq, now + idx * 0.09);
+
+            gain.gain.setValueAtTime(0.2, now + idx * 0.09);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.09 + 0.6);
+
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now + idx * 0.09);
+            osc.stop(now + idx * 0.09 + 0.6);
+          });
+        } catch (e) {
+          console.warn(e);
+        }
+      }
+    }
+
+    /* ==========================================================================
+       2. 萬彩煙火粒子引擎 (Confetti Canvas)
+       ========================================================================== */
+    class ConfettiEngine {
+      constructor(canvasId) {
+        this.canvas = document.getElementById(canvasId);
+        this.ctx = this.canvas.getContext('2d');
+        this.particles = [];
+        this.animating = false;
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+      }
+
+      resize() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+      }
+
+      fire(burstCount = 90, isGolden = false) {
+        const colors = isGolden
+          ? ['#f59e0b', '#fbbf24', '#fef08a', '#d97706', '#ffffff']
+          : ['#38bdf8', '#f43f5e', '#10b981', '#fbbf24', '#a855f7', '#ec4899'];
+
+        for (let i = 0; i < burstCount; i++) {
+          this.particles.push({
+            x: this.canvas.width / 2,
+            y: this.canvas.height / 2,
+            vx: (Math.random() - 0.5) * 22,
+            vy: (Math.random() - 0.7) * 24,
+            size: Math.random() * 8 + 4,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            rotation: Math.random() * 360,
+            vRot: (Math.random() - 0.5) * 15,
+            alpha: 1,
+            shape: Math.random() > 0.4 ? 'rect' : 'circle'
+          });
+        }
+
+        if (!this.animating) {
+          this.animating = true;
+          this.render();
+        }
+      }
+
+      render() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        for (let i = this.particles.length - 1; i >= 0; i--) {
+          const p = this.particles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.35; // 重力
+          p.vx *= 0.98;
+          p.rotation += p.vRot;
+          p.alpha -= 0.009;
+
+          if (p.alpha <= 0) {
+            this.particles.splice(i, 1);
+            continue;
+          }
+
+          this.ctx.save();
+          this.ctx.globalAlpha = p.alpha;
+          this.ctx.fillStyle = p.color;
+          this.ctx.translate(p.x, p.y);
+          this.ctx.rotate((p.rotation * Math.PI) / 180);
+
+          if (p.shape === 'rect') {
+            this.ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.7);
+          } else {
+            this.ctx.beginPath();
+            this.ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+            this.ctx.fill();
+          }
+          this.ctx.restore();
+        }
+
+        if (this.particles.length > 0) {
+          requestAnimationFrame(() => this.render());
+        } else {
+          this.animating = false;
+        }
+      }
+    }
+
+    /* ==========================================================================
+       3. 賓果核心控制大腦 (Bingo State Management)
+       ========================================================================== */
+    class BingoGame {
+      constructor() {
+        this.allNumbers = [];
+        this.drawnNumbers = [];
+        this.tensionNumbers = new Set();
+        this.tensionModeActive = false;
+        this.isRolling = false;
+        this.ttsEnabled = true;
+
+        this.sound = new SoundEngine();
+        this.confetti = new ConfettiEngine('confettiCanvas');
+
+        this.initDOM();
+        this.setupDefaultPool(1, 75);
+        this.setupEventListeners();
+        this.createTumblerBalls();
+      }
+
+      initDOM() {
+        this.dom = {
+          totalBallCount: document.getElementById('totalBallCount'),
+          drawnBallCount: document.getElementById('drawnBallCount'),
+          remainBallCount: document.getElementById('remainBallCount'),
+          drawBallBtn: document.getElementById('drawBallBtn'),
+          drawBtnText: document.getElementById('drawBtnText'),
+          resetGameBtn: document.getElementById('resetGameBtn'),
+          lastDrawnLabel: document.getElementById('lastDrawnLabel'),
+          ballsMatrixGrid: document.getElementById('ballsMatrixGrid'),
+          historyBallsTimeline: document.getElementById('historyBallsTimeline'),
+          historyStats: document.getElementById('historyStats'),
+          cageBallsContainer: document.getElementById('cageBallsContainer'),
+          centerPreviewText: document.getElementById('centerPreviewText'),
+          mainStageBox: document.getElementById('mainStageBox'),
+          tensionAura: document.getElementById('tensionAura'),
+          tensionModeBtn: document.getElementById('tensionModeBtn'),
+          tensionBtnLabel: document.getElementById('tensionBtnLabel'),
+          quickTensionInput: document.getElementById('quickTensionInput'),
+          addTensionBtn: document.getElementById('addTensionBtn'),
+          clearTensionBtn: document.getElementById('clearTensionBtn'),
+          tensionBadgesList: document.getElementById('tensionBadgesList'),
+          tensionCountBadge: document.getElementById('tensionCountBadge'),
+          // 揭曉彈窗
+          grandRevealModal: document.getElementById('grandRevealModal'),
+          grandCard: document.getElementById('grandCard'),
+          revealBigNumber: document.getElementById('revealBigNumber'),
+          revealSequenceTag: document.getElementById('revealSequenceTag'),
+          bingoHitBanner: document.getElementById('bingoHitBanner'),
+          closeRevealBtn: document.getElementById('closeRevealBtn'),
+          // 設定彈窗
+          configModal: document.getElementById('configModal'),
+          openConfigBtn: document.getElementById('openConfigBtn'),
+          closeConfigModalBtn: document.getElementById('closeConfigModalBtn'),
+          cancelConfigBtn: document.getElementById('cancelConfigBtn'),
+          saveConfigBtn: document.getElementById('saveConfigBtn'),
+          customNumbersInput: document.getElementById('customNumbersInput'),
+          configErrorMsg: document.getElementById('configErrorMsg'),
+          // 確認對話盒
+          confirmDialog: document.getElementById('confirmDialog'),
+          confirmOkBtn: document.getElementById('confirmOkBtn'),
+          confirmCancelBtn: document.getElementById('confirmCancelBtn'),
+          // 其他控制
+          ttsToggleBtn: document.getElementById('ttsToggleBtn'),
+          ttsText: document.getElementById('ttsText'),
+          soundToggleBtn: document.getElementById('soundToggleBtn'),
+          soundText: document.getElementById('soundText'),
+          fullscreenBtn: document.getElementById('fullscreenBtn')
+        };
+      }
+
+      setupDefaultPool(min, max) {
+        this.allNumbers = [];
+        for (let i = min; i <= max; i++) {
+          this.allNumbers.push(i);
+        }
+        this.resetGame(false);
+      }
+
+      resetGame(showPrompt = true) {
+        if (showPrompt && this.drawnNumbers.length > 0) {
+          this.showConfirmDialog("確認重置開獎？", "此動作將清空所有目前已抽出的號碼，無法復原！", () => {
+            this.executeReset();
+          });
+          return;
+        }
+        this.executeReset();
+      }
+
+      executeReset() {
+        this.drawnNumbers = [];
+        this.dom.centerPreviewText.textContent = '?';
+        this.dom.lastDrawnLabel.textContent = '尚未抽出任何號碼';
+        this.updateStatsUI();
+        this.renderMatrixGrid();
+        this.renderHistoryTimeline();
+      }
+
+      updateStatsUI() {
+        const total = this.allNumbers.length;
+        const drawn = this.drawnNumbers.length;
+        const remain = total - drawn;
+
+        this.dom.totalBallCount.textContent = total;
+        this.dom.drawnBallCount.textContent = drawn;
+        this.dom.remainBallCount.textContent = remain;
+        this.dom.historyStats.textContent = `已開出 ${drawn} / 總計 ${total}`;
+
+        if (remain === 0) {
+          this.dom.drawBtnText.textContent = '全數號碼已抽完';
+          this.dom.drawBallBtn.classList.add('opacity-50', 'pointer-events-none');
+        } else {
+          this.dom.drawBtnText.textContent = this.isRolling ? '搖 獎 中...' : '開 始 搖 號 抽 球';
+          this.dom.drawBallBtn.classList.remove('opacity-50', 'pointer-events-none');
+        }
+      }
+
+      // 裝飾性迷你攪拌球動畫
+      createTumblerBalls() {
+        this.dom.cageBallsContainer.innerHTML = '';
+        const count = 18;
+        for (let i = 0; i < count; i++) {
+          const ball = document.createElement('div');
+          const size = Math.floor(Math.random() * 14) + 16;
+          ball.className = 'absolute rounded-full shadow-inner opacity-70 transition-transform duration-300';
+          ball.style.width = `${size}px`;
+          ball.style.height = `${size}px`;
+          ball.style.background = `radial-gradient(circle at 30% 30%, #fef08a, #ca8a04)`;
+          ball.style.left = `${Math.random() * 80 + 10}%`;
+          ball.style.top = `${Math.random() * 80 + 10}%`;
+          this.dom.cageBallsContainer.appendChild(ball);
+        }
+      }
+
+      animateCageBalls(active = true) {
+        const balls = this.dom.cageBallsContainer.children;
+        if (!active) {
+          for (let b of balls) {
+            b.style.transform = 'translate(0, 0)';
+          }
+          return;
+        }
+        for (let b of balls) {
+          const rx = (Math.random() - 0.5) * 120;
+          const ry = (Math.random() - 0.5) * 120;
+          b.style.transform = `translate(${rx}px, ${ry}px)`;
+        }
+      }
+
+      // 渲染主看板球格
+      renderMatrixGrid() {
+        this.dom.ballsMatrixGrid.innerHTML = '';
+        const latestDrawn = this.drawnNumbers[this.drawnNumbers.length - 1];
+
+        this.allNumbers.forEach(num => {
+          const isDrawn = this.drawnNumbers.includes(num);
+          const isTension = this.tensionNumbers.has(num);
+          const isLatest = num === latestDrawn;
+
+          const btn = document.createElement('button');
+          btn.textContent = num;
+          btn.dataset.num = num;
+
+          // 樣式計算
+          let baseClass = 'h-10 sm:h-11 rounded-xl font-black text-sm flex items-center justify-center transition-all duration-300 relative border ';
+
+          if (isDrawn) {
+            if (isLatest) {
+              baseClass += 'bg-gradient-to-tr from-amber-400 to-yellow-200 text-slate-950 border-amber-300 shadow-lg shadow-amber-400/50 scale-105 z-10 animate-pulse font-cinzel';
+            } else {
+              baseClass += 'bg-amber-500/20 text-amber-300 border-amber-500/50 hover:bg-amber-500/30 font-cinzel';
+            }
+          } else if (isTension) {
+            baseClass += 'bg-rose-950/80 text-rose-200 border-rose-500 shadow-md shadow-rose-600/40 animate-pulse hover:bg-rose-900';
+          } else {
+            baseClass += 'bg-slate-900/60 text-slate-400 border-slate-800 hover:border-slate-600 hover:text-white';
+          }
+
+          btn.className = baseClass;
+
+          // 若為聽牌，角落加小愛心/準星標記
+          if (isTension && !isDrawn) {
+            const badge = document.createElement('span');
+            badge.className = 'absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-rose-500 border border-slate-950';
+            btn.appendChild(badge);
+          }
+
+          // 點擊號碼可快速切換「聽牌」狀態
+          btn.addEventListener('click', () => {
+            if (isDrawn) return;
+            this.toggleTensionNumber(num);
+          });
+
+          this.dom.ballsMatrixGrid.appendChild(btn);
+        });
+      }
+
+      // 渲染開出歷程
+      renderHistoryTimeline() {
+        this.dom.historyBallsTimeline.innerHTML = '';
+        if (this.drawnNumbers.length === 0) {
+          this.dom.historyBallsTimeline.innerHTML = `<span class="text-xs text-slate-500 italic">尚無抽取紀錄</span>`;
+          return;
+        }
+
+        // 最新的顯示在最前面
+        const reversed = [...this.drawnNumbers].reverse();
+        reversed.forEach((num, idx) => {
+          const item = document.createElement('div');
+          const isLatest = idx === 0;
+          item.className = `flex-shrink-0 w-11 h-11 rounded-xl flex flex-col items-center justify-center font-cinzel font-black transition-all ${
+            isLatest
+              ? 'bg-gradient-to-tr from-yellow-300 to-amber-500 text-slate-950 shadow-md shadow-amber-400/40 scale-105 border border-yellow-200'
+              : 'bg-slate-900 text-amber-300 border border-amber-500/30'
+          }`;
+          item.innerHTML = `
+            <span class="text-xs ${isLatest ? 'text-slate-900' : 'text-slate-400'} font-normal text-[9px]">#${this.drawnNumbers.length - idx}</span>
+            <span class="text-sm font-black -mt-1">${num}</span>
+          `;
+          this.dom.historyBallsTimeline.appendChild(item);
+        });
+      }
+
+      // 聽牌號碼切換與管理
+      toggleTensionNumber(num) {
+        if (this.tensionNumbers.has(num)) {
+          this.tensionNumbers.delete(num);
+        } else {
+          this.tensionNumbers.add(num);
+        }
+        this.updateTensionBadgesUI();
+        this.renderMatrixGrid();
+      }
+
+      updateTensionBadgesUI() {
+        this.dom.tensionBadgesList.innerHTML = '';
+        const count = this.tensionNumbers.size;
+        this.dom.tensionCountBadge.textContent = `${count} 號`;
+
+        if (count === 0) {
+          this.dom.tensionBadgesList.innerHTML = `<div class="text-xs text-slate-500 italic p-1">尚未設定聽牌號碼。點擊右側看板數字可隨時加入！</div>`;
+          return;
+        }
+
+        const sorted = Array.from(this.tensionNumbers).sort((a, b) => a - b);
+        sorted.forEach(num => {
+          const isDrawn = this.drawnNumbers.includes(num);
+          const badge = document.createElement('span');
+          badge.className = `inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-bold transition ${
+            isDrawn
+              ? 'bg-amber-500/20 text-amber-300 line-through border border-amber-500/40'
+              : 'bg-rose-900/60 text-rose-200 border border-rose-500/60'
+          }`;
+          badge.innerHTML = `
+            <span>${num}</span>
+            <button class="hover:text-white ml-1 text-slate-400" title="移除">&times;</button>
+          `;
+          badge.querySelector('button').addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.toggleTensionNumber(num);
+          });
+          this.dom.tensionBadgesList.appendChild(badge);
+        });
+      }
+
+      // 聽牌緊張氣氛模式開關
+      toggleTensionMode() {
+        this.tensionModeActive = !this.tensionModeActive;
+        if (this.tensionModeActive) {
+          this.dom.mainStageBox.classList.add('tension-active');
+          this.dom.tensionModeBtn.classList.add('bg-red-700', 'border-red-400', 'text-white');
+          this.dom.tensionBtnLabel.textContent = '聽牌緊張模式 (開啟中)';
+          // 播放一次心跳提示
+          this.sound.playHeartbeat();
+        } else {
+          this.dom.mainStageBox.classList.remove('tension-active');
+          this.dom.tensionModeBtn.classList.remove('bg-red-700', 'border-red-400', 'text-white');
+          this.dom.tensionBtnLabel.textContent = '聽牌緊張模式';
+        }
+      }
+
+      // 抽球核心流程 (具備儀式感的搖獎動畫與揭露)
+      drawBall() {
+        if (this.isRolling) return;
+
+        // 計算未抽出的號碼
+        const remainPool = this.allNumbers.filter(n => !this.drawnNumbers.includes(n));
+        if (remainPool.length === 0) {
+          this.updateStatsUI();
+          return;
+        }
+
+        this.isRolling = true;
+        this.updateStatsUI();
+
+        // 決定最終中選號碼
+        const randomIndex = Math.floor(Math.random() * remainPool.length);
+        const luckyNumber = remainPool[randomIndex];
+        const isHitTension = this.tensionNumbers.has(luckyNumber);
+
+        // 搖獎儀式時間長度：聽牌模式下更加緊張延長
+        const rollDuration = (this.tensionModeActive || this.tensionNumbers.size > 0) ? 2600 : 1800;
+        const intervalSpeed = 70;
+        let elapsed = 0;
+
+        // 攪拌小球動畫定時器
+        const ballAnimInterval = setInterval(() => {
+          this.animateCageBalls(true);
+        }, 120);
+
+        // 滾動號碼閃爍定時器
+        const rollTimer = setInterval(() => {
+          elapsed += intervalSpeed;
+          const fakeNum = remainPool[Math.floor(Math.random() * remainPool.length)];
+          this.dom.centerPreviewText.textContent = fakeNum;
+
+          // 滴答音效
+          this.sound.playTick();
+
+          // 聽牌模式下的心跳音效
+          if (this.tensionModeActive && elapsed % 420 < intervalSpeed) {
+            this.sound.playHeartbeat();
+          }
+
+          if (elapsed >= rollDuration) {
+            clearInterval(rollTimer);
+            clearInterval(ballAnimInterval);
+            this.animateCageBalls(false);
+            this.finishDraw(luckyNumber, isHitTension);
+          }
+        }, intervalSpeed);
+      }
+
+      finishDraw(luckyNumber, isHitTension) {
+        this.isRolling = false;
+        this.drawnNumbers.push(luckyNumber);
+
+        // 更新核心預覽
+        this.dom.centerPreviewText.textContent = luckyNumber;
+        this.dom.lastDrawnLabel.textContent = `最新開出: ${luckyNumber} 號`;
+
+        this.updateStatsUI();
+        this.renderMatrixGrid();
+        this.renderHistoryTimeline();
+        this.updateTensionBadgesUI();
+
+        // 觸發音效與視覺
+        this.sound.playGrandReveal(isHitTension);
+        this.confetti.fire(isHitTension ? 150 : 80, isHitTension);
+
+        // 若命中聽牌，螢幕晃動
+        if (isHitTension) {
+          document.body.classList.add('shake-effect');
+          setTimeout(() => document.body.classList.remove('shake-effect'), 600);
+        }
+
+        // 開啟巨大特寫視窗
+        this.openGrandReveal(luckyNumber, isHitTension);
+
+        // 語音報號
+        this.speakNumber(luckyNumber, isHitTension);
+      }
+
+      openGrandReveal(number, isHitTension) {
+        this.dom.revealBigNumber.textContent = number;
+        this.dom.revealSequenceTag.textContent = `第 ${this.drawnNumbers.length} 次開獎 (剩餘 ${this.allNumbers.length - this.drawnNumbers.length} 號)`;
+
+        if (isHitTension) {
+          this.dom.bingoHitBanner.classList.remove('hidden');
+          this.dom.grandCard.classList.add('border-red-500', 'shadow-rose-600/60');
+          this.dom.grandCard.classList.remove('border-amber-400/80');
+        } else {
+          this.dom.bingoHitBanner.classList.add('hidden');
+          this.dom.grandCard.classList.remove('border-red-500', 'shadow-rose-600/60');
+          this.dom.grandCard.classList.add('border-amber-400/80');
+        }
+
+        this.dom.grandRevealModal.classList.remove('opacity-0', 'pointer-events-none');
+        this.dom.grandCard.classList.remove('scale-75');
+        this.dom.grandCard.classList.add('scale-100');
+      }
+
+      closeGrandReveal() {
+        this.dom.grandCard.classList.remove('scale-100');
+        this.dom.grandCard.classList.add('scale-75');
+        this.dom.grandRevealModal.classList.add('opacity-0', 'pointer-events-none');
+      }
+
+      speakNumber(num, isHitTension) {
+        if (!this.ttsEnabled || !('speechSynthesis' in window)) return;
+        window.speechSynthesis.cancel(); // 停止先前的語音
+
+        let text = `號碼，${num}號！`;
+        if (isHitTension) {
+          text = `恭喜聽牌！開出關鍵號碼，${num}號！`;
+        }
+
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'zh-TW';
+        utter.rate = 1.0;
+        utter.pitch = isHitTension ? 1.2 : 1.0;
+        window.speechSynthesis.speak(utter);
+      }
+
+      showConfirmDialog(title, desc, onConfirm) {
+        document.getElementById('confirmDialogTitle').textContent = title;
+        document.getElementById('confirmDialogDesc').textContent = desc;
+
+        const modal = this.dom.confirmDialog;
+        modal.classList.remove('opacity-0', 'pointer-events-none');
+
+        const cleanUp = () => {
+          modal.classList.add('opacity-0', 'pointer-events-none');
+          this.dom.confirmOkBtn.removeEventListener('click', handleOk);
+          this.dom.confirmCancelBtn.removeEventListener('click', handleCancel);
+        };
+
+        const handleOk = () => {
+          cleanUp();
+          if (onConfirm) onConfirm();
+        };
+
+        const handleCancel = () => {
+          cleanUp();
+        };
+
+        this.dom.confirmOkBtn.addEventListener('click', handleOk);
+        this.dom.confirmCancelBtn.addEventListener('click', handleCancel);
+      }
+
+      setupEventListeners() {
+        // 抽球按鈕
+        this.dom.drawBallBtn.addEventListener('click', () => {
+          this.sound.init();
+          this.drawBall();
+        });
+
+        // 鍵盤空白鍵快速抽獎
+        window.addEventListener('keydown', (e) => {
+          if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+            e.preventDefault();
+            this.sound.init();
+            if (!this.dom.grandRevealModal.classList.contains('pointer-events-none')) {
+              this.closeGrandReveal();
+            } else {
+              this.drawBall();
+            }
+          } else if (e.code === 'Escape') {
+            this.closeGrandReveal();
+            this.closeConfigModal();
+          }
+        });
+
+        // 重置按鈕
+        this.dom.resetGameBtn.addEventListener('click', () => this.resetGame(true));
+
+        // 關閉特寫視窗
+        this.dom.closeRevealBtn.addEventListener('click', () => this.closeGrandReveal());
+        this.dom.grandRevealModal.addEventListener('click', (e) => {
+          if (e.target === this.dom.grandRevealModal) this.closeGrandReveal();
+        });
+
+        // 聽牌模式切換
+        this.dom.tensionModeBtn.addEventListener('click', () => this.toggleTensionMode());
+
+        // 聽牌快速新增
+        this.dom.addTensionBtn.addEventListener('click', () => {
+          const val = parseInt(this.dom.quickTensionInput.value.trim(), 10);
+          if (!isNaN(val) && this.allNumbers.includes(val)) {
+            this.tensionNumbers.add(val);
+            this.updateTensionBadgesUI();
+            this.renderMatrixGrid();
+            this.dom.quickTensionInput.value = '';
+          }
+        });
+
+        this.dom.quickTensionInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            this.dom.addTensionBtn.click();
+          }
+        });
+
+        // 清空聽牌
+        this.dom.clearTensionBtn.addEventListener('click', () => {
+          this.tensionNumbers.clear();
+          this.updateTensionBadgesUI();
+          this.renderMatrixGrid();
+        });
+
+        // 語音開關
+        this.dom.ttsToggleBtn.addEventListener('click', () => {
+          this.ttsEnabled = !this.ttsEnabled;
+          this.dom.ttsText.textContent = `語音報號: ${this.ttsEnabled ? '開啟' : '關閉'}`;
+          document.getElementById('ttsIcon').textContent = this.ttsEnabled ? '🔊' : '🔇';
+        });
+
+        // 音效開關
+        this.dom.soundToggleBtn.addEventListener('click', () => {
+          this.sound.init();
+          this.sound.enabled = !this.sound.enabled;
+          this.dom.soundText.textContent = `音效: ${this.sound.enabled ? '開啟' : '靜音'}`;
+          document.getElementById('soundIcon').textContent = this.sound.enabled ? '🔔' : '🔕';
+        });
+
+        // 全螢幕切換
+        this.dom.fullscreenBtn.addEventListener('click', () => {
+          if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(() => {});
+          } else {
+            if (document.exitFullscreen) document.exitFullscreen();
+          }
+        });
+
+        // 設定彈窗相關
+        this.dom.openConfigBtn.addEventListener('click', () => this.openConfigModal());
+        this.dom.closeConfigModalBtn.addEventListener('click', () => this.closeConfigModal());
+        this.dom.cancelConfigBtn.addEventListener('click', () => this.closeConfigModal());
+        this.dom.saveConfigBtn.addEventListener('click', () => this.applyCustomConfig());
+
+        // 預設按鈕
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            const range = e.currentTarget.dataset.range;
+            this.dom.customNumbersInput.value = range;
+          });
+        });
+      }
+
+      openConfigModal() {
+        this.dom.configErrorMsg.classList.add('hidden');
+        this.dom.customNumbersInput.value = `${this.allNumbers[0]}-${this.allNumbers[this.allNumbers.length - 1]}`;
+        this.dom.configModal.classList.remove('opacity-0', 'pointer-events-none');
+        this.dom.configModal.querySelector('div').classList.remove('scale-90');
+        this.dom.configModal.querySelector('div').classList.add('scale-100');
+      }
+
+      closeConfigModal() {
+        this.dom.configModal.querySelector('div').classList.remove('scale-100');
+        this.dom.configModal.querySelector('div').classList.add('scale-90');
+        this.dom.configModal.classList.add('opacity-0', 'pointer-events-none');
+      }
+
+      applyCustomConfig() {
+        const raw = this.dom.customNumbersInput.value.trim();
+        const parsed = this.parseInputNumbers(raw);
+
+        if (!parsed || parsed.length === 0) {
+          this.dom.configErrorMsg.textContent = '請輸入有效的號碼清單或區間（例如 1-75）！';
+          this.dom.configErrorMsg.classList.remove('hidden');
+          return;
+        }
+
+        if (parsed.length > 300) {
+          this.dom.configErrorMsg.textContent = '為維持流暢視覺體驗，最多支援 300 個號碼！';
+          this.dom.configErrorMsg.classList.remove('hidden');
+          return;
+        }
+
+        this.allNumbers = parsed;
+        this.tensionNumbers.clear();
+        this.updateTensionBadgesUI();
+        this.closeConfigModal();
+        this.resetGame(false);
+      }
+
+      parseInputNumbers(str) {
+        if (!str) return null;
+        const set = new Set();
+
+        // 匹配 range 格式，如 1-75 或 1~75
+        const rangeMatch = str.match(/^(\d+)\s*[-~至到]\s*(\d+)$/);
+        if (rangeMatch) {
+          const start = parseInt(rangeMatch[1], 10);
+          const end = parseInt(rangeMatch[2], 10);
+          const min = Math.min(start, end);
+          const max = Math.max(start, end);
+          for (let i = min; i <= max; i++) {
+            set.add(i);
+          }
+          return Array.from(set).sort((a, b) => a - b);
+        }
+
+        // 逗點、空白、換行分隔
+        const tokens = str.split(/[\s,，、;\n]+/);
+        for (let token of tokens) {
+          if (!token) continue;
+          if (token.includes('-') || token.includes('~')) {
+            const sub = token.split(/[-~]/);
+            if (sub.length === 2) {
+              const a = parseInt(sub[0], 10);
+              const b = parseInt(sub[1], 10);
+              if (!isNaN(a) && !isNaN(b)) {
+                for (let i = Math.min(a, b); i <= Math.max(a, b); i++) {
+                  set.add(i);
+                }
+              }
+            }
+          } else {
+            const num = parseInt(token, 10);
+            if (!isNaN(num)) {
+              set.add(num);
+            }
+          }
+        }
+
+        return Array.from(set).sort((a, b) => a - b);
+      }
+    }
+
+    // 啟動應用程式
+    window.addEventListener('DOMContentLoaded', () => {
+      window.bingoApp = new BingoGame();
+    });
+  </script>
+</body>
+</html>
