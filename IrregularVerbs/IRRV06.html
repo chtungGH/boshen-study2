@@ -1,0 +1,2027 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="min-h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Bryson 多主題英語不規則動詞特訓站</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Inter:wght@600;700&family=VT323&family=Noto+Sans+TC:wght@600;700;900&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    /* 正常現代風 (theme-default) */
+    body.theme-default {
+      font-family: 'Inter', 'Noto Sans TC', system-ui, -apple-system, sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+    body.theme-default .th-header {
+      background-color: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    body.theme-default .th-card {
+      background-color: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+    body.theme-default .th-btn {
+      transition: all 0.15s ease-in-out;
+      border: 1.5px solid #cbd5e1;
+      background-color: #ffffff;
+      color: #1e293b;
+      border-radius: 0.75rem;
+    }
+    body.theme-default .th-btn:hover {
+      background-color: #f1f5f9;
+      border-color: #94a3b8;
+    }
+    body.theme-default .th-btn:active {
+      transform: scale(0.97);
+    }
+    body.theme-default .th-btn.active {
+      background-color: #4f46e5;
+      color: #ffffff;
+      border-color: #4338ca;
+      box-shadow: 0 3px 8px rgba(79, 70, 229, 0.35);
+    }
+    body.theme-default .th-btn-primary {
+      background-color: #4f46e5;
+      color: #ffffff;
+      border: 1.5px solid #4338ca;
+      border-radius: 0.75rem;
+      box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+      transition: all 0.15s ease;
+    }
+    body.theme-default .th-btn-primary:hover {
+      background-color: #4338ca;
+    }
+    body.theme-default .th-btn-success {
+      background-color: #059669;
+      color: #ffffff;
+      border: 1.5px solid #047857;
+      border-radius: 0.75rem;
+      box-shadow: 0 4px 10px rgba(5, 150, 105, 0.3);
+    }
+    body.theme-default .th-progress {
+      background-color: #4f46e5;
+    }
+    body.theme-default .th-input {
+      background-color: #ffffff;
+      border: 2px solid #cbd5e1;
+      border-radius: 0.75rem;
+      color: #0f172a;
+    }
+    body.theme-default .th-input:focus {
+      border-color: #4f46e5;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+    }
+
+    /* 吉依卡哇風 (theme-chiikawa) */
+    body.theme-chiikawa {
+      font-family: 'Fredoka', 'Noto Sans TC', system-ui, -apple-system, sans-serif;
+      background-color: #fffbf2;
+      color: #3f2e22;
+    }
+    body.theme-chiikawa .th-header {
+      background-color: #ffffff;
+      border-bottom: 2px solid #fed7aa;
+    }
+    body.theme-chiikawa .th-card {
+      background-color: #ffffff;
+      border: 2px solid #fed7aa;
+      border-radius: 1.25rem;
+      box-shadow: 0 6px 16px -2px rgba(254, 215, 170, 0.4);
+    }
+    body.theme-chiikawa .th-btn {
+      transition: all 0.15s ease-in-out;
+      border: 2px solid #fbd38d;
+      background-color: #ffffff;
+      color: #78350f;
+      border-radius: 1rem;
+    }
+    body.theme-chiikawa .th-btn:hover {
+      background-color: #fef3c7;
+      border-color: #f6ad55;
+    }
+    body.theme-chiikawa .th-btn:active {
+      transform: scale(0.96);
+    }
+    body.theme-chiikawa .th-btn.active {
+      background-color: #fb7185;
+      color: #ffffff;
+      border-color: #f43f5e;
+      box-shadow: 0 4px 10px rgba(251, 113, 133, 0.4);
+    }
+    body.theme-chiikawa .th-btn-primary {
+      background: #fb7185;
+      color: #ffffff;
+      border: 2px solid #e11d48;
+      border-radius: 1rem;
+      box-shadow: 0 4px 12px rgba(244, 63, 94, 0.35);
+      transition: all 0.15s ease;
+    }
+    body.theme-chiikawa .th-btn-primary:hover {
+      background: #f43f5e;
+    }
+    body.theme-chiikawa .th-btn-success {
+      background: #0ea5e9;
+      color: #ffffff;
+      border: 2px solid #0284c7;
+      border-radius: 1rem;
+      box-shadow: 0 4px 12px rgba(14, 165, 233, 0.35);
+    }
+    body.theme-chiikawa .th-progress {
+      background: linear-gradient(90deg, #fb7185, #f43f5e);
+    }
+    body.theme-chiikawa .th-input {
+      background-color: #ffffff;
+      border: 2px solid #fed7aa;
+      border-radius: 1rem;
+      color: #3f2e22;
+    }
+    body.theme-chiikawa .th-input:focus {
+      border-color: #fb7185;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(251, 113, 133, 0.2);
+    }
+
+    /* 麥塊像素風 (theme-minecraft) */
+    body.theme-minecraft {
+      font-family: 'VT323', 'Noto Sans TC', monospace;
+      background-color: #1a1a1a;
+      background-image: 
+        radial-gradient(#262626 15%, transparent 16%),
+        radial-gradient(#262626 15%, transparent 16%);
+      background-size: 16px 16px;
+      background-position: 0 0, 8px 8px;
+      color: #f1f5f9 !important;
+      font-size: 1.15rem;
+      letter-spacing: 0.5px;
+    }
+    body.theme-minecraft * {
+      text-shadow: none !important;
+    }
+    body.theme-minecraft .th-header {
+      background-color: #27272a;
+      border-bottom: 4px solid #09090b;
+      box-shadow: inset 0 -3px 0 #3f3f46;
+    }
+    body.theme-minecraft .th-card {
+      background-color: #27272a;
+      border: 3px solid #09090b;
+      border-radius: 0px !important;
+      box-shadow: 
+        inset 2px 2px 0 #3f3f46,
+        inset -2px -2px 0 #18181b,
+        0 4px 0 rgba(0, 0, 0, 0.7);
+      color: #f8fafc !important;
+    }
+    body.theme-minecraft .th-btn {
+      transition: none;
+      border: 2px solid #000000;
+      background-color: #3f3f46;
+      color: #ffffff !important;
+      border-radius: 0px !important;
+      box-shadow: inset 2px 2px 0 #52525b, inset -2px -2px 0 #27272a, 0 3px 0 #000;
+      font-size: 1.15rem;
+    }
+    body.theme-minecraft .th-btn:hover {
+      background-color: #52525b;
+    }
+    body.theme-minecraft .th-btn:active {
+      transform: translateY(2px);
+      box-shadow: inset 2px 2px 0 #18181b, inset -2px -2px 0 #27272a, 0 1px 0 #000;
+    }
+    body.theme-minecraft .th-btn.active {
+      background-color: #2e7d32;
+      color: #fef08a !important;
+      border-color: #000000;
+      box-shadow: inset 2px 2px 0 #4ade80, inset -2px -2px 0 #14532d, 0 3px 0 #000;
+    }
+    body.theme-minecraft .th-btn-primary {
+      background: #3b7e22;
+      color: #ffffff !important;
+      border: 2px solid #000;
+      border-radius: 0px !important;
+      box-shadow: inset 2px 2px 0 #68b83e, inset -2px -2px 0 #235212, 0 4px 0 #000;
+      font-size: 1.35rem;
+    }
+    body.theme-minecraft .th-btn-primary:hover {
+      background: #469628;
+    }
+    body.theme-minecraft .th-btn-success {
+      background: #0284c7;
+      color: #ffffff !important;
+      border: 2px solid #000;
+      border-radius: 0px !important;
+      box-shadow: inset 2px 2px 0 #38bdf8, inset -2px -2px 0 #0369a1, 0 4px 0 #000;
+      font-size: 1.35rem;
+    }
+    body.theme-minecraft .th-progress {
+      background: #4ade80;
+      box-shadow: 0 0 8px #4ade80;
+    }
+    body.theme-minecraft .th-input {
+      background-color: #09090b !important;
+      border: 2px solid #4ade80 !important;
+      border-radius: 0px !important;
+      color: #fef08a !important;
+      font-size: 1.35rem !important;
+      box-shadow: inset 2px 2px 0 #000;
+    }
+    body.theme-minecraft .th-input:focus {
+      outline: none;
+      box-shadow: 0 0 10px #4ade80;
+    }
+    body.theme-minecraft .text-slate-900,
+    body.theme-minecraft .text-amber-950,
+    body.theme-minecraft .text-slate-800,
+    body.theme-minecraft .text-slate-700,
+    body.theme-minecraft .text-amber-900 {
+      color: #ffffff !important;
+    }
+    body.theme-minecraft .text-slate-500,
+    body.theme-minecraft .text-amber-800,
+    body.theme-minecraft .text-slate-600 {
+      color: #cbd5e1 !important;
+    }
+    body.theme-minecraft .bg-slate-50,
+    body.theme-minecraft .bg-amber-50,
+    body.theme-minecraft .bg-white {
+      background-color: #18181b !important;
+      border-color: #3f3f46 !important;
+      color: #f8fafc !important;
+    }
+    body.theme-minecraft .table-row-item:hover {
+      background-color: #3f3f46 !important;
+    }
+    body.theme-minecraft .text-past { color: #38bdf8 !important; font-weight: 700; }
+    body.theme-minecraft .text-pp { color: #4ade80 !important; font-weight: 700; }
+    body.theme-minecraft .text-zh { color: #fef08a !important; font-weight: 600; }
+  </style>
+</head>
+<body class="theme-default min-h-screen flex flex-col select-none">
+
+  <!-- 試用模式頂部提示橫幅 -->
+  <div id="trial-top-bar" class="hidden bg-amber-500 text-white text-xs sm:text-sm py-1.5 px-4 text-center font-bold sticky top-0 z-50 flex items-center justify-center gap-2 shadow">
+    <span>✨ 目前為【免費試玩體驗】(開放前 20 題核心動詞・支援所有題型)</span>
+    <button onclick="exitTrialToAuth()" class="ml-2 bg-white text-amber-800 px-3 py-0.5 rounded-full text-xs font-bold hover:bg-amber-50 transition shadow-sm">
+      輸入正式序號
+    </button>
+  </div>
+
+  <!-- 序號驗證與登入彈窗 -->
+  <div id="auth-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 hidden">
+    <div class="th-card max-w-md w-full p-6 sm:p-8 space-y-5 text-center shadow-2xl">
+      <div class="w-16 h-16 mx-auto rounded-2xl bg-indigo-100 flex items-center justify-center text-3xl">
+        🔐
+      </div>
+      <div>
+        <h2 class="text-2xl font-black">授權驗證</h2>
+        <p class="text-sm opacity-80 mt-1 font-medium">請輸入專屬授權序號，或直接免費體驗</p>
+      </div>
+      <div class="space-y-3">
+        <input id="input-license-key" type="text" placeholder="例如：TEST-888" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" class="th-input w-full px-4 py-3 text-center text-lg font-bold uppercase tracking-wider">
+        <div id="auth-error-msg" class="text-sm font-bold text-rose-500 min-h-[1.25rem]"></div>
+      </div>
+      
+      <div class="space-y-2.5">
+        <button id="btn-submit-license" onclick="verifyLicenseManual()" class="w-full py-3.5 th-btn-primary text-lg font-bold flex items-center justify-center space-x-2">
+          <span>啟用正式特訓系統</span>
+        </button>
+
+        <div class="relative flex py-1 items-center">
+          <div class="flex-grow border-t border-slate-300 dark:border-slate-700"></div>
+          <span class="flex-shrink mx-3 text-xs font-bold opacity-60">OR</span>
+          <div class="flex-grow border-t border-slate-300 dark:border-slate-700"></div>
+        </div>
+
+        <button type="button" onclick="startTrialFlow()" class="w-full py-3 th-btn-success text-base font-bold flex items-center justify-center space-x-2">
+          <span>🎮 免序號・免費體驗 20 題</span>
+        </button>
+      </div>
+
+      <!-- LINE 官方客服導流區塊 (無標價，彈性最高) -->
+      <div class="pt-3 border-t border-dashed border-slate-300 dark:border-slate-700 space-y-2">
+        <div class="text-xs font-bold opacity-75">尚未取得專屬授權序號？</div>
+        <a href="https://line.me/R/ti/p/@787ubyzm" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 px-4 bg-[#06C755] hover:bg-[#05b34c] text-white rounded-xl font-bold flex items-center justify-center space-x-2 transition shadow text-sm sm:text-base">
+          <span>💬 聯繫 LINE 客服取得序號</span>
+        </a>
+        <p class="text-[11px] opacity-60">
+          博深數位學習小站 官方客服 ID: <code class="px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-700 font-mono font-bold">@787ubyzm</code>
+        </p>
+      </div>
+
+      <p class="text-[11px] opacity-60 mt-3">
+        ※ 系統採智慧連線管制，同一序號若偵測到異常多機連線，後台將自動暫停授權服務。
+      </p>
+    </div>
+  </div>
+
+  <!-- 頂部導航列 -->
+  <header class="th-header sticky top-0 z-40 transition-colors duration-200">
+    <div class="max-w-6xl mx-auto px-3 sm:px-4 h-16 sm:h-20 flex items-center justify-between">
+      
+      <!-- Logo 與標題：綁定安全切換 -->
+      <div class="flex items-center space-x-2.5 sm:space-x-3 cursor-pointer shrink-0" onclick="playSound('click'); handleNavClick('quiz')">
+        <div id="nav-logo-box" class="w-10 h-10 sm:w-12 sm:h-12 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-sm">
+          <i id="nav-logo-icon" data-lucide="book-marked" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+        </div>
+        <div>
+          <h1 id="app-nav-title" class="text-lg sm:text-2xl font-bold tracking-tight leading-none flex items-center gap-1.5">
+            <span>Irregular Verbs</span>
+            <span id="app-nav-badge" class="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-bold">特訓</span>
+          </h1>
+          <p id="app-nav-subtitle" class="text-xs sm:text-sm text-slate-500 font-medium mt-1">英語不規則動詞分級特訓站</p>
+        </div>
+      </div>
+
+      <!-- 右側控制群：主題選單、頁籤 -->
+      <div class="flex items-center space-x-2 sm:space-x-3">
+        <div class="relative inline-block text-left">
+          <select id="theme-select" onchange="changeTheme(this.value)" class="th-btn px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs sm:text-base font-bold cursor-pointer pr-7 bg-no-repeat bg-[right_0.4rem_center] border appearance-none shadow-sm">
+            <option value="default">💼 正常風</option>
+            <option value="chiikawa">🌸 吉依卡哇</option>
+            <option value="minecraft">⛏️ 麥塊風</option>
+          </select>
+          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-xs opacity-60">
+            ▼
+          </div>
+        </div>
+
+        <nav class="flex items-center space-x-1.5">
+          <button id="nav-btn-quiz" onclick="playSound('click'); handleNavClick('quiz')" class="th-btn active px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-base font-bold flex items-center space-x-1.5">
+            <span id="nav-quiz-icon">📝</span>
+            <span id="nav-quiz-text">特訓場</span>
+          </button>
+          <button id="nav-btn-dictionary" onclick="playSound('click'); handleNavClick('dictionary')" class="th-btn px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-base font-bold flex items-center space-x-1.5">
+            <span id="nav-dict-icon">📖</span>
+            <span>圖鑑 (<span id="dict-total-count">0</span>)</span>
+          </button>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主內容視窗 -->
+  <main class="flex-1 max-w-5xl w-full mx-auto p-3 sm:p-6 pb-16 flex flex-col">
+
+    <!-- 區塊 1: 測驗設定介面 -->
+    <div id="section-setup" class="w-full max-w-2xl mx-auto space-y-4 sm:space-y-6">
+      
+      <!-- 雲端狀態卡 -->
+      <div id="db-loading-banner" class="th-card p-4 sm:p-5 flex items-center justify-between transition-all">
+        <div class="flex items-center space-x-3">
+          <div id="db-status-icon-box" class="w-9 h-9 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center shrink-0 text-lg">
+            <span id="db-status-emoji">📡</span>
+          </div>
+          <div>
+            <div id="db-loading-title" class="text-sm sm:text-base font-bold">正在連線 Firebase 雲端題庫...</div>
+            <div id="db-loading-desc" class="text-xs sm:text-sm opacity-80">極速載入中，請稍候片刻。</div>
+          </div>
+        </div>
+        <button id="btn-manual-sync" onclick="playSound('click'); startAuthFlow(true)" class="th-btn px-3 py-1.5 text-xs sm:text-sm font-semibold shrink-0">
+          切換序號 / 重新連線
+        </button>
+      </div>
+
+      <div class="text-center space-y-1.5">
+        <h2 id="main-banner-title" class="text-2xl sm:text-3xl font-extrabold tracking-tight">特訓設定與範圍選擇</h2>
+        <p id="main-banner-desc" class="text-sm sm:text-base opacity-80 font-medium">結合真實語境例句，依程度精準強化不規則動詞記憶</p>
+      </div>
+
+      <div class="th-card p-5 sm:p-8 space-y-6">
+        
+        <!-- 1. 動詞單字範圍選擇 -->
+        <div class="space-y-2.5">
+          <label class="text-base sm:text-lg font-bold flex items-center space-x-2">
+            <span class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold bg-indigo-100 text-indigo-700">1</span>
+            <span id="label-step-1">選擇單字收錄範圍</span>
+          </label>
+          <div class="grid grid-cols-2 gap-3">
+            <button type="button" onclick="playSound('click'); setScope('COMMON')" id="scope-btn-common" class="th-btn active py-3 px-3 sm:px-4 text-sm sm:text-base font-bold flex items-center justify-center">
+              <span id="scope-common-label">🔥 核心常用動詞</span>
+            </button>
+            <button type="button" onclick="playSound('click'); setScope('ALL')" id="scope-btn-all" class="th-btn py-3 px-3 sm:px-4 text-sm sm:text-base font-bold flex items-center justify-center">
+              <span id="scope-all-label">🌐 完整全收錄</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. 等級 1~5 聯集選擇 (預設全不選) -->
+        <div class="space-y-2.5">
+          <div class="flex justify-between items-center">
+            <div>
+              <label class="text-base sm:text-lg font-bold flex items-center space-x-2">
+                <span class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold bg-indigo-100 text-indigo-700">2</span>
+                <span id="label-step-2">例句閱讀難度（改錯與填空適用）</span>
+              </label>
+              <p class="text-xs opacity-60 ml-8 font-medium">※ 請至少勾選一級；純三態單選題為動詞背誦，不受例句難度限制</p>
+            </div>
+            <span id="selected-level-desc" class="text-xs sm:text-sm px-2.5 py-0.5 rounded-full font-semibold border">請選擇</span>
+          </div>
+          <div class="grid grid-cols-5 gap-1.5 sm:gap-2">
+            <button type="button" onclick="playSound('click'); toggleLevelFilter(1)" id="level-btn-1" class="level-toggle-btn th-btn py-2.5 flex flex-col items-center justify-center">
+              <span class="text-sm sm:text-lg font-bold leading-tight">Lv.1</span>
+              <span class="level-label text-xs sm:text-sm font-medium opacity-90 mt-0.5" data-lvl="1">基礎</span>
+            </button>
+            <button type="button" onclick="playSound('click'); toggleLevelFilter(2)" id="level-btn-2" class="level-toggle-btn th-btn py-2.5 flex flex-col items-center justify-center">
+              <span class="text-sm sm:text-lg font-bold leading-tight">Lv.2</span>
+              <span class="level-label text-xs sm:text-sm font-medium opacity-90 mt-0.5" data-lvl="2">初級</span>
+            </button>
+            <button type="button" onclick="playSound('click'); toggleLevelFilter(3)" id="level-btn-3" class="level-toggle-btn th-btn py-2.5 flex flex-col items-center justify-center">
+              <span class="text-sm sm:text-lg font-bold leading-tight">Lv.3</span>
+              <span class="level-label text-xs sm:text-sm font-medium opacity-90 mt-0.5" data-lvl="3">中級</span>
+            </button>
+            <button type="button" onclick="playSound('click'); toggleLevelFilter(4)" id="level-btn-4" class="level-toggle-btn th-btn py-2.5 flex flex-col items-center justify-center">
+              <span class="text-sm sm:text-lg font-bold leading-tight">Lv.4</span>
+              <span class="level-label text-xs sm:text-sm font-medium opacity-90 mt-0.5" data-lvl="4">中高</span>
+            </button>
+            <button type="button" onclick="playSound('click'); toggleLevelFilter(5)" id="level-btn-5" class="level-toggle-btn th-btn py-2.5 flex flex-col items-center justify-center">
+              <span class="text-sm sm:text-lg font-bold leading-tight">Lv.5</span>
+              <span class="level-label text-xs sm:text-sm font-medium opacity-90 mt-0.5" data-lvl="5">高階</span>
+            </button>
+          </div>
+          <div class="flex justify-end space-x-3 pt-0.5 text-xs sm:text-sm font-bold opacity-80">
+            <button type="button" onclick="playSound('click'); selectAllLevels(true)" class="hover:underline">全選</button>
+            <span>|</span>
+            <button type="button" onclick="playSound('click'); selectAllLevels(false)" class="hover:underline">清空</button>
+          </div>
+        </div>
+
+        <!-- 3. 動詞型態聯集多選 -->
+        <div class="space-y-2.5">
+          <div class="flex justify-between items-center">
+            <label class="text-base sm:text-lg font-bold flex items-center space-x-2">
+              <span class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold bg-indigo-100 text-indigo-700">3</span>
+              <span id="label-step-3">變化型態（多選）</span>
+            </label>
+            <span id="selected-type-count" class="text-xs sm:text-sm px-2.5 py-0.5 rounded-full font-semibold border">0 個在庫</span>
+          </div>
+          <div class="grid grid-cols-5 gap-1.5 sm:gap-2">
+            <button type="button" onclick="playSound('click'); toggleTypeFilter('AAA')" id="type-btn-AAA" class="type-toggle-btn th-btn active py-2.5 text-xs sm:text-base font-bold">AAA</button>
+            <button type="button" onclick="playSound('click'); toggleTypeFilter('AAB')" id="type-btn-AAB" class="type-toggle-btn th-btn active py-2.5 text-xs sm:text-base font-bold">AAB</button>
+            <button type="button" onclick="playSound('click'); toggleTypeFilter('ABA')" id="type-btn-ABA" class="type-toggle-btn th-btn active py-2.5 text-xs sm:text-base font-bold">ABA</button>
+            <button type="button" onclick="playSound('click'); toggleTypeFilter('ABB')" id="type-btn-ABB" class="type-toggle-btn th-btn active py-2.5 text-xs sm:text-base font-bold">ABB</button>
+            <button type="button" onclick="playSound('click'); toggleTypeFilter('ABC')" id="type-btn-ABC" class="type-toggle-btn th-btn active py-2.5 text-xs sm:text-base font-bold">ABC</button>
+          </div>
+          <div class="flex justify-end space-x-3 pt-0.5 text-xs font-bold opacity-80">
+            <button type="button" onclick="playSound('click'); selectAllTypes(true)" class="hover:underline">全選</button>
+            <span>|</span>
+            <button type="button" onclick="playSound('click'); selectAllTypes(false)" class="hover:underline">清空</button>
+          </div>
+        </div>
+
+        <!-- 4. 題型選擇 (4種模式完全支援) -->
+        <div class="space-y-2.5">
+          <label class="text-base sm:text-lg font-bold flex items-center space-x-2">
+            <span class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold bg-indigo-100 text-indigo-700">4</span>
+            <span id="label-step-4">測驗題型模式</span>
+          </label>
+          <div class="grid grid-cols-2 gap-3">
+            <label class="th-btn p-3.5 sm:p-4 flex items-center cursor-pointer">
+              <input type="radio" name="question-mode" value="MIXED" checked class="w-5 h-5 shrink-0">
+              <span id="mode-opt-mixed" class="ml-2.5 text-base sm:text-lg font-bold">混合挑戰</span>
+            </label>
+            <label class="th-btn p-3.5 sm:p-4 flex items-center cursor-pointer">
+              <input type="radio" name="question-mode" value="CHOICE" class="w-5 h-5 shrink-0">
+              <span id="mode-opt-choice" class="ml-2.5 text-base sm:text-lg font-bold">三態單選</span>
+            </label>
+            <label class="th-btn p-3.5 sm:p-4 flex items-center cursor-pointer">
+              <input type="radio" name="question-mode" value="ERROR" class="w-5 h-5 shrink-0">
+              <span id="mode-opt-error" class="ml-2.5 text-base sm:text-lg font-bold">例句改錯</span>
+            </label>
+            <label class="th-btn p-3.5 sm:p-4 flex items-center cursor-pointer">
+              <input type="radio" name="question-mode" value="CLOZE" class="w-5 h-5 shrink-0">
+              <span id="mode-opt-cloze" class="ml-2.5 text-base sm:text-lg font-bold">例句填空</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- 5. 題數選擇 -->
+        <div class="space-y-2.5">
+          <label class="text-base sm:text-lg font-bold flex items-center space-x-2">
+            <span class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold bg-indigo-100 text-indigo-700">5</span>
+            <span id="label-step-5">本輪題目數量</span>
+          </label>
+          <div class="grid grid-cols-4 gap-2">
+            <button type="button" onclick="playSound('click'); setCount(10)" class="count-btn active th-btn py-2.5 text-sm sm:text-base font-bold" data-count="10">10 題</button>
+            <button type="button" onclick="playSound('click'); setCount(20)" class="count-btn th-btn py-2.5 text-sm sm:text-base font-bold" data-count="20">20 題</button>
+            <button type="button" onclick="playSound('click'); setCount(30)" class="count-btn th-btn py-2.5 text-sm sm:text-base font-bold" data-count="30">30 題</button>
+            <button type="button" onclick="playSound('click'); setCount(50)" class="count-btn th-btn py-2.5 text-sm sm:text-base font-bold" data-count="50">50 題</button>
+          </div>
+        </div>
+
+        <!-- 開始按鈕 -->
+        <div class="pt-3">
+          <button id="btn-start-quiz" onclick="playSound('levelup'); startQuiz()" class="w-full py-4 th-btn-primary text-lg sm:text-2xl font-bold flex items-center justify-center space-x-2 tracking-wide shadow-md">
+            <span id="btn-start-icon">⚔️</span>
+            <span id="btn-start-text">開始特訓作答</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 區塊 2: 進行中測驗 -->
+    <div id="section-quiz" class="w-full max-w-3xl mx-auto hidden flex-col space-y-4">
+      <div class="th-card p-4 sm:p-5 space-y-3">
+        <div class="flex items-center justify-between text-sm sm:text-base font-bold">
+          <div class="flex items-center space-x-2">
+            <span id="quiz-badge-type" class="th-btn px-3 py-1 text-xs sm:text-sm font-bold">題型</span>
+            <span id="quiz-badge-level" class="th-btn px-3 py-1 text-xs sm:text-sm font-bold hidden">Lv.1</span>
+            <span id="quiz-progress-text" class="font-bold ml-1 text-sm sm:text-base">第 1 / 10 題</span>
+          </div>
+          <div class="flex items-center space-x-4">
+            <span class="flex items-center text-emerald-400 font-extrabold text-base sm:text-lg"><span id="badge-stat-correct">✓</span><span id="current-correct" class="ml-1">0</span></span>
+            <span class="flex items-center text-rose-400 font-extrabold text-base sm:text-lg"><span id="badge-stat-wrong">✗</span><span id="current-wrong" class="ml-1">0</span></span>
+            <button onclick="playSound('click'); confirmExitQuiz()" id="btn-exit-quiz" class="th-btn px-3 py-1 text-xs sm:text-sm font-bold bg-rose-50 text-rose-600 hover:bg-rose-100 border-rose-200">
+              放棄返回
+            </button>
+          </div>
+        </div>
+        
+        <div class="w-full bg-slate-200 dark:bg-slate-700 h-3 overflow-hidden rounded-full">
+          <div id="quiz-progress-bar" class="th-progress h-full transition-all duration-300" style="width: 10%"></div>
+        </div>
+      </div>
+
+      <div id="question-card" class="th-card p-5 sm:p-8 space-y-6">
+        <!-- 頂部輔助列：中文翻譯切換勾選框 -->
+        <div class="flex justify-end items-center border-b pb-3 border-slate-200 dark:border-slate-700">
+          <label class="flex items-center space-x-2 cursor-pointer text-xs sm:text-sm font-bold select-none opacity-80 hover:opacity-100 transition-opacity">
+            <input type="checkbox" id="toggle-zh-hint" onchange="toggleZhHint(this.checked)" class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer">
+            <span>💡 顯示中文提示</span>
+          </label>
+        </div>
+
+        <div id="question-body"></div>
+
+        <div id="feedback-container" class="hidden p-4 sm:p-6 border transition-all space-y-2 rounded-xl text-base sm:text-lg">
+          <div class="flex items-center space-x-2 font-bold" id="feedback-title"></div>
+          <div class="font-medium leading-relaxed" id="feedback-explanation"></div>
+        </div>
+
+        <div class="flex justify-end pt-2" id="action-buttons">
+          <button id="btn-submit-answer" onclick="checkCurrentAnswer()" class="w-full sm:w-auto px-8 sm:px-10 py-3.5 th-btn-primary text-lg sm:text-xl font-bold tracking-wide shadow-md">
+            送出答案
+          </button>
+          <button id="btn-next-question" onclick="playSound('click'); nextQuestion()" class="hidden w-full sm:w-auto px-8 sm:px-10 py-3.5 th-btn-success text-lg sm:text-xl font-bold flex items-center justify-center space-x-2 tracking-wide shadow-md">
+            <span id="btn-next-text">下一題</span>
+            <i data-lucide="arrow-right" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 區塊 3: 結算報告 -->
+    <div id="section-result" class="w-full max-w-2xl mx-auto hidden flex-col space-y-4 sm:space-y-6">
+      <div class="th-card p-6 sm:p-9 text-center space-y-6">
+        <div id="result-icon-wrapper" class="w-20 h-20 mx-auto flex items-center justify-center text-4xl th-card shadow-sm">
+          🏆
+        </div>
+        
+        <div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight" id="result-title">測驗完成！成果結算</h2>
+          <p class="text-sm sm:text-base opacity-80 font-medium mt-1" id="result-subtitle">以下為本次特訓的詳細統計</p>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3 p-4 th-card">
+          <div class="p-2">
+            <div id="result-label-rate" class="text-xs sm:text-sm font-bold opacity-80">答對率</div>
+            <div class="text-2xl sm:text-4xl font-black mt-1" id="result-score">0%</div>
+          </div>
+          <div class="p-2 border-x border-slate-300 dark:border-slate-700">
+            <div id="result-label-correct" class="text-xs sm:text-sm font-bold opacity-80">答對題數</div>
+            <div class="text-2xl sm:text-4xl font-black text-emerald-400 mt-1" id="result-correct-count">0</div>
+          </div>
+          <div class="p-2">
+            <div id="result-label-wrong" class="text-xs sm:text-sm font-bold opacity-80">答錯題數</div>
+            <div class="text-2xl sm:text-4xl font-black text-rose-400 mt-1" id="result-wrong-count">0</div>
+          </div>
+        </div>
+
+        <div id="wrong-answers-container" class="space-y-2 text-left"></div>
+
+        <!-- 體驗模式通關導流卡片 (無標價) -->
+        <div id="trial-unlock-result-card" class="p-4 sm:p-5 rounded-xl border border-emerald-400 bg-emerald-50 text-emerald-950 dark:bg-emerald-950/80 dark:text-emerald-100 space-y-2.5 hidden">
+          <div class="font-bold text-base sm:text-lg">🌱 喜歡這個特訓站嗎？</div>
+          <p class="text-xs sm:text-sm opacity-90 leading-relaxed">
+            立即取得正式序號，解鎖完整 222 個不規則動詞、Lv.1 ~ Lv.5 生活例句改錯與填空挑戰！
+          </p>
+          <div class="pt-1 flex flex-col sm:flex-row gap-2 justify-center">
+            <a href="https://line.me/R/ti/p/@787ubyzm" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center px-5 py-2.5 bg-[#06C755] hover:bg-[#05b34c] text-white font-bold rounded-xl text-sm transition shadow">
+              <span>💬 聯繫 LINE 客服取得序號</span>
+            </a>
+            <button onclick="exitTrialToAuth()" class="inline-flex items-center justify-center px-4 py-2.5 th-btn text-xs sm:text-sm font-bold">
+              輸入已取得序號
+            </button>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-3 pt-2">
+          <button id="btn-retry-wrong" onclick="playSound('click'); retryWrongQuestions()" class="hidden flex-1 py-3.5 th-btn text-base font-bold flex items-center justify-center space-x-2">
+            <span>🛡️</span>
+            <span id="btn-retry-text">僅重測錯題 (<span id="wrong-retry-count">0</span>)</span>
+          </button>
+          <button onclick="playSound('click'); resetToSetup()" class="flex-1 py-3.5 th-btn-primary text-base font-bold flex items-center justify-center space-x-2">
+            <span>🔄</span>
+            <span id="btn-restart-text">再來一輪特訓</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 區塊 4: 完整動詞檢索圖鑑 -->
+    <div id="section-dictionary" class="w-full hidden flex-col space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h2 id="dict-title" class="text-2xl sm:text-3xl font-extrabold tracking-tight flex items-center gap-2">
+            <span>📖 不規則動詞檢索圖鑑</span>
+          </h2>
+          <p id="dict-subtitle" class="text-sm sm:text-base opacity-80 font-medium mt-0.5">點擊搜尋或篩選三態，字體清晰放大好複習</p>
+        </div>
+        <div class="flex items-center space-x-2">
+          <div class="relative w-full sm:w-80">
+            <i data-lucide="search" class="w-5 h-5 absolute left-3.5 top-3.5 opacity-60"></i>
+            <input id="dict-search-input" oninput="renderDictionary()" type="text" placeholder="搜尋動詞或中文..." autocapitalize="none" autocomplete="off" autocorrect="off" spellcheck="false" class="th-input w-full pl-11 pr-4 py-2.5 text-base sm:text-lg font-bold shadow-sm">
+          </div>
+        </div>
+      </div>
+
+      <div class="th-card p-3.5 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">
+        <div class="flex items-center space-x-2">
+          <span class="text-sm sm:text-base font-bold opacity-80 shrink-0">範圍：</span>
+          <button type="button" onclick="playSound('click'); setDictScope('ALL')" id="dict-scope-btn-all" class="dict-scope-btn th-btn active px-3 py-1.5 text-xs sm:text-sm font-bold">
+            全收錄 (<span id="dict-scope-all-count">0</span>)
+          </button>
+          <button type="button" onclick="playSound('click'); setDictScope('COMMON')" id="dict-scope-btn-common" class="dict-scope-btn th-btn px-3 py-1.5 text-xs sm:text-sm font-bold">
+            核心 (<span id="dict-scope-common-count">0</span>)
+          </button>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-1.5">
+          <button onclick="playSound('click'); setDictFilter('ALL')" class="dict-filter active th-btn px-2.5 py-1.5 text-xs sm:text-sm font-bold" data-dict="ALL">全部</button>
+          <button onclick="playSound('click'); setDictFilter('AAA')" class="dict-filter th-btn px-2.5 py-1.5 text-xs sm:text-sm font-bold" data-dict="AAA">AAA</button>
+          <button onclick="playSound('click'); setDictFilter('AAB')" class="dict-filter th-btn px-2.5 py-1.5 text-xs sm:text-sm font-bold" data-dict="AAB">AAB</button>
+          <button onclick="playSound('click'); setDictFilter('ABA')" class="dict-filter th-btn px-2.5 py-1.5 text-xs sm:text-sm font-bold" data-dict="ABA">ABA</button>
+          <button onclick="playSound('click'); setDictFilter('ABB')" class="dict-filter th-btn px-2.5 py-1.5 text-xs sm:text-sm font-bold" data-dict="ABB">ABB</button>
+          <button onclick="playSound('click'); setDictFilter('ABC')" class="dict-filter th-btn px-2.5 py-1.5 text-xs sm:text-sm font-bold" data-dict="ABC">ABC</button>
+        </div>
+      </div>
+
+      <div class="th-card overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left whitespace-nowrap sm:whitespace-normal">
+            <thead class="border-b text-sm sm:text-base font-extrabold uppercase tracking-wider bg-black/5">
+              <tr>
+                <th class="py-3.5 px-3 sm:px-4 w-12 text-center">#</th>
+                <th class="py-3.5 px-3 sm:px-5">原形 (Base)</th>
+                <th class="py-3.5 px-3 sm:px-5">過去式 (Past)</th>
+                <th class="py-3.5 px-3 sm:px-5">過去分詞 (P.P.)</th>
+                <th class="py-3.5 px-3 sm:px-5">中文涵義</th>
+                <th class="py-3.5 px-3 sm:px-4 text-center">型態</th>
+              </tr>
+            </thead>
+            <tbody id="dict-table-body" class="divide-y text-base sm:text-lg font-semibold">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // ========================================================
+    // 1. Firebase 連線設定
+    // ========================================================
+    const FIREBASE_PROJECT_ID = "irrverbs-cc585";
+    const FIREBASE_API_KEY = "AIzaSyDg2Rw8U2jZ4SxhrwTUXeuvQeGfg7j-ViY";
+
+    let VERB_DATABASE = [];
+    let isTrialMode = false;
+    let isQuizActive = false; // 紀錄測驗是否正在進行中
+    let showZhHint = false;   // 紀錄是否開啟中文提示
+
+    let localDeviceId = localStorage.getItem('app_device_token');
+    if (!localDeviceId) {
+      localDeviceId = 'dev_' + Math.random().toString(36).substring(2, 12) + '_' + Date.now().toString(36);
+      localStorage.setItem('app_device_token', localDeviceId);
+    }
+
+    // ========================================================
+    // 2. 授權驗證與試用分流
+    // ========================================================
+    async function startAuthFlow(forcePrompt = false) {
+      let savedKey = localStorage.getItem('app_license_key');
+      if (!savedKey || forcePrompt) {
+        showAuthModal(true);
+        return;
+      }
+      await verifyLicense(savedKey);
+    }
+
+    function showAuthModal(show, errText = "") {
+      const modal = document.getElementById('auth-modal');
+      const errEl = document.getElementById('auth-error-msg');
+      errEl.textContent = errText;
+      if (show) modal.classList.remove('hidden');
+      else modal.classList.add('hidden');
+    }
+
+    async function startTrialFlow() {
+      showAuthModal(false);
+      setDbLoadingState('loading');
+      try {
+        isTrialMode = true;
+        await fetchVerbDatabaseFromFirestore();
+        VERB_DATABASE = VERB_DATABASE.slice(0, 20); // 切片前 20 題
+
+        document.getElementById('trial-top-bar').classList.remove('hidden');
+        setDbLoadingState('success', `試玩模式啟動：前 20 個核心動詞已就緒！`);
+        updateFilterCount();
+        renderDictionary();
+      } catch (err) {
+        setDbLoadingState('offline');
+        showAuthModal(true, "試用題庫連線失敗，請檢查網路。");
+      }
+    }
+
+    function exitTrialToAuth() {
+      if (isQuizActive && !confirm("確定要離開目前的試玩並輸入序號嗎？")) return;
+      localStorage.removeItem('app_license_key');
+      isTrialMode = false;
+      isQuizActive = false;
+      document.getElementById('trial-top-bar').classList.add('hidden');
+      resetToSetup();
+      showAuthModal(true);
+    }
+
+    async function verifyLicenseManual() {
+      const input = document.getElementById('input-license-key');
+      const key = input.value.trim().toUpperCase();
+      if (!key) {
+        document.getElementById('auth-error-msg').textContent = "請輸入有效序號！";
+        return;
+      }
+      const btn = document.getElementById('btn-submit-license');
+      btn.disabled = true;
+      btn.textContent = "驗證中...";
+      await verifyLicense(key);
+      btn.disabled = false;
+      btn.textContent = "啟用正式特訓系統";
+    }
+
+    async function verifyLicense(key) {
+      setDbLoadingState('loading');
+      try {
+        const licUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/licenses/${key}?key=${FIREBASE_API_KEY}`;
+        const licRes = await fetch(licUrl);
+
+        if (licRes.status === 404) throw new Error("此授權序號不存在，請確認輸入是否正確。");
+        if (!licRes.ok) throw new Error("雲端連線失敗，請檢查網路連線。");
+
+        const licDoc = await licRes.json();
+        const fields = licDoc.fields || {};
+        const status = fields.status ? fields.status.stringValue : "啟用";
+        const maxDevices = fields.maxDevices ? Number(fields.maxDevices.integerValue || fields.maxDevices.stringValue) : 2;
+
+        if (status !== "啟用") throw new Error("此序號已被停用，請洽詢管理者。");
+
+        let sessions = {};
+        if (fields.sessions && fields.sessions.stringValue) {
+          try { sessions = JSON.parse(fields.sessions.stringValue); } catch(e) { sessions = {}; }
+        }
+
+        const now = Date.now();
+        const activeDevices = {};
+
+        for (const [devId, lastTime] of Object.entries(sessions)) {
+          if (now - lastTime < 600000) activeDevices[devId] = lastTime;
+        }
+
+        const isCurrentDevActive = Boolean(activeDevices[localDeviceId]);
+        const currentActiveCount = Object.keys(activeDevices).length;
+
+        if (!isCurrentDevActive && currentActiveCount >= maxDevices) {
+          throw new Error(`已達到裝置上限（最多 ${maxDevices} 台裝置同時上線）。請先關閉其他裝置後再試！`);
+        }
+
+        activeDevices[localDeviceId] = now;
+        await updateDeviceSession(key, activeDevices);
+
+        isTrialMode = false;
+        document.getElementById('trial-top-bar').classList.add('hidden');
+        localStorage.setItem('app_license_key', key);
+        showAuthModal(false);
+
+        await fetchVerbDatabaseFromFirestore();
+        startHeartbeat(key);
+
+      } catch (err) {
+        setDbLoadingState('offline');
+        showAuthModal(true, err.message);
+      }
+    }
+
+    async function updateDeviceSession(key, activeDevices) {
+      try {
+        const updateUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/licenses/${key}?updateMask.fieldPaths=sessions&key=${FIREBASE_API_KEY}`;
+        await fetch(updateUrl, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            fields: { sessions: { stringValue: JSON.stringify(activeDevices) } }
+          })
+        });
+      } catch (e) {}
+    }
+
+    async function fetchVerbDatabaseFromFirestore() {
+      const dbUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/system_data/verb_database?key=${FIREBASE_API_KEY}`;
+      const res = await fetch(dbUrl);
+      if (!res.ok) throw new Error("讀取題庫資料失敗。");
+      const doc = await res.json();
+      
+      let jsonStr = doc.fields?.dataJson?.stringValue;
+      if (!jsonStr && doc.fields) {
+        for (let k of Object.keys(doc.fields)) {
+          if (doc.fields[k].stringValue) {
+            jsonStr = doc.fields[k].stringValue;
+            break;
+          }
+        }
+      }
+
+      if (!jsonStr) throw new Error("題庫為空，請先至試算表點擊同步！");
+
+      VERB_DATABASE = JSON.parse(jsonStr);
+      setDbLoadingState('success', `全等級題庫共 ${VERB_DATABASE.length} 個動詞已就緒！`);
+      updateFilterCount();
+      renderDictionary();
+    }
+
+    let heartbeatTimer = null;
+    function startHeartbeat(key) {
+      if (heartbeatTimer) clearInterval(heartbeatTimer);
+      heartbeatTimer = setInterval(async () => {
+        try {
+          const licUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/licenses/${key}?key=${FIREBASE_API_KEY}`;
+          const res = await fetch(licUrl);
+          if (res.ok) {
+            const doc = await res.json();
+            let sessions = {};
+            try { sessions = JSON.parse(doc.fields?.sessions?.stringValue || "{}"); } catch(e){}
+            sessions[localDeviceId] = Date.now();
+            await updateDeviceSession(key, sessions);
+          }
+        } catch(e) {}
+      }, 180000);
+    }
+
+    // ========================================================
+    // 3. 風格配置
+    // ========================================================
+    const THEMES = {
+      default: {
+        id: 'default',
+        navTitle: 'Irregular Verbs',
+        navBadge: '特訓',
+        navSubtitle: '英語不規則動詞分級特訓站',
+        bannerTitle: '特訓設定與範圍選擇',
+        bannerDesc: '結合真實語境例句，依程度精準強化不規則動詞記憶',
+        scopeCommon: '🔥 核心常用動詞',
+        scopeAll: '🌐 完整全收錄',
+        btnStart: '開始特訓作答',
+        btnSubmit: '送出答案',
+        btnNext: '下一題',
+        correctMsg: '回答正確！',
+        wrongMsg: '回答錯誤，正解為：',
+        levels: { 1: '基礎', 2: '初級', 3: '中級', 4: '中高', 5: '高階' },
+        modeMixed: '混合挑戰', modeChoice: '三態單選', modeError: '例句改錯', modeCloze: '例句填空',
+        iconStatCorrect: '✓', iconStatWrong: '✗', exitText: '放棄返回',
+        dictTitle: '📖 不規則動詞檢索圖鑑', dictSubtitle: '支援快速篩選三態型態與即時搜尋中英文'
+      },
+      chiikawa: {
+        id: 'chiikawa',
+        navTitle: 'ちいかわ',
+        navBadge: '特訓場',
+        navSubtitle: 'なんとかなれーッ！不規則動詞特訓',
+        bannerTitle: '🌿 拔草檢定・三態特訓設定 🌿',
+        bannerDesc: '「フ！ハッ！なんとかなれーッ！」考取除草檢定證書吧！',
+        scopeCommon: '⭐ 核心必考動詞',
+        scopeAll: '🏰 全收錄大冒險',
+        btnStart: 'ヤハッ！討伐出發！',
+        btnSubmit: 'エイッ！送出答案',
+        btnNext: '下一題 (なんとかなれ！)',
+        correctMsg: '🎉 なんとかなったーッ！（答對了！）',
+        wrongMsg: '😿 哇啊啊…答錯了！（正解是：',
+        levels: { 1: '吉伊 (基)', 2: '小八 (初)', 3: '兔兔 (中)', 4: '飛鼠 (高)', 5: '前輩 (極)' },
+        modeMixed: '🎲 綜合大討伐', modeChoice: '✨ 三態單選', modeError: '🔍 例句抓錯', modeCloze: '✏️ 例句填空',
+        iconStatCorrect: '🌸', iconStatWrong: '💧', exitText: '回休息處',
+        dictTitle: '📖 小八的動詞複習手冊', dictSubtitle: '隨身小筆記，字體放大看得更清楚'
+      },
+      minecraft: {
+        id: 'minecraft',
+        navTitle: 'MINECRAFT',
+        navBadge: 'FORGE',
+        navSubtitle: '動詞三態・附魔鍛造實驗台',
+        bannerTitle: '⛏️ 裝備附魔・特訓模式配置 ⛏️',
+        bannerDesc: '在生存冒險中升級動詞鋒利度與耐久度，擊退文法苦力怕！',
+        scopeCommon: '⚔️ 核心生存必備',
+        scopeAll: '📦 終界箱全收錄',
+        btnStart: '生成世界 (開始挑戰)',
+        btnSubmit: '右鍵放置方塊 (送出)',
+        btnNext: '前往下一區域 >>',
+        correctMsg: '💎 獲得進度：完美的暴擊！',
+        wrongMsg: '💥 嘶嘶…苦力怕爆炸！正解為：',
+        levels: { 1: '皮革裝 (Lv.1)', 2: '鐵裝備 (Lv.2)', 3: '黃金套 (Lv.3)', 4: '鑽石級 (Lv.4)', 5: '獄髓神裝 (Lv.5)' },
+        modeMixed: '🎲 生存大亂鬥', modeChoice: '💎 附魔單選', modeError: '🏹 找出損壞耐久', modeCloze: '🧱 填補方塊空缺',
+        iconStatCorrect: '💎', iconStatWrong: '💥', exitText: '離開伺服器',
+        dictTitle: '📜 鐵砧附魔圖鑑大典', dictSubtitle: '翻閱所有動詞屬性與附魔變化'
+      }
+    };
+
+    let currentThemeKey = localStorage.getItem('app_saved_theme') || 'default';
+
+    function changeTheme(themeKey) {
+      currentThemeKey = themeKey;
+      localStorage.setItem('app_saved_theme', themeKey);
+      document.body.className = `theme-${themeKey} min-h-screen flex flex-col select-none`;
+      
+      const selectEl = document.getElementById('theme-select');
+      if (selectEl) selectEl.value = themeKey;
+
+      const pack = THEMES[themeKey] || THEMES.default;
+
+      document.getElementById('app-nav-title').children[0].textContent = pack.navTitle;
+      document.getElementById('app-nav-badge').textContent = pack.navBadge;
+      document.getElementById('app-nav-subtitle').textContent = pack.navSubtitle;
+
+      document.getElementById('main-banner-title').textContent = pack.bannerTitle;
+      document.getElementById('main-banner-desc').textContent = pack.bannerDesc;
+
+      document.getElementById('scope-common-label').textContent = pack.scopeCommon;
+      document.getElementById('scope-all-label').textContent = pack.scopeAll;
+      document.getElementById('btn-start-text').textContent = pack.btnStart;
+      document.getElementById('btn-submit-answer').textContent = pack.btnSubmit;
+      document.getElementById('btn-next-text').textContent = pack.btnNext;
+      document.getElementById('btn-exit-quiz').textContent = pack.exitText;
+
+      document.getElementById('mode-opt-mixed').textContent = pack.modeMixed;
+      document.getElementById('mode-opt-choice').textContent = pack.modeChoice;
+      document.getElementById('mode-opt-error').textContent = pack.modeError;
+      document.getElementById('mode-opt-cloze').textContent = pack.modeCloze;
+
+      document.getElementById('badge-stat-correct').textContent = pack.iconStatCorrect;
+      document.getElementById('badge-stat-wrong').textContent = pack.iconStatWrong;
+
+      document.getElementById('dict-title').children[0].textContent = pack.dictTitle;
+      document.getElementById('dict-subtitle').textContent = pack.dictSubtitle;
+
+      for (let i = 1; i <= 5; i++) {
+        const el = document.querySelector(`.level-label[data-lvl="${i}"]`);
+        if (el) el.textContent = pack.levels[i];
+      }
+
+      updateLevelBadge();
+      updateFilterCount();
+      renderDictionary();
+      lucide.createIcons();
+    }
+
+    // ========================================================
+    // 4. 音效系統
+    // ========================================================
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx && AudioContextClass) audioCtx = new AudioContextClass();
+      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function playSound(type) {
+      initAudio();
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+
+      if (currentThemeKey === 'minecraft') {
+        if (type === 'click') {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(440, now);
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.08);
+        } else if (type === 'correct') {
+          [600, 800, 1000].forEach((freq, idx) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(freq, now + idx * 0.06);
+            gain.gain.setValueAtTime(0.1, now + idx * 0.06);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.06 + 0.1);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now + idx * 0.06);
+            osc.stop(now + idx * 0.06 + 0.1);
+          });
+        } else if (type === 'wrong') {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(150, now);
+          osc.frequency.linearRampToValueAtTime(80, now + 0.2);
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.2);
+        } else if (type === 'levelup') {
+          [440, 554, 659, 880].forEach((f, i) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(f, now + i * 0.08);
+            gain.gain.setValueAtTime(0.1, now + i * 0.08);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.15);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now + i * 0.08);
+            osc.stop(now + i * 0.08 + 0.15);
+          });
+        }
+      } else {
+        if (type === 'click') {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(600, now);
+          osc.frequency.exponentialRampToValueAtTime(300, now + 0.04);
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.04);
+        } else if (type === 'correct') {
+          [523.25, 783.99].forEach((freq, i) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now + i * 0.09);
+            gain.gain.setValueAtTime(0.12, now + i * 0.09);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.09 + 0.25);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now + i * 0.09);
+            osc.stop(now + i * 0.09 + 0.25);
+          });
+        } else if (type === 'wrong') {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(220, now);
+          osc.frequency.exponentialRampToValueAtTime(160, now + 0.2);
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.2);
+        } else if (type === 'levelup') {
+          [440, 554, 659, 880].forEach((freq, i) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now + i * 0.08);
+            gain.gain.setValueAtTime(0.12, now + i * 0.08);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.35);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now + i * 0.08);
+            osc.stop(now + i * 0.08 + 0.35);
+          });
+        }
+      }
+    }
+
+    function setDbLoadingState(state, infoText = "") {
+      const title = document.getElementById('db-loading-title');
+      const desc = document.getElementById('db-loading-desc');
+      const emoji = document.getElementById('db-status-emoji');
+
+      if (state === 'loading') {
+        title.textContent = "正在連線 Firebase 雲端題庫...";
+        desc.textContent = "驗證授權並下載題庫中，請稍候片刻！";
+        emoji.textContent = "⏳";
+      } else if (state === 'success') {
+        title.textContent = `✅ 授權通過！題庫已就緒 (${VERB_DATABASE.length} 個動詞)`;
+        desc.textContent = infoText || "全等級例句已就緒，可開始自由特訓！";
+        emoji.textContent = "📦";
+      } else if (state === 'offline') {
+        title.textContent = "⚠️ 授權未通過或連線中斷";
+        desc.textContent = "請確認序號正確性或裝置未超過上限。";
+        emoji.textContent = "🔒";
+      }
+      lucide.createIcons();
+    }
+
+    // ========================================================
+    // 5. 測驗選取管理
+    // ========================================================
+    let currentScope = 'COMMON';
+    // 預設皆不勾選難度，交由使用者自行點選
+    let selectedLevels = new Set();
+    let selectedTypes = new Set(['AAA', 'AAB', 'ABA', 'ABB', 'ABC']);
+    let selectedCount = 10;
+    let quizQuestions = [];
+    let currentIndex = 0;
+    let score = 0;
+    let answeredCurrent = false;
+    let wrongList = [];
+
+    let dictCurrentType = 'ALL';
+    let dictCurrentScope = 'ALL';
+
+    function setScope(scope) {
+      currentScope = scope;
+      const btnCommon = document.getElementById('scope-btn-common');
+      const btnAll = document.getElementById('scope-btn-all');
+      if (scope === 'COMMON') {
+        btnCommon.classList.add('active');
+        btnAll.classList.remove('active');
+      } else {
+        btnAll.classList.add('active');
+        btnCommon.classList.remove('active');
+      }
+      updateFilterCount();
+    }
+
+    function setDictScope(scope) {
+      dictCurrentScope = scope;
+      const btnAll = document.getElementById('dict-scope-btn-all');
+      const btnCommon = document.getElementById('dict-scope-btn-common');
+      if (scope === 'ALL') {
+        btnAll.classList.add('active');
+        btnCommon.classList.remove('active');
+      } else {
+        btnCommon.classList.add('active');
+        btnAll.classList.remove('active');
+      }
+      renderDictionary();
+    }
+
+    function toggleLevelFilter(lvl) {
+      if (selectedLevels.has(lvl)) {
+        selectedLevels.delete(lvl);
+        document.getElementById(`level-btn-${lvl}`).classList.remove('active');
+      } else {
+        selectedLevels.add(lvl);
+        document.getElementById(`level-btn-${lvl}`).classList.add('active');
+      }
+      updateLevelBadge();
+    }
+
+    function selectAllLevels(isSelectAll) {
+      const all = [1, 2, 3, 4, 5];
+      if (isSelectAll) {
+        selectedLevels = new Set(all);
+        all.forEach(l => document.getElementById(`level-btn-${l}`).classList.add('active'));
+      } else {
+        selectedLevels.clear();
+        all.forEach(l => document.getElementById(`level-btn-${l}`).classList.remove('active'));
+      }
+      updateLevelBadge();
+    }
+
+    function updateLevelBadge() {
+      const sorted = Array.from(selectedLevels).sort((a, b) => a - b);
+      const descEl = document.getElementById('selected-level-desc');
+      if (sorted.length === 0) {
+        descEl.textContent = "未選擇";
+      } else if (sorted.length === 5) {
+        descEl.textContent = "Lv.1 ~ Lv.5 (全部)";
+      } else {
+        descEl.textContent = `已選：Lv.${sorted.join(',')}`;
+      }
+    }
+
+    function toggleTypeFilter(type) {
+      if (selectedTypes.has(type)) {
+        selectedTypes.delete(type);
+        document.getElementById(`type-btn-${type}`).classList.remove('active');
+      } else {
+        selectedTypes.add(type);
+        document.getElementById(`type-btn-${type}`).classList.add('active');
+      }
+      updateFilterCount();
+    }
+
+    function selectAllTypes(isSelectAll) {
+      const all = ['AAA', 'AAB', 'ABA', 'ABB', 'ABC'];
+      if (isSelectAll) {
+        selectedTypes = new Set(all);
+        all.forEach(t => document.getElementById(`type-btn-${t}`).classList.add('active'));
+      } else {
+        selectedTypes.clear();
+        all.forEach(t => document.getElementById(`type-btn-${t}`).classList.remove('active'));
+      }
+      updateFilterCount();
+    }
+
+    function getFilteredVerbs() {
+      return VERB_DATABASE.filter(v => {
+        const scopeMatch = currentScope === 'ALL' ? true : v.common;
+        const typeMatch = selectedTypes.has(v.type);
+        return scopeMatch && typeMatch;
+      });
+    }
+
+    function updateFilterCount() {
+      const pool = getFilteredVerbs();
+      const commonCount = VERB_DATABASE.filter(v => v.common).length;
+      const allCount = VERB_DATABASE.length;
+
+      const commonLabel = document.getElementById('scope-common-label');
+      const allLabel = document.getElementById('scope-all-label');
+      const typeCountEl = document.getElementById('selected-type-count');
+      const dictCountEl = document.getElementById('dict-total-count');
+
+      const dictScopeAll = document.getElementById('dict-scope-all-count');
+      const dictScopeCommon = document.getElementById('dict-scope-common-count');
+
+      const pack = THEMES[currentThemeKey] || THEMES.default;
+
+      if (commonLabel) commonLabel.textContent = `${pack.scopeCommon} (${commonCount})`;
+      if (allLabel) allLabel.textContent = `${pack.scopeAll} (${allCount})`;
+      if (typeCountEl) typeCountEl.textContent = `${pool.length} 個在庫`;
+      if (dictCountEl) dictCountEl.textContent = allCount;
+      if (dictScopeAll) dictScopeAll.textContent = allCount;
+      if (dictScopeCommon) dictScopeCommon.textContent = commonCount;
+    }
+
+    function setCount(num) {
+      selectedCount = num;
+      document.querySelectorAll('.count-btn').forEach(btn => {
+        if (parseInt(btn.dataset.count) === num) btn.classList.add('active');
+        else btn.classList.remove('active');
+      });
+    }
+
+    function shuffleArray(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function pickSentenceByLevel(sentenceList) {
+      if (!sentenceList || sentenceList.length === 0) return null;
+      if (isTrialMode) {
+        const lv1 = sentenceList.filter(s => s.level === 1);
+        if (lv1.length > 0) return lv1[Math.floor(Math.random() * lv1.length)];
+      }
+      const matched = sentenceList.filter(s => selectedLevels.has(s.level));
+      if (matched.length > 0) {
+        return matched[Math.floor(Math.random() * matched.length)];
+      }
+      return sentenceList[Math.floor(Math.random() * sentenceList.length)];
+    }
+
+    // 中文提示切換控制
+    function toggleZhHint(checked) {
+      showZhHint = checked;
+      const hintEls = document.querySelectorAll('.zh-hint-text');
+      hintEls.forEach(el => {
+        if (showZhHint) el.classList.remove('hidden');
+        else el.classList.add('hidden');
+      });
+    }
+
+    // ========================================================
+    // 6. 出題與作答邏輯
+    // ========================================================
+    function generateChoiceQuestion(verb) {
+      const isPast = Math.random() > 0.45;
+      const targetTense = isPast ? "過去式 (Past Tense)" : "過去分詞 (P.P.)";
+      const correctAnswer = isPast ? verb.past : verb.pp;
+
+      const distractors = new Set();
+      if (verb.base + "ed" !== correctAnswer) distractors.add(verb.base + "ed");
+      if (verb.base !== correctAnswer) distractors.add(verb.base);
+      if (verb.past !== verb.pp) {
+        const alt = isPast ? verb.pp : verb.past;
+        if (alt !== correctAnswer) distractors.add(alt);
+      }
+
+      const others = shuffleArray(VERB_DATABASE.filter(v => v.base !== verb.base));
+      for (const o of others) {
+        if (distractors.size >= 3) break;
+        const cand = isPast ? o.past : o.pp;
+        if (cand && cand !== correctAnswer) distractors.add(cand);
+      }
+
+      const options = shuffleArray([correctAnswer, ...Array.from(distractors).slice(0, 3)]);
+
+      return {
+        type: 'CHOICE',
+        typeName: '三態單選',
+        level: null, // 三態單選純考動詞，隱藏等級
+        verb: verb,
+        title: `選出動詞 <span class="font-extrabold underline text-indigo-500">${verb.base}</span> <span class="zh-hint-text ${showZhHint ? '' : 'hidden'} text-amber-600 font-bold">（${verb.zh}）</span> 的【${targetTense}】：`,
+        subText: `請選出正確的動詞變化選項`,
+        zhSentence: `動詞涵義：${verb.zh}`,
+        options: options,
+        correctAnswer: correctAnswer,
+        explanation: `<b>${verb.base}</b> 的變化為：原形 <code>${verb.base}</code> / 過去式 <code>${verb.past}</code> / 過去分詞 <code>${verb.pp}</code>。<br>💡 中文涵義為「<b>${verb.zh}</b>」。`
+      };
+    }
+
+    
+    // ========================================================
+    // 智慧干擾字與段考易錯陷阱生成機制
+    // ========================================================
+    let preferredInputMode = 'BUTTON'; // 預設使用按鈕選項，可切換為 'INPUT'
+
+    function toggleInputMode() {
+      preferredInputMode = preferredInputMode === 'BUTTON' ? 'INPUT' : 'BUTTON';
+      playSound('click');
+      renderCurrentQuestion();
+    }
+
+    // 依據段考常見易錯陷阱動態生成擬真干擾字
+    function getSmartErrorDistractor(verb, isPast, correctAnswer) {
+      const b = verb.base;
+      const p = verb.past;
+      const pp = verb.pp;
+
+      // 陷阱 1：AAA 不變型過度變形 (如 hit -> hitted, cut -> cutted, cost -> costed)
+      if (verb.type === 'AAA') {
+        const lastChar = b.slice(-1);
+        if ("bcdfghjklmnpqrstvwxyz".includes(lastChar)) {
+          return b + lastChar + "ed";
+        }
+        return b + "ed";
+      }
+
+      // 陷阱 2：時態張冠李戴 (40% 機率：過去式句子放 PP，完成式/被動語態放 Past)
+      if (Math.random() < 0.45 && p !== pp) {
+        const wrongTense = isPast ? pp : p;
+        if (wrongTense && wrongTense.toLowerCase() !== correctAnswer.toLowerCase()) {
+          return wrongTense;
+        }
+      }
+
+      // 陷阱 3：規則化偽裝 (-d, -ied, 重複子音+ed)
+      if (b.endsWith('e')) return b + "d"; // make -> maked, take -> taked
+      if (b.endsWith('y') && !['a','e','i','o','u'].includes(b.charAt(b.length - 2))) {
+        return b.slice(0, -1) + "ied"; // fly -> flied
+      }
+
+      const lastChar = b.slice(-1);
+      // 短母音單子音結尾重複字尾加 ed
+      if ("bcdfghjklmnpqrstvwxyz".includes(lastChar) && b.length <= 4) {
+        return b + lastChar + "ed"; // run -> runned
+      }
+
+      return b + "ed";
+    }
+
+    // 為改錯與填空題產生 4 個作答選項 (包含正確答案與 3 個高擬真干擾字)
+    function generateQuestionOptions(verb, correctAnswer, isPast = true) {
+      const options = new Set();
+      options.add(correctAnswer);
+
+      // 干擾 1：易錯規則化或時態混淆
+      const smartDistractor = getSmartErrorDistractor(verb, isPast, correctAnswer);
+      if (smartDistractor && smartDistractor.toLowerCase() !== correctAnswer.toLowerCase()) {
+        options.add(smartDistractor);
+      }
+
+      // 干擾 2：原形動詞
+      if (verb.base && verb.base.toLowerCase() !== correctAnswer.toLowerCase()) {
+        options.add(verb.base);
+      }
+
+      // 干擾 3：另一態 (Past 或 PP)
+      const altForm = isPast ? verb.pp : verb.past;
+      if (altForm && altForm.toLowerCase() !== correctAnswer.toLowerCase()) {
+        options.add(altForm);
+      }
+
+      // 干擾 4：若不足 4 個，從題庫隨機抽取其他動詞形式補齊
+      if (VERB_DATABASE && VERB_DATABASE.length > 0) {
+        const others = shuffleArray(VERB_DATABASE.filter(v => v.base !== verb.base));
+        for (const other of others) {
+          if (options.size >= 4) break;
+          const candidate = isPast ? other.past : other.pp;
+          if (candidate && candidate.toLowerCase() !== correctAnswer.toLowerCase()) {
+            options.add(candidate);
+          }
+        }
+      }
+
+      return shuffleArray(Array.from(options).slice(0, 4));
+    }
+
+    function generateErrorQuestion(verb) {
+      const isPast = Math.random() > 0.5;
+      const sentenceList = (isPast ? verb.ptSentences : verb.ppSentences) || [];
+
+      const sampleObj = pickSentenceByLevel(sentenceList);
+      const chosenLevel = sampleObj && sampleObj.level ? sampleObj.level : 1;
+      const correctAnswer = sampleObj ? sampleObj.answer : (isPast ? verb.past : verb.pp);
+      
+      // 擷取例句對應的中文翻譯
+      const zhSentence = sampleObj ? (sampleObj.zh || sampleObj.chinese || sampleObj.translation || sampleObj.cSentence || "") : "";
+
+      // 套用段考易錯智慧干擾字
+      const incorrectForm = getSmartErrorDistractor(verb, isPast, correctAnswer);
+
+      let rawSentence = sampleObj ? sampleObj.sentence : "The student (_____) the assignment.";
+      const displaySentenceHtml = rawSentence.replace(
+        /\([_]+\)/g, 
+        `<span class="px-2 py-0.5 mx-1 bg-rose-100 border border-rose-400 text-rose-700 font-bold rounded underline decoration-wavy decoration-rose-500">${incorrectForm}</span>`
+      );
+
+      // 產生 4 個作答選項
+      const options = generateQuestionOptions(verb, correctAnswer, isPast);
+
+      return {
+        type: 'ERROR',
+        typeName: '例句抓錯',
+        level: chosenLevel,
+        verb: verb,
+        title: `找出句子中【錯誤動詞拼法】並修正：`,
+        subText: `依前後文時態與語境選擇或填寫正確動詞變化`,
+        displaySentence: displaySentenceHtml,
+        wrongWord: incorrectForm,
+        correctAnswer: correctAnswer,
+        zhSentence: zhSentence,
+        options: options,
+        explanation: `句中「<code>${incorrectForm}</code>」為錯誤拼法。<br>正確句子：<b>${rawSentence.replace(/\([_]+\)/g, correctAnswer)}</b>${zhSentence ? `<br>💡 中文翻譯：<b>${zhSentence}</b>` : ''}<br>動詞「${verb.base}（${verb.zh}）」三態：<code>${verb.base}</code> - <code>${verb.past}</code> - <code>${verb.pp}</code>。`
+      };
+    }
+
+    function generateClozeQuestion(verb) {
+      const isPast = Math.random() > 0.5;
+      const sentenceList = (isPast ? verb.ptSentences : verb.ppSentences) || [];
+
+      const sampleObj = pickSentenceByLevel(sentenceList);
+      const chosenLevel = sampleObj && sampleObj.level ? sampleObj.level : 1;
+      const correctAnswer = sampleObj ? sampleObj.answer : (isPast ? verb.past : verb.pp);
+      let rawSentence = sampleObj ? sampleObj.sentence : "They (_____) very quickly.";
+
+      // 擷取例句對應的中文翻譯
+      const zhSentence = sampleObj ? (sampleObj.zh || sampleObj.chinese || sampleObj.translation || sampleObj.cSentence || "") : "";
+
+      const parts = rawSentence.split(/\([_]+\)/);
+      const clozePre = parts[0] || "";
+      const clozePost = parts.slice(1).join("") || "";
+
+      // 產生 4 個作答選項
+      const options = generateQuestionOptions(verb, correctAnswer, isPast);
+
+      return {
+        type: 'CLOZE',
+        typeName: '例句填空',
+        level: chosenLevel,
+        verb: verb,
+        title: `閱讀上下文線索，填入正確的動詞形式：`,
+        subText: `考查動詞：<b class="underline">${verb.base}</b> <span class="zh-hint-text ${showZhHint ? '' : 'hidden'} text-amber-600 font-bold">（${verb.zh}）</span>`,
+        clozePre: clozePre,
+        clozePost: clozePost,
+        correctAnswer: correctAnswer,
+        zhSentence: zhSentence,
+        options: options,
+        explanation: `完整句子：<b>${rawSentence.replace(/\([_]+\)/g, correctAnswer)}</b>${zhSentence ? `<br>💡 中文翻譯：<b>${zhSentence}</b>` : ''}<br>動詞「${verb.base}」變化：<code>${verb.base}</code> / <code>${verb.past}</code> / <code>${verb.pp}</code>。中文涵義為「${verb.zh}」。`
+      };
+    }
+
+    function startQuiz(customVerbs = null) {
+      const mode = document.querySelector('input[name="question-mode"]:checked').value;
+      // 只有涉及例句的題型才強制要求選擇難度等級
+      if (mode !== 'CHOICE' && selectedLevels.size === 0) {
+        alert("目前所選題型包含例句閱讀，請至少勾選一個「例句難度等級（Lv.1 ~ Lv.5）」！");
+        return;
+      }
+      const pool = customVerbs || getFilteredVerbs();
+      if (pool.length === 0) {
+        alert("目前條件下沒有符合的動詞！請先確認題庫已載入或放寬篩選條件。");
+        return;
+      }
+
+      const targetNum = Math.min(customVerbs ? customVerbs.length : selectedCount, pool.length);
+      const chosenVerbs = shuffleArray(pool).slice(0, targetNum);
+
+      quizQuestions = chosenVerbs.map(verb => {
+        let questionType = mode;
+        if (mode === 'MIXED') {
+          const types = ['CHOICE', 'ERROR', 'CLOZE'];
+          questionType = types[Math.floor(Math.random() * types.length)];
+        }
+        if (questionType === 'CHOICE') return generateChoiceQuestion(verb);
+        if (questionType === 'ERROR') return generateErrorQuestion(verb);
+        return generateClozeQuestion(verb);
+      });
+
+      currentIndex = 0;
+      score = 0;
+      wrongList = [];
+      answeredCurrent = false;
+      isQuizActive = true;
+
+      document.getElementById('section-setup').classList.add('hidden');
+      document.getElementById('section-result').classList.add('hidden');
+      document.getElementById('section-result').classList.remove('flex');
+      document.getElementById('section-dictionary').classList.add('hidden');
+      document.getElementById('section-dictionary').classList.remove('flex');
+      
+      document.getElementById('section-quiz').classList.remove('hidden');
+      document.getElementById('section-quiz').classList.add('flex');
+
+      // 同步 Checkbox 狀態
+      const chk = document.getElementById('toggle-zh-hint');
+      if (chk) chk.checked = showZhHint;
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      renderCurrentQuestion();
+    }
+
+    function renderCurrentQuestion() {
+      answeredCurrent = false;
+      const q = quizQuestions[currentIndex];
+      const total = quizQuestions.length;
+
+      document.getElementById('quiz-progress-text').textContent = `第 ${currentIndex + 1} / ${total} 題`;
+      document.getElementById('quiz-progress-bar').style.width = `${((currentIndex + 1) / total) * 100}%`;
+      document.getElementById('quiz-badge-type').textContent = q.typeName;
+      
+      const levelBadgeEl = document.getElementById('quiz-badge-level');
+      if (q.level) {
+        const pack = THEMES[currentThemeKey] || THEMES.default;
+        const levelName = pack.levels[q.level] || `Lv.${q.level}`;
+        levelBadgeEl.textContent = `Lv.${q.level} ${levelName}`;
+        levelBadgeEl.classList.remove('hidden');
+      } else {
+        levelBadgeEl.classList.add('hidden');
+      }
+
+      document.getElementById('current-correct').textContent = score;
+      document.getElementById('current-wrong').textContent = wrongList.length;
+
+      document.getElementById('btn-submit-answer').classList.remove('hidden');
+      document.getElementById('btn-next-question').classList.add('hidden');
+      document.getElementById('feedback-container').classList.add('hidden');
+
+      const body = document.getElementById('question-body');
+
+      // 切換作答方式 (按鈕點選 / 鍵盤打字) 之小控制項
+      const toggleModeControl = (q.type === 'ERROR' || q.type === 'CLOZE') ? `
+        <div class="flex justify-end pt-1">
+          <button type="button" onclick="toggleInputMode()" class="th-btn px-2.5 py-1 text-xs font-bold flex items-center gap-1 shadow-sm">
+            <span>${preferredInputMode === 'BUTTON' ? '⌨️ 改用打字輸入' : '👆 改用點選按鈕'}</span>
+          </button>
+        </div>
+      ` : '';
+
+      if (q.type === 'CHOICE') {
+        body.innerHTML = `
+          <div class="space-y-5">
+            <div>
+              <div class="text-xl sm:text-2xl font-bold leading-relaxed">${q.title}</div>
+              <div class="text-sm sm:text-base opacity-80 mt-1">${q.subText}</div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+              ${q.options.map((opt, i) => `
+                <button type="button" onclick="selectOption('${opt}')" class="choice-opt-btn th-btn p-4 sm:p-5 text-left text-lg sm:text-xl font-bold flex items-center justify-between" data-val="${opt}">
+                  <span>(${String.fromCharCode(65 + i)}) ${opt}</span>
+                  <span class="opt-indicator w-6 h-6 rounded-full border border-slate-400 flex items-center justify-center text-sm font-bold"></span>
+                </button>
+              `).join('')}
+            </div>
+            <input type="hidden" id="user-selected-val" value="">
+          </div>
+        `;
+      } else if (q.type === 'ERROR') {
+        body.innerHTML = `
+          <div class="space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <div class="text-xl sm:text-2xl font-bold">${q.title}</div>
+                <div class="text-sm sm:text-base opacity-80 mt-1">${q.subText}</div>
+              </div>
+              ${toggleModeControl}
+            </div>
+            <div class="p-5 sm:p-6 th-card text-lg sm:text-2xl leading-relaxed font-semibold">
+              ${q.displaySentence}
+            </div>
+            ${q.zhSentence ? `
+              <div class="zh-hint-text ${showZhHint ? '' : 'hidden'} px-4 py-2.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-lg text-sm sm:text-base text-amber-900 dark:text-amber-200 font-bold">
+                💡 中文翻譯：${q.zhSentence}
+              </div>
+            ` : ''}
+
+            ${preferredInputMode === 'BUTTON' ? `
+              <div class="space-y-2 pt-2">
+                <div class="text-xs sm:text-sm font-bold opacity-75">點選修正選項：</div>
+                <div class="grid grid-cols-2 gap-3">
+                  ${q.options.map((opt, i) => `
+                    <button type="button" onclick="selectOption('${opt}')" class="choice-opt-btn th-btn p-3.5 sm:p-4 text-center text-base sm:text-lg font-bold flex items-center justify-between" data-val="${opt}">
+                      <span>(${String.fromCharCode(65 + i)}) ${opt}</span>
+                      <span class="opt-indicator w-5 h-5 rounded-full border border-slate-400 flex items-center justify-center text-xs font-bold"></span>
+                    </button>
+                  `).join('')}
+                </div>
+              </div>
+              <input type="hidden" id="user-selected-val" value="">
+            ` : `
+              <div class="pt-2 space-y-2.5">
+                <label class="block text-sm sm:text-base font-bold">請輸入修正後的正確拼法：</label>
+                <input type="text" id="user-text-input" autofocus placeholder="輸入正確動詞..." autocapitalize="none" autocomplete="off" autocorrect="off" spellcheck="false" class="th-input w-full sm:w-96 px-4 py-3 text-lg sm:text-xl font-bold shadow-sm">
+              </div>
+            `}
+          </div>
+        `;
+      } else if (q.type === 'CLOZE') {
+        body.innerHTML = `
+          <div class="space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <div class="text-xl sm:text-2xl font-bold">${q.title}</div>
+                <div class="text-sm sm:text-base opacity-80 mt-1">${q.subText}</div>
+              </div>
+              ${toggleModeControl}
+            </div>
+            <div class="p-5 sm:p-6 th-card text-lg sm:text-2xl leading-loose font-semibold">
+              ${q.clozePre}
+              ${preferredInputMode === 'BUTTON' ? `
+                <span id="cloze-preview-word" class="inline-block mx-2 px-3 py-1 font-bold text-indigo-500 border-b-2 border-indigo-500 min-w-[90px] text-center">(點選選項)</span>
+              ` : `
+                <input type="text" id="user-text-input" autofocus placeholder="填入形式" autocapitalize="none" autocomplete="off" autocorrect="off" spellcheck="false" class="th-input inline-block mx-2 px-3 py-1 font-bold w-40 sm:w-48 text-center border-b-2 text-xl">
+              `}
+              ${q.clozePost}
+            </div>
+            ${q.zhSentence ? `
+              <div class="zh-hint-text ${showZhHint ? '' : 'hidden'} px-4 py-2.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-lg text-sm sm:text-base text-amber-900 dark:text-amber-200 font-bold">
+                💡 中文翻譯：${q.zhSentence}
+              </div>
+            ` : ''}
+
+            ${preferredInputMode === 'BUTTON' ? `
+              <div class="space-y-2 pt-2">
+                <div class="text-xs sm:text-sm font-bold opacity-75">點選填空選項：</div>
+                <div class="grid grid-cols-2 gap-3">
+                  ${q.options.map((opt, i) => `
+                    <button type="button" onclick="selectOption('${opt}')" class="choice-opt-btn th-btn p-3.5 sm:p-4 text-center text-base sm:text-lg font-bold flex items-center justify-between" data-val="${opt}">
+                      <span>(${String.fromCharCode(65 + i)}) ${opt}</span>
+                      <span class="opt-indicator w-5 h-5 rounded-full border border-slate-400 flex items-center justify-center text-xs font-bold"></span>
+                    </button>
+                  `).join('')}
+                </div>
+              </div>
+              <input type="hidden" id="user-selected-val" value="">
+            ` : ''}
+          </div>
+        `;
+      }
+
+      const textInput = document.getElementById('user-text-input');
+      if (textInput) {
+        textInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            if (!answeredCurrent) checkCurrentAnswer();
+            else nextQuestion();
+          }
+        });
+      }
+
+      lucide.createIcons();
+    }
+
+    function selectOption(val) {
+      if (answeredCurrent) return;
+      playSound('click');
+      const valInput = document.getElementById('user-selected-val');
+      if (valInput) valInput.value = val;
+
+      const previewWord = document.getElementById('cloze-preview-word');
+      if (previewWord) {
+        previewWord.textContent = val;
+        previewWord.className = "inline-block mx-2 px-3 py-1 font-black text-indigo-600 border-b-2 border-indigo-600 min-w-[90px] text-center";
+      }
+
+      document.querySelectorAll('.choice-opt-btn').forEach(btn => {
+        if (btn.dataset.val === val) {
+          btn.classList.add('active');
+          const indicator = btn.querySelector('.opt-indicator');
+          if (indicator) indicator.innerHTML = '✓';
+        } else {
+          btn.classList.remove('active');
+          const indicator = btn.querySelector('.opt-indicator');
+          if (indicator) indicator.innerHTML = '';
+        }
+      });
+    }
+
+    function checkCurrentAnswer() {
+      if (answeredCurrent) return;
+
+      const q = quizQuestions[currentIndex];
+      let userAns = "";
+
+      if (q.type === 'CHOICE' || preferredInputMode === 'BUTTON') {
+        const valInput = document.getElementById('user-selected-val');
+        userAns = valInput ? valInput.value.trim() : "";
+        if (!userAns) {
+          alert("請先點選一個選項！");
+          return;
+        }
+      } else {
+        const inp = document.getElementById('user-text-input');
+        userAns = inp ? inp.value.trim().toLowerCase() : "";
+        if (!userAns) {
+          alert("請輸入答案！");
+          return;
+        }
+        if (inp) inp.blur(); // 送出答案後收起虛擬鍵盤，避免遮擋解析
+      }
+
+      answeredCurrent = true;
+      const isCorrect = userAns.toLowerCase() === q.correctAnswer.toLowerCase();
+      const pack = THEMES[currentThemeKey] || THEMES.default;
+
+      const feedbackBox = document.getElementById('feedback-container');
+      const feedbackTitle = document.getElementById('feedback-title');
+      const feedbackExp = document.getElementById('feedback-explanation');
+
+      feedbackBox.classList.remove('hidden');
+
+      if (isCorrect) {
+        score++;
+        playSound('correct');
+        feedbackBox.className = "p-4 sm:p-6 rounded-xl border border-emerald-400 bg-emerald-50 text-emerald-950 dark:bg-emerald-950/80 dark:text-emerald-100 shadow-sm text-base sm:text-lg";
+        feedbackTitle.innerHTML = `<span>✓</span> <span>${pack.correctMsg}</span>`;
+      } else {
+        wrongList.push({ question: q, userAns: userAns });
+        playSound('wrong');
+        feedbackBox.className = "p-4 sm:p-6 rounded-xl border border-rose-400 bg-rose-50 text-rose-950 dark:bg-rose-950/80 dark:text-rose-100 shadow-sm text-base sm:text-lg";
+        feedbackTitle.innerHTML = `<span>✗</span> <span>${pack.wrongMsg} <b class="underline text-xl sm:text-2xl">${q.correctAnswer}</b></span>`;
+      }
+
+      feedbackExp.innerHTML = q.explanation;
+      lucide.createIcons();
+
+      document.getElementById('btn-submit-answer').classList.add('hidden');
+      document.getElementById('btn-next-question').classList.remove('hidden');
+    }
+function nextQuestion() {
+      if (currentIndex < quizQuestions.length - 1) {
+        currentIndex++;
+        renderCurrentQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function retryWrongQuestions() {
+      if (!wrongList || wrongList.length === 0) return;
+      const wrongVerbs = wrongList.map(item => item.question.verb);
+      startQuiz(wrongVerbs);
+    }
+
+    function resetToSetup() {
+      isQuizActive = false;
+      document.getElementById('section-quiz').classList.add('hidden');
+      document.getElementById('section-quiz').classList.remove('flex');
+      document.getElementById('section-result').classList.add('hidden');
+      document.getElementById('section-result').classList.remove('flex');
+      document.getElementById('section-dictionary').classList.add('hidden');
+      document.getElementById('section-dictionary').classList.remove('flex');
+
+      document.getElementById('section-setup').classList.remove('hidden');
+      
+      document.getElementById('nav-btn-quiz').classList.add('active');
+      document.getElementById('nav-btn-dictionary').classList.remove('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function confirmExitQuiz() {
+      if (confirm("確定要放棄目前的測驗進度返回特訓設定嗎？")) {
+        resetToSetup();
+      }
+    }
+
+    function handleNavClick(tab) {
+      if (isQuizActive) {
+        if (!confirm("目前測驗正在進行中，確定要放棄進度並離開嗎？")) {
+          return;
+        }
+        isQuizActive = false;
+      }
+      switchTab(tab);
+    }
+
+    function showResults() {
+      isQuizActive = false;
+      playSound('levelup');
+      document.getElementById('section-quiz').classList.add('hidden');
+      document.getElementById('section-quiz').classList.remove('flex');
+      document.getElementById('section-result').classList.remove('hidden');
+      document.getElementById('section-result').classList.add('flex');
+
+      const total = quizQuestions.length;
+      const rate = Math.round((score / total) * 100);
+
+      document.getElementById('result-score').textContent = `${rate}%`;
+      document.getElementById('result-correct-count').textContent = score;
+      document.getElementById('result-wrong-count').textContent = wrongList.length;
+
+      const titleEl = document.getElementById('result-title');
+      const subEl = document.getElementById('result-subtitle');
+
+      const trialCard = document.getElementById('trial-unlock-result-card');
+      if (isTrialMode) {
+        titleEl.textContent = "🎉 試玩關卡挑戰完成！";
+        subEl.textContent = "想解鎖完整 222 個不規則動詞、Lv.1~5 全情境例句嗎？請聯絡取得正式序號！";
+        if (trialCard) trialCard.classList.remove('hidden');
+      } else {
+        if (trialCard) trialCard.classList.add('hidden');
+        if (currentThemeKey === 'minecraft') {
+          if (rate >= 90) {
+            titleEl.textContent = "🏆 史詩級通關！全成就解鎖！";
+            subEl.textContent = "你已經完全附魔了所有動詞三態！終界龍也難不倒你！";
+          } else if (rate >= 60) {
+            titleEl.textContent = "⚔️ 成功存活！耐久度良好！";
+            subEl.textContent = "回到鐵砧繼續敲打弱點動詞吧！";
+          } else {
+            titleEl.textContent = "💥 你已陣亡！重生點見！";
+            subEl.textContent = "苦力怕成群出沒，重新裝備再戰一場！";
+          }
+        } else if (currentThemeKey === 'chiikawa') {
+          if (rate >= 90) {
+            titleEl.textContent = "超絕厲害！檢定 1 級合格！";
+            subEl.textContent = "烏薩奇：「ウラ…ヤハッ！！」鎧甲前輩發放最高等報酬！";
+          } else if (rate >= 60) {
+            titleEl.textContent = "なんとかなった！表現很棒！";
+            subEl.textContent = "小八貓：「太好了～我們一起喝熱湯慶祝吧！」";
+          } else {
+            titleEl.textContent = "別哭別哭！再練一次一定行！";
+            subEl.textContent = "吉伊卡哇：「わ…わァ…！（擦乾眼淚再次挑戰！）」";
+          }
+        } else {
+          if (rate >= 90) {
+            titleEl.textContent = "表現極佳！完全精通！";
+            subEl.textContent = "答題準確度極高，請繼續保持！";
+          } else if (rate >= 60) {
+            titleEl.textContent = "表現不錯！持之以恆！";
+            subEl.textContent = "已掌握多數核心動詞，多加複習即可滿分！";
+          } else {
+            titleEl.textContent = "再接再厲，多加練習！";
+            subEl.textContent = "建議可先由 Lv.1 ~ Lv.2 基礎動詞開始扎實奠基。";
+          }
+        }
+      }
+
+      const wrongContainer = document.getElementById('wrong-answers-container');
+      const retryWrongBtn = document.getElementById('btn-retry-wrong');
+
+      if (wrongList.length > 0) {
+        retryWrongBtn.classList.remove('hidden');
+        retryWrongBtn.classList.add('flex');
+        document.getElementById('wrong-retry-count').textContent = wrongList.length;
+
+        wrongContainer.innerHTML = `
+          <div class="text-sm sm:text-base font-bold flex items-center mb-1.5">
+            <span>📝</span>
+            <span class="ml-1.5">本次錯題檢視 (${wrongList.length} 題)：</span>
+          </div>
+          <div class="space-y-2 max-h-60 overflow-y-auto pr-1">
+            ${wrongList.map(item => `
+              <div class="p-3 sm:p-4 th-card text-sm sm:text-base flex justify-between items-center font-medium">
+                <div>
+                  <span class="font-bold text-base sm:text-lg">${item.question.verb.base} (${item.question.verb.zh})</span>
+                  ${item.question.level ? `<span class="text-xs px-2 py-0.5 rounded ml-1 border font-bold">Lv.${item.question.level}</span>` : ''}
+                  <div class="opacity-75 text-sm mt-0.5">你的回答: <span class="text-rose-400 line-through">${item.userAns || "(未作答)"}</span></div>
+                </div>
+                <div class="text-emerald-400 font-bold shrink-0 text-right text-base sm:text-lg">正解: ${item.question.correctAnswer}</div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } else {
+        retryWrongBtn.classList.add('hidden');
+        wrongContainer.innerHTML = `<div class="p-4 th-card text-emerald-400 font-bold text-center text-sm sm:text-base">🎉 完美通關！本次沒有任何錯題記錄！</div>`;
+      }
+      lucide.createIcons();
+    }
+
+    // ========================================================
+    // 7. 圖鑑檢索展示
+    // ========================================================
+    function switchTab(tab) {
+      if (tab === 'quiz') {
+        resetToSetup();
+      } else if (tab === 'dictionary') {
+        document.getElementById('section-setup').classList.add('hidden');
+        document.getElementById('section-quiz').classList.add('hidden');
+        document.getElementById('section-quiz').classList.remove('flex');
+        document.getElementById('section-result').classList.add('hidden');
+        document.getElementById('section-result').classList.remove('flex');
+
+        document.getElementById('section-dictionary').classList.remove('hidden');
+        document.getElementById('section-dictionary').classList.add('flex');
+        document.getElementById('nav-btn-quiz').classList.remove('active');
+        document.getElementById('nav-btn-dictionary').classList.add('active');
+        renderDictionary();
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function setDictFilter(type) {
+      dictCurrentType = type;
+      document.querySelectorAll('.dict-filter').forEach(btn => {
+        if (btn.dataset.dict === type) btn.classList.add('active');
+        else btn.classList.remove('active');
+      });
+      renderDictionary();
+    }
+
+    function renderDictionary() {
+      const searchKey = (document.getElementById('dict-search-input')?.value || "").toLowerCase().trim();
+      const tbody = document.getElementById('dict-table-body');
+      if (!tbody) return;
+
+      const filtered = VERB_DATABASE.filter(v => {
+        const matchesScope = dictCurrentScope === 'ALL' ? true : v.common;
+        const matchesType = dictCurrentType === 'ALL' || v.type === dictCurrentType;
+        const matchesSearch = !searchKey || 
+          v.base.toLowerCase().includes(searchKey) ||
+          v.past.toLowerCase().includes(searchKey) ||
+          v.pp.toLowerCase().includes(searchKey) ||
+          v.zh.toLowerCase().includes(searchKey);
+
+        return matchesScope && matchesType && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="py-10 text-center opacity-70 font-medium text-base">無符合條件的動詞</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map((v, idx) => {
+        return `
+          <tr class="table-row-item hover:bg-black/5 transition-colors">
+            <td class="py-3.5 px-3 sm:px-4 text-center opacity-60 text-xs sm:text-sm font-bold">${idx + 1}</td>
+            <td class="py-3.5 px-3 sm:px-5 font-bold flex items-center space-x-2 text-base sm:text-xl">
+              <span>${v.base}</span>
+              ${v.common ? '<span class="text-xs px-2 py-0.5 rounded-full font-bold border border-amber-300 bg-amber-100 text-amber-900">核心</span>' : ''}
+            </td>
+            <td class="py-3.5 px-3 sm:px-5 text-past font-bold text-base sm:text-xl text-indigo-600">${v.past}</td>
+            <td class="py-3.5 px-3 sm:px-5 text-pp font-bold text-base sm:text-xl text-emerald-600">${v.pp}</td>
+            <td class="py-3.5 px-3 sm:px-5 text-zh font-semibold text-base sm:text-lg">${v.zh}</td>
+            <td class="py-3.5 px-3 sm:px-4 text-center"><span class="px-2.5 py-1 rounded text-xs sm:text-sm font-bold border">${v.type}</span></td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // 初始化
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      updateLevelBadge();
+      changeTheme(currentThemeKey);
+      startAuthFlow();
+    });
+  </script>
+</body>
+</html>
