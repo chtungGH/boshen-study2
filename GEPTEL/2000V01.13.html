@@ -58,16 +58,45 @@
     <!-- 主要操作區 -->
     <main class="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 flex flex-col justify-center">
         
-        <!-- 1. 授權登入畫面 -->
-        <section id="auth-section" class="theme-card p-8 rounded-2xl shadow-xl border border-slate-200 text-center max-w-md mx-auto w-full space-y-4">
+        <!-- 1. 授權登入畫面 (參照 IRRV06 風格設計) -->
+        <section id="auth-section" class="theme-card p-8 rounded-2xl shadow-xl border border-slate-200 text-center max-w-md mx-auto w-full space-y-5">
             <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto text-3xl shadow-inner">🔑</div>
-            <h2 class="text-2xl font-black">系統授權登入</h2>
-            <p class="text-slate-500 text-sm">請輸入您的專屬授權序號以解鎖學習世界</p>
-            <input type="text" id="license-input" placeholder="例如: TEST" value="TEST"
-                   class="w-full px-4 py-3.5 border-2 border-slate-200 rounded-xl text-center font-mono uppercase tracking-widest font-black text-lg focus:outline-none focus:border-indigo-600">
-            <button onclick="verifyLicense()" class="w-full py-3.5 accent-btn text-white font-black rounded-xl shadow-lg transition transform active:scale-95">
-                進入學習世界
-            </button>
+            <div class="space-y-1">
+                <h2 class="text-2xl font-black">系統授權登入</h2>
+                <p class="text-slate-500 text-sm">請輸入專屬授權序號，或直接免費體驗</p>
+            </div>
+            
+            <div class="space-y-3">
+                <input type="text" id="license-input" placeholder="例如: TEST" value="TEST"
+                       class="w-full px-4 py-3.5 border-2 border-slate-200 rounded-xl text-center font-mono uppercase tracking-widest font-black text-lg focus:outline-none focus:border-indigo-600">
+                <button onclick="verifyLicense()" class="w-full py-3.5 accent-btn text-white font-black rounded-xl shadow-lg transition transform active:scale-95">
+                    啟用正式特訓系統
+                </button>
+            </div>
+
+            <div class="relative flex py-1 items-center">
+                <div class="flex-grow border-t border-slate-300"></div>
+                <span class="flex-shrink mx-3 text-xs font-bold opacity-60">OR</span>
+                <div class="flex-grow border-t border-slate-300"></div>
+            </div>
+
+            <div class="space-y-2.5">
+                <button onclick="startTrial50()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm transition shadow flex items-center justify-center space-x-2">
+                    <span>⚡ 免序號・免費試用 50 個單字</span>
+                </button>
+            </div>
+
+            <!-- LINE 官方客服導流區塊 (參照 IRRV06) -->
+            <div class="pt-3 border-t border-dashed border-slate-300 space-y-2">
+                <div class="text-xs font-bold opacity-75">尚未取得專屬授權序號？</div>
+                <a href="https://line.me/R/ti/p/@787ubyzm" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 px-4 bg-[#06C755] hover:bg-[#05b34c] text-white rounded-xl font-bold flex items-center justify-center space-x-2 transition shadow text-sm sm:text-base">
+                    <span>💬 聯繫 LINE 客服取得序號</span>
+                </a>
+                <p class="text-[11px] opacity-60">
+                    官方客服 ID: <code class="px-1.5 py-0.5 rounded bg-slate-200 font-mono font-bold">@787ubyzm</code>
+                </p>
+            </div>
+
             <p id="auth-msg" class="text-sm font-bold text-rose-500 h-5"></p>
         </section>
 
@@ -84,7 +113,7 @@
                     <div class="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center text-2xl group-hover:bg-indigo-600 group-hover:text-white transition">📇</div>
                     <div>
                         <h3 class="font-black text-lg">1. 閃卡記憶挑戰</h3>
-                        <p class="text-xs text-slate-500 font-medium mt-0.5">翻牌模式，背誦單字與專屬例句</p>
+                        <p class="text-xs text-slate-500 font-medium mt-0.5">翻牌模式（支援中->英 / 英->中）與熟練評分</p>
                     </div>
                 </div>
 
@@ -108,7 +137,7 @@
                     <div class="w-14 h-14 bg-purple-50 text-purple-700 rounded-2xl flex items-center justify-center text-2xl group-hover:bg-purple-600 group-hover:text-white transition">✏️</div>
                     <div>
                         <h3 class="font-black text-lg">4. 智慧克漏字填充</h3>
-                        <p class="text-xs text-slate-500 font-medium mt-0.5">結合單字專屬例句挖空，挑戰拼寫實力</p>
+                        <p class="text-xs text-slate-500 font-medium mt-0.5">結合單字專屬例句挖空（支援 Enter 送出）</p>
                     </div>
                 </div>
             </div>
@@ -139,11 +168,11 @@
                     <p class="text-xs text-slate-500 font-bold">測驗方向：</p>
                     <label class="flex items-center p-2.5 rounded-xl border border-slate-200 hover:border-indigo-600 cursor-pointer font-bold text-sm">
                         <input type="radio" name="quiz-dir" value="zh-en" checked class="w-4 h-4 text-indigo-600">
-                        <span class="ml-3">中翻英 (看中文選英文)</span>
+                        <span class="ml-3" id="lbl-dir-1">中 -> 英 (看中文翻英文)</span>
                     </label>
                     <label class="flex items-center p-2.5 rounded-xl border border-slate-200 hover:border-indigo-600 cursor-pointer font-bold text-sm">
                         <input type="radio" name="quiz-dir" value="en-zh" class="w-4 h-4 text-indigo-600">
-                        <span class="ml-3">英翻中 (看英文選中文)</span>
+                        <span class="ml-3" id="lbl-dir-2">英 -> 中 (看英文想中文)</span>
                     </label>
                 </div>
 
@@ -193,7 +222,7 @@
             </div>
         </div>
 
-        <!-- 4. 單字圖鑑與熟練度管理子頁面 (修復跑版與加入燈號切換) -->
+        <!-- 4. 單字圖鑑與熟練度管理子頁面 -->
         <div id="section-dict" class="hidden space-y-4">
             <div class="theme-card p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
                 <button onclick="goDashboard()" class="w-full sm:w-auto px-4 py-2 bg-slate-100 hover:bg-slate-200 font-bold text-xs rounded-xl transition">← 返回主選單</button>
@@ -273,7 +302,7 @@
 
         let currentUser = null;
         let WORD_DATABASE = [];
-        let WORD_STATUS = {}; // 記錄每個單字的熟練度：0=紅(不熟), 1=黃(半生熟), 2=綠(滾瓜爛熟)
+        let WORD_STATUS = {}; 
         let SHOP_ITEMS = {};
         let ACHIEVEMENTS = {};
         let currentMode = 'flashcard';
@@ -287,7 +316,6 @@
         let lives = 3;
         let answered = false;
 
-        // 安全轉換 Firebase 路徑用的 Key（將點轉為底線，徹底解決 A.M. 卡頓問題）
         function sanitizeKey(word) {
             return String(word).replace(/\./g, '_dot_');
         }
@@ -303,10 +331,7 @@
                     const data = snapshot.val();
                     if (data.status === "啟用" || data.狀況 === "啟用") {
                         currentUser = key;
-                        document.getElementById('auth-section').classList.add('hidden');
-                        document.getElementById('main-header').classList.remove('hidden');
-                        goDashboard();
-                        loadAppData();
+                        loginSuccess();
                     } else {
                         msg.textContent = "此序號目前尚未啟用或已被停用。";
                     }
@@ -317,6 +342,18 @@
                 console.error(err);
                 msg.textContent = "連線驗證失敗，請檢查網路。";
             });
+        }
+
+        function startTrial50() {
+            currentUser = "TRIAL_USER_50";
+            loginSuccess();
+        }
+
+        function loginSuccess() {
+            document.getElementById('auth-section').classList.add('hidden');
+            document.getElementById('main-header').classList.remove('hidden');
+            goDashboard();
+            loadAppData();
         }
 
         function goDashboard() {
@@ -341,26 +378,35 @@
         }
 
         function loadAppData() {
-            db.ref('users/' + currentUser).once('value').then(snapshot => {
-                if (snapshot.exists()) {
-                    const u = snapshot.val();
-                    document.getElementById('user-coins').textContent = u.coins || 150;
-                    document.getElementById('user-streak').textContent = u.streak || 3;
-                    if (u.word_status) {
-                        // 將舊的帶點 key 還原或對應
-                        WORD_STATUS = {};
-                        for (let k in u.word_status) {
-                            let originalWord = k.replace(/_dot_/g, '.');
-                            WORD_STATUS[originalWord] = u.word_status[k];
+            if (currentUser !== "TRIAL_USER_50") {
+                db.ref('users/' + currentUser).once('value').then(snapshot => {
+                    if (snapshot.exists()) {
+                        const u = snapshot.val();
+                        document.getElementById('user-coins').textContent = u.coins || 150;
+                        document.getElementById('user-streak').textContent = u.streak || 3;
+                        if (u.word_status) {
+                            WORD_STATUS = {};
+                            for (let k in u.word_status) {
+                                let originalWord = k.replace(/_dot_/g, '.');
+                                WORD_STATUS[originalWord] = u.word_status[k];
+                            }
                         }
+                        if (u.activeSkin) applySkin(u.activeSkin);
                     }
-                    if (u.activeSkin) applySkin(u.activeSkin);
-                }
-            });
+                });
+            } else {
+                document.getElementById('user-coins').textContent = 50;
+                document.getElementById('user-streak').textContent = 1;
+            }
 
             db.ref('GEPT_Core_2000').once('value').then(snapshot => {
                 const raw = snapshot.val();
-                if (raw) WORD_DATABASE = Object.keys(raw).map(k => raw[k]);
+                if (raw) {
+                    WORD_DATABASE = Object.keys(raw).map(k => raw[k]);
+                    if (currentUser === "TRIAL_USER_50") {
+                        WORD_DATABASE = WORD_DATABASE.slice(0, 50);
+                    }
+                }
                 renderDictionary();
 
                 const grid = document.getElementById('quiz-buttons-grid');
@@ -398,8 +444,15 @@
             }
             pendingQuizMode = mode;
             const dirBox = document.getElementById('config-dir-box');
+            
             if (mode === 'word_quiz') {
                 dirBox.classList.remove('hidden');
+                document.getElementById('lbl-dir-1').textContent = "中 -> 英 (看中文選英文)";
+                document.getElementById('lbl-dir-2').textContent = "英 -> 中 (看英文選中文)";
+            } else if (mode === 'flashcard') {
+                dirBox.classList.remove('hidden');
+                document.getElementById('lbl-dir-1').textContent = "中 -> 英 (正面顯示中文，翻面看英文)";
+                document.getElementById('lbl-dir-2').textContent = "英 -> 中 (正面顯示英文，翻面看中文)";
             } else {
                 dirBox.classList.add('hidden');
             }
@@ -411,13 +464,15 @@
         }
 
         function confirmQuizConfig() {
-            const dirRadios = document.getElementsByName('quiz-dir');
-            for (let r of dirRadios) {
-                if (r.checked) quizDirection = r.value;
-            }
             const countRadios = document.getElementsByName('quiz-count');
             for (let r of countRadios) {
                 if (r.checked) quizCountSetting = r.value;
+            }
+            if (pendingQuizMode === 'word_quiz' || pendingQuizMode === 'flashcard') {
+                const dirRadios = document.getElementsByName('quiz-dir');
+                for (let r of dirRadios) {
+                    if (r.checked) quizDirection = r.value;
+                }
             }
             closeQuizConfig();
             startStudyMode(pendingQuizMode);
@@ -436,7 +491,7 @@
             });
 
             if (quizCountSetting === 'infinite') {
-                quizList = weightedPool;
+                quizList = [...weightedPool].sort(() => 0.5 - Math.random());
                 document.getElementById('lives-container').classList.remove('hidden');
                 updateLivesDisplay();
             } else {
@@ -477,7 +532,7 @@
             }
             WORD_STATUS[word] = currentSt;
 
-            if (currentUser) {
+            if (currentUser && currentUser !== "TRIAL_USER_50") {
                 const safeKey = sanitizeKey(word);
                 db.ref(`users/${currentUser}/word_status/${safeKey}`).set(currentSt).catch(err => {
                     console.error("同步狀態失敗:", err);
@@ -492,7 +547,7 @@
             
             renderDictionary();
 
-            if (currentUser) {
+            if (currentUser && currentUser !== "TRIAL_USER_50") {
                 const safeKey = sanitizeKey(word);
                 db.ref(`users/${currentUser}/word_status/${safeKey}`).set(currentSt).catch(err => {
                     console.error("同步狀態失敗:", err);
@@ -503,7 +558,7 @@
         function resetAllWordStatus() {
             if (confirm("確定要將所有單字的熟練度重置為「完全不熟（紅燈）」嗎？")) {
                 WORD_STATUS = {};
-                if (currentUser) {
+                if (currentUser && currentUser !== "TRIAL_USER_50") {
                     db.ref(`users/${currentUser}/word_status`).remove();
                 }
                 renderDictionary();
@@ -538,10 +593,16 @@
 
         function renderQuestion() {
             answered = false;
+            
+            if (quizCountSetting === 'infinite' && currentIndex >= quizList.length - 5) {
+                let shuffledMore = [...WORD_DATABASE].sort(() => 0.5 - Math.random());
+                quizList = quizList.concat(shuffledMore);
+            }
+
             const q = quizList[currentIndex % quizList.length];
             const totalStr = quizCountSetting === 'infinite' ? '∞' : quizList.length;
             const titles = { 
-                flashcard: '1. 閃卡記憶挑戰', 
+                flashcard: `1. 閃卡記憶挑戰 (${quizDirection === 'zh-en' ? '中->英' : '英->中'})`, 
                 word_quiz: `2. 核心單字選擇題 (${quizDirection === 'zh-en' ? '中翻英' : '英翻中'})`, 
                 sentence_quiz: '3. 生活情境句子選擇題', 
                 cloze: '4. 智慧克漏字填充' 
@@ -562,6 +623,8 @@
             const word = String(q.word || q.單字 || "").trim();
             const zh = String(q.zh || q.中文解釋 || "").trim();
             const pos = q.pos || q.詞性 || "";
+            window.currentActiveWord = word;
+            window.currentCorrectAnswer = word;
             
             let availableSentences = [];
             for (let i = 1; i <= 5; i++) {
@@ -595,26 +658,59 @@
             }
 
             if (currentMode === 'flashcard') {
+                document.getElementById('btn-submit').classList.add('hidden');
+                
+                let frontHtml = "";
+                let backHtml = "";
+
+                if (quizDirection === 'zh-en') {
+                    frontHtml = `
+                        <span class="text-xs uppercase tracking-widest bg-indigo-500 px-3 py-1 rounded-full font-bold">${pos}</span>
+                        <h3 class="text-3xl font-black">${zh}</h3>
+                        <p class="text-xs opacity-75 mt-2">點擊卡片翻面看英文單字</p>
+                    `;
+                    backHtml = `
+                        <h3 class="text-3xl font-black text-indigo-600">${word}</h3>
+                        <p class="text-xs text-slate-400 font-bold">詞性：${pos}</p>
+                        <p class="text-sm font-medium text-slate-600 italic">"${selectedSen.sentence}"</p>
+                        <p class="text-xs text-slate-400">${selectedSen.zh}</p>
+                    `;
+                } else {
+                    frontHtml = `
+                        <span class="text-xs uppercase tracking-widest bg-indigo-500 px-3 py-1 rounded-full font-bold">${pos}</span>
+                        <h3 class="text-4xl font-black">${word}</h3>
+                        <p class="text-xs opacity-75 mt-2">點擊卡片翻面看中文意義</p>
+                    `;
+                    backHtml = `
+                        <h3 class="text-2xl font-black text-indigo-600">${zh}</h3>
+                        <p class="text-sm font-medium text-slate-600 italic">"${selectedSen.sentence}"</p>
+                        <p class="text-xs text-slate-400">${selectedSen.zh}</p>
+                    `;
+                }
+
                 container.innerHTML = `
                     <div class="text-center space-y-4">
-                        <p class="text-xs text-slate-400 font-bold">點擊下方卡片即可翻面查看中英對照與專屬例句</p>
-                        <div onclick="this.firstElementChild.classList.toggle('rotate-y-180')" class="w-full h-72 perspective cursor-pointer">
+                        <p class="text-xs text-slate-400 font-bold">點擊下方卡片翻面，並依據熟練程度點擊下方評分按鈕</p>
+                        <div onclick="this.firstElementChild.classList.toggle('rotate-y-180')" class="w-full h-64 perspective cursor-pointer">
                             <div class="relative w-full h-full duration-500 transform-style-3d shadow-xl rounded-2xl">
                                 <div class="absolute inset-0 bg-indigo-600 text-white rounded-2xl flex flex-col items-center justify-center backface-hidden p-6 space-y-2">
-                                    <span class="text-xs uppercase tracking-widest bg-indigo-500 px-3 py-1 rounded-full font-bold">${pos}</span>
-                                    <h3 class="text-4xl font-black">${word}</h3>
-                                    <p class="text-xs opacity-75 mt-2">點擊翻牌看中文與專屬情境例句</p>
+                                    ${frontHtml}
                                 </div>
                                 <div class="absolute inset-0 theme-card border-2 border-indigo-600 text-slate-800 rounded-2xl flex flex-col items-center justify-center backface-hidden rotate-y-180 p-6 space-y-3">
-                                    <h3 class="text-2xl font-black text-indigo-600">${zh}</h3>
-                                    <p class="text-sm font-medium text-slate-600 italic">"${selectedSen.sentence}"</p>
-                                    <p class="text-xs text-slate-400">${selectedSen.zh}</p>
+                                    ${backHtml}
                                 </div>
                             </div>
                         </div>
+                        <div class="flex justify-center space-x-4 pt-2">
+                            <button onclick="flashcardRated(false)" class="px-6 py-3 bg-rose-100 hover:bg-rose-200 text-rose-700 font-black rounded-xl shadow transition">
+                                👈 還不熟 (紅燈)
+                            </button>
+                            <button onclick="flashcardRated(true)" class="px-6 py-3 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 font-black rounded-xl shadow transition">
+                                👉 熟練了 (綠燈)
+                            </button>
+                        </div>
                     </div>
                 `;
-                document.getElementById('btn-submit').textContent = "認識這個單字了 →";
             } else if (currentMode === 'word_quiz') {
                 let targetPrompt = "";
                 let correctAns = "";
@@ -631,7 +727,6 @@
                 }
 
                 window.currentCorrectAnswer = correctAns;
-                window.currentActiveWord = word;
 
                 container.innerHTML = `
                     <div>
@@ -651,7 +746,6 @@
                 document.getElementById('btn-submit').textContent = "送出答案";
             } else if (currentMode === 'sentence_quiz') {
                 window.currentCorrectAnswer = word;
-                window.currentActiveWord = word;
                 const options = getSmartDistractors(word, pos, false);
 
                 container.innerHTML = `
@@ -675,7 +769,6 @@
                 document.getElementById('btn-submit').textContent = "送出答案";
             } else if (currentMode === 'cloze') {
                 window.currentCorrectAnswer = word;
-                window.currentActiveWord = word;
 
                 container.innerHTML = `
                     <div>
@@ -688,11 +781,25 @@
                     </div>
                     <div class="pt-2">
                         <input type="text" id="cloze-input" placeholder="請在此輸入正確的英文單字原型..." 
+                               onkeydown="if(event.key === 'Enter') checkAnswer()"
                                class="w-full px-4 py-3.5 border-2 border-slate-300 rounded-xl font-bold text-lg focus:outline-none focus:border-purple-600">
                     </div>
                 `;
                 document.getElementById('btn-submit').textContent = "送出答案";
             }
+        }
+
+        function flashcardRated(isMastered) {
+            score++;
+            document.getElementById('stat-correct').textContent = score;
+            if (window.currentActiveWord) {
+                WORD_STATUS[window.currentActiveWord] = isMastered ? 2 : 0;
+                if (currentUser && currentUser !== "TRIAL_USER_50") {
+                    const safeKey = sanitizeKey(window.currentActiveWord);
+                    db.ref(`users/${currentUser}/word_status/${safeKey}`).set(isMastered ? 2 : 0);
+                }
+            }
+            nextQuestion();
         }
 
         function checkAnswer() {
@@ -702,20 +809,18 @@
             const feedback = document.getElementById('feedback-box');
             feedback.style.opacity = '1';
 
-            if (currentMode === 'flashcard') {
-                score++;
-                nextQuestion();
-                return;
-            }
-
             let isCorrect = false;
+            let userVal = "";
             if (currentMode === 'cloze') {
-                const userVal = (document.getElementById('cloze-input').value || "").trim().toLowerCase();
+                userVal = (document.getElementById('cloze-input').value || "").trim().toLowerCase();
                 isCorrect = userVal === window.currentCorrectAnswer.toLowerCase();
             } else {
                 const selected = document.querySelector('input[name="quiz-opt"]:checked');
                 if (!selected) { alert("請先選擇一個選項！"); answered = false; feedback.style.opacity = '0'; return; }
-                isCorrect = selected.value.trim().toLowerCase() === window.currentCorrectAnswer.trim().toLowerCase();
+                userVal = selected.value.trim().toLowerCase();
+                // 智慧容忍文法變化 (例如 bark 與 barks)
+                const correctBase = window.currentCorrectAnswer.trim().toLowerCase();
+                isCorrect = (userVal === correctBase) || (userVal === correctBase + 's') || (userVal === correctBase + 'es') || (correctBase === userVal + 's') || (correctBase === userVal + 'es');
             }
 
             if (window.currentActiveWord) {
@@ -780,7 +885,10 @@
                 iconBox.textContent = "🎉";
             }
 
-            db.ref('users/' + currentUser + '/coins').transaction(c => (c || 150) + coinsEarned);
+            if (currentUser !== "TRIAL_USER_50") {
+                db.ref('users/' + currentUser + '/coins').transaction(c => (c || 150) + coinsEarned);
+            }
+            document.getElementById('result-modal').classList.add('hidden'); 
             document.getElementById('result-modal').classList.remove('hidden');
         }
 
@@ -789,7 +897,6 @@
             goDashboard();
         }
 
-        // 渲染圖鑑表格（放大燈號至 w-6 h-6 清楚易點）
         function renderDictionary() {
             const kw = (document.getElementById('search-input').value || "").toLowerCase();
             const tbody = document.getElementById('dict-tbody');
@@ -803,7 +910,6 @@
                 const wWord = String(w.word || w.單字 || "").trim();
                 const st = WORD_STATUS[wWord] !== undefined ? WORD_STATUS[wWord] : 0;
                 
-                // 燈號改為更大的圓形按鈕 (w-6 h-6) 方便點擊
                 let dotColor = "bg-rose-500 shadow-rose-200";
                 let statusText = "完全不熟 (點擊可切換)";
                 if (st === 1) {
