@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>英語測驗 - 第一部分：單題（第 1~11 題）</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
+    body { font-family: 'Noto Sans TC', 'Segoe UI', Arial, sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen py-8 px-4">
+  <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200">
+    <!-- 頂部標題與基本資料欄 -->
+    <div class="bg-slate-800 text-white px-6 py-6 sm:px-8">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <h1 class="text-2xl sm:text-3xl font-bold tracking-wide">英語數位評量試卷</h1>
+        <span class="inline-block bg-slate-700 text-slate-200 text-sm px-3 py-1 rounded-full w-fit">本頁共 11 題・每題 2 分・滿分 22 分</span>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5 text-sm">
+        <div class="bg-slate-700/70 rounded-lg px-3 py-2 flex items-center gap-2">
+          <label for="stu-class" class="text-slate-300 whitespace-nowrap">班級：</label>
+          <input id="stu-class" type="text" class="w-full bg-transparent border-b border-slate-400 focus:border-white focus:outline-none text-white">
+        </div>
+        <div class="bg-slate-700/70 rounded-lg px-3 py-2 flex items-center gap-2">
+          <label for="stu-no" class="text-slate-300 whitespace-nowrap">座號：</label>
+          <input id="stu-no" type="text" class="w-full bg-transparent border-b border-slate-400 focus:border-white focus:outline-none text-white">
+        </div>
+        <div class="bg-slate-700/70 rounded-lg px-3 py-2 flex items-center gap-2">
+          <label for="stu-name" class="text-slate-300 whitespace-nowrap">姓名：</label>
+          <input id="stu-name" type="text" class="w-full bg-transparent border-b border-slate-400 focus:border-white focus:outline-none text-white">
+        </div>
+        <div class="bg-slate-700/70 rounded-lg px-3 py-2 flex items-center gap-2">
+          <label for="parent-sign" class="text-slate-300 whitespace-nowrap">家長簽章：</label>
+          <input id="parent-sign" type="text" class="w-full bg-transparent border-b border-slate-400 focus:border-white focus:outline-none text-white">
+        </div>
+      </div>
+    </div>
+
+    <!-- 成績統計看板（預設隱藏，批改後顯示） -->
+    <div id="score-board" class="hidden bg-indigo-50 border-b border-indigo-200 px-6 py-5 sm:px-8">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-bold text-indigo-950">評量結果統計</h2>
+          <p id="score-detail" class="text-sm text-indigo-800 mt-1"></p>
+        </div>
+        <div class="flex items-baseline gap-2 bg-white px-5 py-3 rounded-xl shadow-sm border border-indigo-100">
+          <span class="text-sm font-medium text-slate-500">總得分</span>
+          <span id="total-score" class="text-3xl font-extrabold text-indigo-600">0</span>
+          <span class="text-sm font-medium text-slate-500">/ <span id="max-score">22</span> 分</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 試題內容區 -->
+    <div id="exam-container" class="p-6 sm:p-8 space-y-8"></div>
+
+    <!-- 底部操作按鈕 -->
+    <div class="bg-slate-50 border-t border-slate-200 px-6 py-5 sm:px-8 flex flex-wrap items-center justify-center gap-4">
+      <button id="submit-btn" onclick="gradeExam()" class="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md transition cursor-pointer">
+        提交試卷並評分
+      </button>
+      <button id="reset-btn" onclick="resetExam()" class="px-6 py-3 bg-white hover:bg-slate-100 text-slate-700 font-bold rounded-xl border border-slate-300 shadow-sm transition cursor-pointer">
+        重新作答
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // 1. 試卷結構資料庫（100% 忠實對齊原試卷文字與標點）
+    const examData = {
+      sectionTitle: "第一部分：單題（第 1~30 題，共 30 題，每題 2 分，共 60 分）",
+      pointsPerQuestion: 2,
+      questions: [
+        {
+          id: 1,
+          stem: "When typhoons come, ocean __________ and winds often get higher and stronger.",
+          options: [
+            { label: "A", text: "ways" },
+            { label: "B", text: "wallets" },
+            { label: "C", text: "walls" },
+            { label: "D", text: "waves" },
+            { label: "E", text: "weekends" }
+          ],
+          answer: "D",
+          explanation: "句意：「當颱風來臨時，海浪和風勢通常會變得更高更強。」(A) 方式／道路；(B) 錢包；(C) 牆壁；(D) 海浪；(E) 週末。故選 (D)。"
+        },
+        {
+          id: 2,
+          stem: "Sorry, I didn't catch that. Could you please __________ your voice?",
+          options: [
+            { label: "A", text: "race" },
+            { label: "B", text: "rise" },
+            { label: "C", text: "raise" },
+            { label: "D", text: "repeat" },
+            { label: "E", text: "ride" }
+          ],
+          answer: "C",
+          explanation: "句意：「抱歉，我沒聽清楚。可以請你提高音量嗎？」raise one's voice 為固定搭配，意指「提高嗓門／音量」（raise 為及物動詞，後接受詞 your voice；rise 為不及物動詞）。故選 (C)。"
+        },
+        {
+          id: 3,
+          stem: "We __________ a welcome party for Ethan last week. Everyone had a great time.",
+          options: [
+            { label: "A", text: "hoped" },
+            { label: "B", text: "held" },
+            { label: "C", text: "hurt" },
+            { label: "D", text: "hunted" },
+            { label: "E", text: "hurried" }
+          ],
+          answer: "B",
+          explanation: "句意：「我們上週為 Ethan 舉辦了一場歡迎派對。每個人都玩得很開心。」hold a party 意為「舉辦派對」，過去式為 held。故選 (B)。"
+        },
+        {
+          id: 4,
+          stem: "Because of a serious gas explosion(爆炸), __________ smoke filled the burning factory.",
+          options: [
+            { label: "A", text: "true" },
+            { label: "B", text: "thin" },
+            { label: "C", text: "total" },
+            { label: "D", text: "thick" },
+            { label: "E", text: "tidy" }
+          ],
+          answer: "D",
+          explanation: "句意：「因為嚴重的瓦斯爆炸，濃煙瀰漫了這座燃燒中的工廠。」thick smoke 意為「濃煙」。(A) 真實的；(B) 薄的／稀疏的；(C) 總共的；(D) 濃密的；(E) 整潔的。故選 (D)。"
+        },
+        {
+          id: 5,
+          stem: "If you write or draw in pencil, you can always rub out your __________ with an eraser.",
+          options: [
+            { label: "A", text: "mistakes" },
+            { label: "B", text: "moments" },
+            { label: "C", text: "millions" },
+            { label: "D", text: "members" },
+            { label: "E", text: "medicine" }
+          ],
+          answer: "A",
+          explanation: "句意：「如果你用鉛筆寫字或畫畫，你隨時可以用橡皮擦擦掉你的錯誤。」(A) 錯誤；(B) 時刻；(C) 百萬；(D) 成員；(E) 藥物。故選 (A)。"
+        },
+        {
+          id: 6,
+          stem: "Learning a __________ language opens up new career opportunities(職涯機會) for us.",
+          options: [
+            { label: "A", text: "famous" },
+            { label: "B", text: "fresh" },
+            { label: "C", text: "future" },
+            { label: "D", text: "foreign" },
+            { label: "E", text: "full" }
+          ],
+          answer: "D",
+          explanation: "句意：「學習一門外語能為我們開啟新的職涯機會。」foreign language 意為「外國語言」。(A) 有名的；(B) 新鮮的；(C) 未來的；(D) 外國的；(E) 滿的。故選 (D)。"
+        },
+        {
+          id: 7,
+          stem: "Alice stood on her tiptoes to __________ the top shelf so that she could get her favorite novel.",
+          options: [
+            { label: "A", text: "roll" },
+            { label: "B", text: "reach" },
+            { label: "C", text: "ring" },
+            { label: "D", text: "remember" },
+            { label: "E", text: "report" }
+          ],
+          answer: "B",
+          explanation: "句意：「Alice 踮起腳尖以夠到最上層的書架，好拿到她最喜歡的小說。」reach 意為「伸手觸及、夠到」。故選 (B)。"
+        },
+        {
+          id: 8,
+          stem: "Everyone has to pass a series of __________ before they get a job at this company.",
+          options: [
+            { label: "A", text: "interests" },
+            { label: "B", text: "items" },
+            { label: "C", text: "interviews" },
+            { label: "D", text: "islands" },
+            { label: "E", text: "insects" }
+          ],
+          answer: "C",
+          explanation: "句意：「每個人在這家公司獲得工作之前，都必須通過一連串的面試。」(A) 興趣；(B) 項目；(C) 面試；(D) 島嶼；(E) 昆蟲。故選 (C)。"
+        },
+        {
+          id: 9,
+          stem: "Our teacher told us to take notes on a __________ page to review some key points.",
+          options: [
+            { label: "A", text: "block" },
+            { label: "B", text: "bench" },
+            { label: "C", text: "bell" },
+            { label: "D", text: "blind" },
+            { label: "E", text: "blank" }
+          ],
+          answer: "E",
+          explanation: "句意：「老師告訴我們在一張空白頁上做筆記，以複習一些重點。」blank page 意為「空白頁」。(A) 街區／積木；(B) 長椅；(C) 鐘／鈴；(D) 盲的；(E) 空白的。故選 (E)。"
+        },
+        {
+          id: 10,
+          stem: "I didn't think I'd like the movie before watching it, but __________ it was pretty funny and touching.",
+          options: [
+            { label: "A", text: "even though" },
+            { label: "B", text: "after all" },
+            { label: "C", text: "so far" },
+            { label: "D", text: "in fact" },
+            { label: "E", text: "for example" }
+          ],
+          answer: "D",
+          explanation: "句意：「看電影前我以為我不會喜歡它，但事實上它相當有趣又感人。」in fact 意為「事實上、其實」，用於帶出與預期相反的實際情況。故選 (D)。"
+        },
+        {
+          id: 11,
+          stem: "Abby: Hey, it's ten to seven already by my watch.\nClark: Oh no! The movie started ten minutes ago.\nWhen did the movie start?",
+          options: [
+            { label: "A", text: "At 7:00." },
+            { label: "B", text: "At 6:50." },
+            { label: "C", text: "At 10:07." },
+            { label: "D", text: "At 6:40." },
+            { label: "E", text: "At 7:10." }
+          ],
+          answer: "D",
+          explanation: "Abby 說現在是「ten to seven」（差 10 分鐘到 7 點，即 6:50）；Clark 說電影在「ten minutes ago」（10 分鐘前）就開始了，6:50 往前推 10 分鐘為 6:40。故選 (D)。"
+        }
+      ]
+    };
+
+    // 2. 渲染試題畫面
+    function renderExam() {
+      const container = document.getElementById("exam-container");
+      let html = `
+        <div class="border-b-2 border-slate-800 pb-3 mb-6">
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-900">${examData.sectionTitle}</h2>
+        </div>
+        <div class="space-y-6">
+      `;
+
+      examData.questions.forEach((q) => {
+        const formattedStem = q.stem.replace(/\n/g, "<br>");
+        html += `
+          <div id="q-card-${q.id}" class="p-5 rounded-xl border border-slate-200 bg-slate-50/60 transition">
+            <div class="flex items-start gap-3 text-base sm:text-lg font-medium text-slate-900 leading-relaxed">
+              <span class="font-bold text-indigo-700 shrink-0">${q.id}. ( &nbsp;&nbsp; )</span>
+              <div>${formattedStem}</div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mt-4 pl-0 sm:pl-8">
+              ${q.options.map(opt => `
+                <label id="opt-label-${q.id}-${opt.label}" class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 bg-white hover:bg-indigo-50/60 cursor-pointer transition select-none">
+                  <input type="radio" name="q_${q.id}" value="${opt.label}" class="w-4 h-4 text-indigo-600 focus:ring-indigo-500">
+                  <span class="font-bold text-slate-700">(${opt.label})</span>
+                  <span class="text-slate-800 text-base">${opt.text}</span>
+                </label>
+              `).join("")}
+            </div>
+            <div id="feedback-${q.id}" class="hidden mt-4 pl-0 sm:pl-8"></div>
+          </div>
+        `;
+      });
+
+      html += `</div>`;
+      container.innerHTML = html;
+      document.getElementById("max-score").textContent = examData.questions.length * examData.pointsPerQuestion;
+    }
+
+    // 3. 自動批改與解析顯示
+    function gradeExam() {
+      let correctCount = 0;
+      let unansweredCount = 0;
+      const totalQuestions = examData.questions.length;
+
+      examData.questions.forEach((q) => {
+        const selected = document.querySelector(`input[name="q_${q.id}"]:checked`);
+        const card = document.getElementById(`q-card-${q.id}`);
+        const feedback = document.getElementById(`feedback-${q.id}`);
+
+        // 重置選項樣式
+        q.options.forEach(opt => {
+          const lbl = document.getElementById(`opt-label-${q.id}-${opt.label}`);
+          lbl.classList.remove("border-emerald-500", "bg-emerald-50", "border-rose-500", "bg-rose-50");
+        });
+
+        const userAns = selected ? selected.value : null;
+        if (!userAns) unansweredCount++;
+
+        const isCorrect = userAns === q.answer;
+        if (isCorrect) correctCount++;
+
+        // 標記正確選項與錯誤選項
+        const correctLabel = document.getElementById(`opt-label-${q.id}-${q.answer}`);
+        if (correctLabel) {
+          correctLabel.classList.add("border-emerald-500", "bg-emerald-50");
+        }
+        if (userAns && !isCorrect) {
+          const wrongLabel = document.getElementById(`opt-label-${q.id}-${userAns}`);
+          if (wrongLabel) {
+            wrongLabel.classList.add("border-rose-500", "bg-rose-50");
+          }
+        }
+
+        // 顯示反饋框
+        feedback.classList.remove("hidden");
+        if (isCorrect) {
+          card.classList.remove("border-slate-200", "border-rose-300");
+          card.classList.add("border-emerald-300");
+          feedback.innerHTML = `
+            <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-sm sm:text-base leading-relaxed">
+              <div class="font-bold text-emerald-700 mb-1">✓ 答對了！正確答案：(${q.answer})</div>
+              <div>${q.explanation}</div>
+            </div>
+          `;
+        } else {
+          card.classList.remove("border-slate-200", "border-emerald-300");
+          card.classList.add("border-rose-300");
+          const yourChoiceText = userAns ? `(${userAns})` : "未作答";
+          feedback.innerHTML = `
+            <div class="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 text-sm sm:text-base leading-relaxed">
+              <div class="font-bold text-rose-700 mb-1">✗ 你的答案：${yourChoiceText} ｜ 正確答案：(${q.answer})</div>
+              <div>${q.explanation}</div>
+            </div>
+          `;
+        }
+      });
+
+      const earnedScore = correctCount * examData.pointsPerQuestion;
+      const maxScore = totalQuestions * examData.pointsPerQuestion;
+
+      const scoreBoard = document.getElementById("score-board");
+      scoreBoard.classList.remove("hidden");
+      document.getElementById("total-score").textContent = earnedScore;
+      document.getElementById("score-detail").textContent =
+        `共 ${totalQuestions} 題，答對 ${correctCount} 題，答錯 ${totalQuestions - correctCount - unansweredCount} 題，未作答 ${unansweredCount} 題。`;
+
+      scoreBoard.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    // 4. 清除重測機制
+    function resetExam() {
+      document.querySelectorAll('input[type="radio"]').forEach(radio => {
+        radio.checked = false;
+      });
+      document.getElementById("score-board").classList.add("hidden");
+
+      examData.questions.forEach((q) => {
+        const card = document.getElementById(`q-card-${q.id}`);
+        card.classList.remove("border-emerald-300", "border-rose-300");
+        card.classList.add("border-slate-200");
+
+        const feedback = document.getElementById(`feedback-${q.id}`);
+        feedback.classList.add("hidden");
+        feedback.innerHTML = "";
+
+        q.options.forEach(opt => {
+          const lbl = document.getElementById(`opt-label-${q.id}-${opt.label}`);
+          lbl.classList.remove("border-emerald-500", "bg-emerald-50", "border-rose-500", "bg-rose-50");
+        });
+      });
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // 初始化渲染
+    renderExam();
+  </script>
+</body>
+</html>
