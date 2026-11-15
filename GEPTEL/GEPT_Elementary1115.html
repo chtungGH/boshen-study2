@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GEPT 全民英檢初級單字特訓站限2</title>
+    <title>GEPT 全民英檢初級單字特訓站</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide 向量圖示 -->
@@ -414,7 +414,7 @@
                 if (snapshot.exists()) {
                     const data = snapshot.val();
                     if (data.status === "啟用" || data.狀況 === "啟用") {
-                        const maxDevices = parseInt(data.Maxdevices || data.允許裝置數 || 2);
+                        const maxDevices = parseInt(data.maxDevices || data.Maxdevices || data.允許裝置數 || 2);
                         const deviceUuid = getDeviceUUID();
                         const activeSessions = data.active_sessions || {};
                         
@@ -447,29 +447,8 @@
                                 loginSuccess();
                             });
                         } else {
-                            // 名額已滿，自動將最舊登入的裝置踢出 (FIFO)
-                            activeKeys.sort((a, b) => {
-                                return new Date(activeSessions[a].lastLogin || 0) - new Date(activeSessions[b].lastLogin || 0);
-                            });
-                            
-                            const oldestDeviceUuid = activeKeys[0];
-                            
-                            const updates = {};
-                            updates[`active_sessions/${oldestDeviceUuid}`] = null;
-                            updates[`active_sessions/${deviceUuid}`] = {
-                                lastLogin: new Date().toISOString(),
-                                userAgent: navigator.userAgent
-                            };
-
-                            licenseRef.update(updates).then(() => {
-                                const sessionRef = licenseRef.child(`active_sessions/${deviceUuid}`);
-                                sessionRef.onDisconnect().remove();
-                                currentUser = key;
-                                loginSuccess();
-                            }).catch(err => {
-                                console.error("裝置切換失敗:", err);
-                                msg.textContent = "登入同步失敗，請重試。";
-                            });
+                            // 3. 名額已滿，直接拒絕登入，不自動頂替！
+                            msg.textContent = `此序號目前已有 ${activeKeys.length} 台裝置在使用中（已達上限 ${maxDevices} 台），無法在此裝置登入。`;
                         }
                     } else {
                         msg.textContent = "此序號目前尚未啟用或已被停用。";
